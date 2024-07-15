@@ -7,7 +7,9 @@ export default async function fetchApi(url, options) {
     requestOptions.body = JSON.stringify(requestOptions.body);
   }
   const response = await fetch(url, requestOptions);
-  
+
+  console.log(url , response);
+
   if (!response.ok) {
     const errorData = await response.json();
     throw errorData;
