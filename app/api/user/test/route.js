@@ -1,7 +1,7 @@
 import connectDB from "@/lib/mongoose";
 
 
-export async function GET() {
+export async function POST() {
   await connectDB();
-  return Response.json({ message: "THIS IS WORKING" }, { status: 200 });
+  return Response.json({ message: "THIS IS WORKING AGAIN" }, { status: 200 });
 }
