@@ -22,7 +22,7 @@ export default function UsersPage() {
     queryKey: ["users"],
     queryFn: (params) => getUsers({ ...params, limit: 20 }),
     initialPageParam: 1,
-    getNextPageParam: (lastPage, allPages, lastPageParam) => {
+    getNextPageParam: (lastPage) => {
       return lastPage.info.nextPage;
     },
     refetchOnWindowFocus: false,
