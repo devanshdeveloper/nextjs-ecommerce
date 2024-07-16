@@ -21,7 +21,7 @@ function AuthPage() {
 
   function onSuccess(user) {
     setUser(user.user || user);
-    router.push("/shop");
+    router.push(user.user ? "/shop" : "/verify-email");
   }
 
   const mutate_createUser = useMutation({

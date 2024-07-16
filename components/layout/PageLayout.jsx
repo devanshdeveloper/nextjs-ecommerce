@@ -1,6 +1,6 @@
-function PageLayout() {
+function PageLayout({children}) {
   return (
-    <div>PageLayout</div>
+    <div className="">{children}</div>
   )
 }
 
