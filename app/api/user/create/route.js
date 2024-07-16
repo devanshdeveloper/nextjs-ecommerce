@@ -4,6 +4,10 @@ export async function POST(request) {
   const body = await request.json();
   try {
     await connectDB();
+    const user = await User.findOne({ email : body.email });
+    if (user) {
+      return Response.json({ error: "Email already in use" }, { status: 500 });
+    }
     const newUser = await User.create(body);
     return Response.json(newUser);
   } catch (err) {

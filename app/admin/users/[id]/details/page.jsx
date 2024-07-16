@@ -71,7 +71,7 @@ function UserDetailsPage() {
               selectedKeys={new Set([pageUser.role])}
               className="w-[200px]"
             >
-              {["User", "Admin"].map((role) => (
+              {["User", "Admin" , "Blocked"].map((role) => (
                 <SelectItem key={role}>{role}</SelectItem>
               ))}
             </Select>

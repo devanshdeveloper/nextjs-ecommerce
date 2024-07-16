@@ -28,7 +28,7 @@ function AuthPage() {
     mutationFn: createUser,
     onSuccess,
   });
-  
+
   const mutate_logInUser = useMutation({
     mutationFn: logInUser,
     onSuccess,
@@ -49,26 +49,28 @@ function AuthPage() {
         <div className="text-5xl font-semibold my-20">
           {isLoginPage ? "Log in" : "Sign In"}
         </div>
-        <form onSubmit={handleSubmit} className="flex flex-col w-full gap-7">
+        <form onSubmit={handleSubmit} className="flex flex-col w-full gap-5">
           {!isLoginPage && <Input type="text" label="Name" name="name" />}
           <Input type="email" label="Email" name="email" />
           <PasswordInput name="password" />
-          <Button
-            isLoading={
-              mutate_createUser.isPending || mutate_logInUser.isPending
-            }
-            type="submit"
-            color="primary"
-          >
-            {isLoginPage ? "Log in" : "Sign In"}
-          </Button>
-          {(mutate_createUser.error || mutate_logInUser.error) && (
-            <span className="text-red-500">
-              {parseError(
-                isLoginPage ? mutate_logInUser.error : mutate_createUser.error
-              )}
-            </span>
-          )}
+          <div className="flex flex-col gap-2">
+            <Button
+              isLoading={
+                mutate_createUser.isPending || mutate_logInUser.isPending
+              }
+              type="submit"
+              color="primary"
+            >
+              {isLoginPage ? "Log in" : "Sign In"}
+            </Button>
+            {(mutate_createUser.error || mutate_logInUser.error) && (
+              <span className="text-red-500">
+                {parseError(
+                  isLoginPage ? mutate_logInUser.error : mutate_createUser.error
+                )}
+              </span>
+            )}
+          </div>
         </form>
       </div>
     </div>

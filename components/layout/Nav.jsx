@@ -12,21 +12,30 @@ import {
   Button,
 } from "@nextui-org/react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname , useRouter} from "next/navigation";
 import { useAuthContext } from "../providers/AuthProvider";
 
 export default function Nav() {
   const { user, setUser } = useAuthContext();
+  const router = useRouter()
+  const pathname = usePathname()
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const menuItems = [
-    { href: "/shop", text: "Shop", show: true },
+    { href: "/shop", text: "Shop", show: true  },
     { href: "/cart", text: "Cart", show: true },
     { href: "/auth?action=login", text: "Log In", show: !user },
     { href: "/auth?action=signin", text: "Sign In", show: !user },
     { href: "/admin", text: "Admin", show: !!user && user.role === "Admin" },
     { href: "/account", text: "Account", show: !!user },
-    { onClick: () => setUser(null), text: "Logout", show: !!user },
+    {
+      onClick: () => {
+        router.push("/")
+        setUser(null);
+      },
+      text: "Log out",
+      show: !!user,
+    },
   ];
 
   function NavbarItems({ NavbarItem, className }) {
@@ -39,12 +48,19 @@ export default function Nav() {
               className="w-full"
               color="primary"
               variant="flat"
-              onClick={item.onClick}
+              onClick={(e) => {
+                setIsMenuOpen(false)
+                item.onClick(e);
+              }}
             >
               {item.text}
             </Button>
           ) : (
-            <Link className="w-full" href={item.href}>
+            <Link
+              className={`w-full ${pathname === item.href ? "font-bold" : ""}`}
+              onClick={() => setIsMenuOpen(false)}
+              href={item.href}
+            >
               {item.text}
             </Link>
           )}
