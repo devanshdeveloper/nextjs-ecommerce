@@ -13,13 +13,16 @@ function AuthProvider({ children }) {
 
   useEffect(() => {
     async function asyncHandler() {
-      if (!user || !user._id) return;
+      if (!user || !user._id) {
+        setLoading(false);
+        return;
+      }
       try {
         const updatedUser = await getUserById({ id: user._id });
         setUser(updatedUser);
       } catch (error) {
         console.error(error);
-        setUser(null); 
+        setUser(null);
       } finally {
         setLoading(false);
       }
