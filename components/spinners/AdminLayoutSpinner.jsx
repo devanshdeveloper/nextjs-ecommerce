@@ -1,10 +1,11 @@
 import { Spinner } from "@nextui-org/react";
+import AdminLayoutCover from "../layout/AdminLayoutCover";
 
 function AdminLayoutSpinner() {
   return (
-    <div className="w-[calc(100vw-300px)] h-[calc(100vh-68px)] flex items-center justify-center">
+    <AdminLayoutCover>
       <Spinner />
-    </div>
+    </AdminLayoutCover>
   );
 }
 

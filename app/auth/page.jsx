@@ -20,7 +20,7 @@ function AuthPage() {
   const isLoginPage = getSearchParams("action").action === "login";
 
   function onSuccess(user) {
-    setUser(user.user);
+    setUser(user.user || user);
     router.push("/shop");
   }
 
@@ -28,6 +28,7 @@ function AuthPage() {
     mutationFn: createUser,
     onSuccess,
   });
+  
   const mutate_logInUser = useMutation({
     mutationFn: logInUser,
     onSuccess,
@@ -38,7 +39,6 @@ function AuthPage() {
     if (isLoginPage) {
       mutate_logInUser.mutate(getFormData(e, "email", "password"));
     } else {
-      // const users = Promise.all(dummyUsers.map(createUser));
       mutate_createUser.mutate(getFormData(e, "name", "email", "password"));
     }
   }

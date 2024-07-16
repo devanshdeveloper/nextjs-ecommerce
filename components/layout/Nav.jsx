@@ -24,7 +24,7 @@ export default function Nav() {
     { href: "/cart", text: "Cart", show: true },
     { href: "/auth?action=login", text: "Log In", show: !user },
     { href: "/auth?action=signin", text: "Sign In", show: !user },
-    { href: "/admin", text: "Admin", show: !!user && user.role === "admin" },
+    { href: "/admin", text: "Admin", show: !!user && user.role === "Admin" },
     { href: "/account", text: "Account", show: !!user },
     { onClick: () => setUser(null), text: "Logout", show: !!user },
   ];
