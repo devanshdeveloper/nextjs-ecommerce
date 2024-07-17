@@ -80,7 +80,7 @@ export default function UsersPage() {
 
   return (
     <>
-      <div className="flex justify-end mr-10">
+      <div className="flex justify-end mr-10 mt-10">
         <Input
           className="w-[300px]"
           isClearable

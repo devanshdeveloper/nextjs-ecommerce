@@ -27,6 +27,7 @@ async function paginateModel(Model, request) {
       nextPage = null;
     }
     const data = await Model.find(query)
+      .sort({ _id: -1 })
       .skip((pageParam - 1) * limit)
       .limit(limit);
     return [{ info: { pageParam, limit, count, totalPages, nextPage }, data }];

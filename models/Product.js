@@ -13,70 +13,21 @@ const ProductSchema = new mongoose.Schema({
     type: Number,
     required: [true, "Please enter product price"],
   },
-  images: [
-    {
-      public_id: {
-        type: String,
-      },
-      url: {
-        type: String,
-      },
-    },
-  ],
-
-  category: {
-    type: String,
-    required: [true, "Please enter product category"],
-    enum: {
-      values: [
-        "Electronics",
-        "Cameras",
-        "Laptops",
-        "Accessories",
-        "Headphones",
-        "Sports",
-      ],
-      message: "Please select correct category",
-    },
-  },
-  seller: {
-    type: String,
-    required: [true, "Please enter product seller"],
-  },
-  stock: {
+  actualPrice: {
     type: Number,
-    required: [true, "Please enter product stock"],
   },
+  images: [{ type: String }],
+  category: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Category",
+    required: [true, "Please enter product category"],
+  },
+  variants: [{ type: mongoose.Schema.Types.ObjectId, ref: "Variant" }],
   ratings: {
     type: Number,
     default: 0,
   },
-  reviews: [
-    {
-      user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        required: true,
-      },
-      rating: {
-        type: Number,
-        required: true,
-      },
-      comment: {
-        type: String,
-        required: true,
-      },
-      createdAt: {
-        type: Date,
-        default: Date.now,
-      },
-    },
-  ],
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: false,
-  },
+  reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "Review" }],
   createdAt: {
     type: Date,
     default: Date.now,

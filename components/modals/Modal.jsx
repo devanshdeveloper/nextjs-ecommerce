@@ -5,7 +5,6 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
-  Button,
 } from "@nextui-org/react";
 
 export default function MyModal({
@@ -13,7 +12,6 @@ export default function MyModal({
   children,
   Footer,
   isOpen,
-  onOpen,
   onOpenChange,
 }) {
   return (

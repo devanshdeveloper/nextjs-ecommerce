@@ -11,18 +11,17 @@ import {
   NavbarMenuItem,
   Button,
 } from "@nextui-org/react";
-import Link from "next/link";
-import { usePathname , useRouter} from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAuthContext } from "../providers/AuthProvider";
 
 export default function Nav() {
   const { user, setUser } = useAuthContext();
-  const router = useRouter()
-  const pathname = usePathname()
+  const router = useRouter();
+  const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const menuItems = [
-    { href: "/shop", text: "Shop", show: true  },
+    { href: "/shop", text: "Shop", show: true },
     { href: "/cart", text: "Cart", show: true },
     { href: "/auth?action=login", text: "Log In", show: !user },
     { href: "/auth?action=signin", text: "Sign In", show: !user },
@@ -30,7 +29,7 @@ export default function Nav() {
     { href: "/account", text: "Account", show: !!user },
     {
       onClick: () => {
-        router.push("/")
+        router.push("/");
         setUser(null);
       },
       text: "Log out",
@@ -49,20 +48,22 @@ export default function Nav() {
               color="primary"
               variant="flat"
               onClick={(e) => {
-                setIsMenuOpen(false)
+                setIsMenuOpen(false);
                 item.onClick(e);
               }}
             >
               {item.text}
             </Button>
           ) : (
-            <Link
+            <button
               className={`w-full ${pathname === item.href ? "font-bold" : ""}`}
-              onClick={() => setIsMenuOpen(false)}
-              href={item.href}
+              onClick={() => {
+                setIsMenuOpen(false);
+                router.push(item.href);
+              }}
             >
               {item.text}
-            </Link>
+            </button>
           )}
         </NavbarItem>
       );
@@ -70,7 +71,7 @@ export default function Nav() {
   }
 
   return (
-    <Navbar>
+    <Navbar isBordered isMenuOpen={isMenuOpen} onMenuOpenChange={setIsMenuOpen}>
       <NavbarBrand>
         <p className="font-bold text-inherit">Bhrm Clothings</p>
       </NavbarBrand>
