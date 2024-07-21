@@ -22,7 +22,20 @@ const ProductSchema = new mongoose.Schema({
     ref: "Category",
     required: [true, "Please enter product category"],
   },
-  variants: [{ type: mongoose.Schema.Types.ObjectId, ref: "Variant" }],
+  variants: [
+    {
+      name: {
+        type: String,
+        required: [true, "Please enter variant name"],
+      },
+      options: [
+        {
+          type: String,
+          required: [true, "Please enter variant option"],
+        },
+      ],
+    },
+  ],
   ratings: {
     type: Number,
     default: 0,

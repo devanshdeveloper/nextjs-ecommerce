@@ -2,7 +2,6 @@ import connectDB from "@/lib/mongoose";
 import Category from "@/models/Category";
 export async function POST(request) {
   const body = await request.json();
-  console.log(body);
   try {
     await connectDB();
     const category = await Category.findOne({ name: body.name });

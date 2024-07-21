@@ -11,7 +11,7 @@ export async function logInUser({ email, password }) {
     body: { email, password },
   });
 }
-export async function getUsers({ pageParam, limit , search }) {
+export async function getUsers({ pageParam, limit, search }) {
   return await fetchApi(
     `/api/user/getall?pageParam=${pageParam}&limit=${limit}&search=${search}`,
     {
@@ -31,6 +31,15 @@ export async function updateUserById({ id, newDetails }) {
     method: "PUT",
     body: { id, newDetails },
   });
+}
+
+export async function addToCart({ userId, productId, quantity }) {
+  return await fetchApi(
+    `/api/user/addToCart?userId=${userId}&productId=${productId}&quantity=${quantity}`,
+    {
+      method: "POST",
+    }
+  );
 }
 export async function deleteUserById({ id }) {
   return await fetchApi(`/api/user/deletebyid?id=${id}`, {

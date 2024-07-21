@@ -34,6 +34,8 @@ export default function AdminLayout({ children }) {
               { href: "/admin/users", text: "Users" },
               { href: "/admin/categories", text: "Categories" },
               { href: "/admin/products", text: "Products" },
+              { href: "/admin/orders", text: "Orders" },
+              { href: "/admin/carts", text: "Carts" },
             ]}
             aria-label="Dynamic Actions"
             onAction={(key) => router.push(key)}

@@ -1,0 +1,94 @@
+import { Button, Card, CardFooter } from "@nextui-org/react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { MdImageNotSupported } from "react-icons/md";
+import { BiPlus } from "react-icons/bi";
+import { useMutation } from "@tanstack/react-query";
+import { addToCart } from "@/fetch/user";
+import { useAuthContext } from "../providers/AuthProvider";
+export default function ProductCard({
+  actualPrice,
+  category,
+  description,
+  images,
+  name,
+  price,
+  ratings,
+  reviews,
+  variants,
+  _id,
+}) {
+  const router = useRouter();
+  const { user } = useAuthContext();
+
+  const mutateAddToCart = useMutation({
+    mutationFn: addToCart,
+    onSuccess() {
+      router.push("/cart");
+    },
+  });
+
+  // return
+  return (
+    <Card
+      as={"div"}
+      isHoverable
+      isPressable
+      onClick={() => router.push("/product/" + _id)}
+      className="group relative border-1 border-foreground-200"
+    >
+      {images[0] && (
+        <Image
+          className={
+            images[1] &&
+            `${
+              images[1] && "absolute"
+            } z-10 group-hover:invisible w-full h-[300px]`
+          }
+          src={images[0]}
+          width={500}
+          height={500}
+          alt={name}
+        />
+      )}
+      {images[1] && (
+        <Image
+          className="group-hover:visible w-full h-[300px]"
+          src={images[1]}
+          width={500}
+          height={500}
+          alt={name}
+        />
+      )}
+      {!images[0] && (
+        <div className="w-full h-[300px] flex items-center justify-center">
+          <MdImageNotSupported size={100} />
+        </div>
+      )}
+      <CardFooter className="justify-between">
+        <div className="flex flex-col items-start">
+          <h4 className="font-bold sm:text-sm md:text-md lg:text-large">
+            {name}
+          </h4>
+          <small className="text-default-500">Rs {price}</small>
+        </div>
+        <Button
+          isLoading={mutateAddToCart.isPending}
+          isIconOnly
+          variant="flat"
+          color="primary"
+          radius="lg"
+          onPress={() =>
+            mutateAddToCart.mutate({
+              userId: user._id,
+              productId: _id,
+              quantity: 1,
+            })
+          }
+        >
+          <BiPlus size={30} />
+        </Button>
+      </CardFooter>
+    </Card>
+  );
+}

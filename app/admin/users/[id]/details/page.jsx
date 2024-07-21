@@ -54,8 +54,6 @@ function UserDetailsPage() {
     );
   }
 
-  console.log(pageUser);
-
   return (
     <div>
       <div className="w-[calc(100vw-300px)] p-10 flex flex-col items-center gap-10">

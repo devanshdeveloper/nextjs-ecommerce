@@ -1,40 +1,70 @@
 "use client";
-import { Button, ButtonGroup } from "@nextui-org/react";
-import ProductCard from "./ProductCard";
+import { Button, ButtonGroup, Spinner } from "@nextui-org/react";
+import ProductCard from "./cards/ProductCard";
 import { TfiLayoutGrid4Alt, TfiLayoutGrid2Alt } from "react-icons/tfi";
 import { RiLayoutGrid2Fill } from "react-icons/ri";
 import { IoSquare } from "react-icons/io5";
 import useWindowSize from "@/hooks/useWindowSize";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import getGridOption, { gridOptions } from "@/utils/getGridOption";
+import { useDebouncedCallback } from "use-debounce";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInView } from "react-intersection-observer";
+import { getProductsByCategory } from "@/fetch/product";
+import AdminLayoutCover from "./layout/AdminLayoutCover";
+import { useRouter } from "next/navigation";
 
-function Category({ name }) {
-  const getGridOption = useCallback((number) => {
-    if (number >= 0 && number <= 640) return "1";
-    else if (number >= 641 && number <= 765) return "2";
-    else if (number >= 766 && number <= 1024) return "3";
-    else if (number >= 1025) return "3";
-    return "4";
-  }, []);
-
+function Category({ name, id }) {
+  const router = useRouter();
   const [windowSize] = useWindowSize({
     onChange: useCallback((value) => {
       setGridOption(getGridOption(value));
-    }, [getGridOption]),
+    }, []),
   });
 
-  const [gridOption, setGridOption] = useState(
-    getGridOption(windowSize)
-  );
+  const [gridOption, setGridOption] = useState(getGridOption(windowSize));
 
-  console.log(gridOption);
+  const [searchInputValue, setSearchInputValue] = useState("");
+  const [searchValue, setSearchValue] = useState("");
 
-  const gridOptions = {
-    "1": "grid-cols-1",
-    "2": "grid-cols-2",
-    "3": "grid-cols-3",
-    "4": "grid-cols-4",
-  };
+  const {
+    data,
+    status,
+    error,
+    fetchNextPage,
+    isFetching,
+    hasNextPage,
+    refetch,
+  } = useInfiniteQuery({
+    queryKey: ["products", searchValue],
+    queryFn: (params) =>
+      getProductsByCategory({
+        ...params,
+        limit: 20,
+        search: searchValue,
+        categoryId: id,
+      }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      return lastPage.info.nextPage;
+    },
+    refetchOnWindowFocus: false,
+    retries: false,
+  });
+
+  const debouncedMutateSearchProduct = useDebouncedCallback((search) => {
+    if (search.length < 3) return setSearchValue("");
+    setSearchValue(search);
+  }, 2000);
+
+  const { ref, inView } = useInView();
+
+  useEffect(() => {
+    if (inView) {
+      fetchNextPage();
+    }
+  }, [inView, fetchNextPage]);
 
   return (
     <div>
@@ -78,158 +108,44 @@ function Category({ name }) {
       <div
         className={`grid ${gridOptions[gridOption]} gap-3 md:gap-5 lg:gap-8`}
       >
-        <ProductCard
-          id="2"
-          name="Black T Shirt"
-          price={200}
-          frontImage="https://imbuzi.in/cdn/shop/files/3.jpg?v=1701950526&width=493"
-          backImage="https://imbuzi.in/cdn/shop/files/4.jpg?v=1701950526"
-          inventory={10}
-        />
-        <ProductCard
-          id="2"
-          name="Black T Shirt"
-          price={200}
-          frontImage="https://imbuzi.in/cdn/shop/files/3.jpg?v=1701950526&width=493"
-          backImage="https://imbuzi.in/cdn/shop/files/4.jpg?v=1701950526"
-          inventory={10}
-        />
-        <ProductCard
-          id="2"
-          name="Black T Shirt"
-          price={200}
-          frontImage="https://imbuzi.in/cdn/shop/files/3.jpg?v=1701950526&width=493"
-          backImage="https://imbuzi.in/cdn/shop/files/4.jpg?v=1701950526"
-          inventory={10}
-        />
-        <ProductCard
-          id="2"
-          name="Black T Shirt"
-          price={200}
-          frontImage="https://imbuzi.in/cdn/shop/files/3.jpg?v=1701950526&width=493"
-          backImage="https://imbuzi.in/cdn/shop/files/4.jpg?v=1701950526"
-          inventory={10}
-        />
-        <ProductCard
-          id="2"
-          name="Black T Shirt"
-          price={200}
-          frontImage="https://imbuzi.in/cdn/shop/files/3.jpg?v=1701950526&width=493"
-          backImage="https://imbuzi.in/cdn/shop/files/4.jpg?v=1701950526"
-          inventory={10}
-        />
-        <ProductCard
-          id="2"
-          name="Black T Shirt"
-          price={200}
-          frontImage="https://imbuzi.in/cdn/shop/files/3.jpg?v=1701950526&width=493"
-          backImage="https://imbuzi.in/cdn/shop/files/4.jpg?v=1701950526"
-          inventory={10}
-        />
-        <ProductCard
-          id="2"
-          name="Black T Shirt"
-          price={200}
-          frontImage="https://imbuzi.in/cdn/shop/files/3.jpg?v=1701950526&width=493"
-          backImage="https://imbuzi.in/cdn/shop/files/4.jpg?v=1701950526"
-          inventory={10}
-        />
-        <ProductCard
-          id="2"
-          name="Black T Shirt"
-          price={200}
-          frontImage="https://imbuzi.in/cdn/shop/files/3.jpg?v=1701950526&width=493"
-          backImage="https://imbuzi.in/cdn/shop/files/4.jpg?v=1701950526"
-          inventory={10}
-        />
-        <ProductCard
-          id="2"
-          name="Black T Shirt"
-          price={200}
-          frontImage="https://imbuzi.in/cdn/shop/files/3.jpg?v=1701950526&width=493"
-          backImage="https://imbuzi.in/cdn/shop/files/4.jpg?v=1701950526"
-          inventory={10}
-        />
-        <ProductCard
-          id="2"
-          name="Black T Shirt"
-          price={200}
-          frontImage="https://imbuzi.in/cdn/shop/files/3.jpg?v=1701950526&width=493"
-          backImage="https://imbuzi.in/cdn/shop/files/4.jpg?v=1701950526"
-          inventory={10}
-        />
-        <ProductCard
-          id="2"
-          name="Black T Shirt"
-          price={200}
-          frontImage="https://imbuzi.in/cdn/shop/files/3.jpg?v=1701950526&width=493"
-          backImage="https://imbuzi.in/cdn/shop/files/4.jpg?v=1701950526"
-          inventory={10}
-        />
-        <ProductCard
-          id="2"
-          name="Black T Shirt"
-          price={200}
-          frontImage="https://imbuzi.in/cdn/shop/files/3.jpg?v=1701950526&width=493"
-          backImage="https://imbuzi.in/cdn/shop/files/4.jpg?v=1701950526"
-          inventory={10}
-        />
-        <ProductCard
-          id="2"
-          name="Black T Shirt"
-          price={200}
-          frontImage="https://imbuzi.in/cdn/shop/files/3.jpg?v=1701950526&width=493"
-          backImage="https://imbuzi.in/cdn/shop/files/4.jpg?v=1701950526"
-          inventory={10}
-        />
-        <ProductCard
-          id="2"
-          name="Black T Shirt"
-          price={200}
-          frontImage="https://imbuzi.in/cdn/shop/files/3.jpg?v=1701950526&width=493"
-          backImage="https://imbuzi.in/cdn/shop/files/4.jpg?v=1701950526"
-          inventory={10}
-        />
-        <ProductCard
-          id="2"
-          name="Black T Shirt"
-          price={200}
-          frontImage="https://imbuzi.in/cdn/shop/files/3.jpg?v=1701950526&width=493"
-          backImage="https://imbuzi.in/cdn/shop/files/4.jpg?v=1701950526"
-          inventory={10}
-        />
-        <ProductCard
-          id="2"
-          name="Black T Shirt"
-          price={200}
-          frontImage="https://imbuzi.in/cdn/shop/files/3.jpg?v=1701950526&width=493"
-          backImage="https://imbuzi.in/cdn/shop/files/4.jpg?v=1701950526"
-          inventory={10}
-        />
-        <ProductCard
-          id="2"
-          name="Black T Shirt"
-          price={200}
-          frontImage="https://imbuzi.in/cdn/shop/files/3.jpg?v=1701950526&width=493"
-          backImage="https://imbuzi.in/cdn/shop/files/4.jpg?v=1701950526"
-          inventory={10}
-        />
-        <ProductCard
-          id="2"
-          name="Black T Shirt"
-          price={200}
-          frontImage="https://imbuzi.in/cdn/shop/files/3.jpg?v=1701950526&width=493"
-          backImage="https://imbuzi.in/cdn/shop/files/4.jpg?v=1701950526"
-          inventory={10}
-        />
-        <ProductCard
-          id="2"
-          name="Black T Shirt"
-          price={200}
-          frontImage="https://imbuzi.in/cdn/shop/files/3.jpg?v=1701950526&width=493"
-          backImage="https://imbuzi.in/cdn/shop/files/4.jpg?v=1701950526"
-          inventory={10}
-        />
+        {data ? (
+          data.pages.map((page) => {
+            return page.data.map((product, i) => {
+              return <ProductCard key={i} {...{ ...product }} />;
+            });
+          })
+        ) : status === "pending" ? null : (
+          <AdminLayoutCover>
+            <div className="flex flex-col items-center gap-10">
+              <div className="text-3xl">No Products Found</div>
+              <Button
+                variant="flat"
+                color="primary"
+                size="lg"
+                onPress={() => router.back()}
+              >
+                Back
+              </Button>
+            </div>
+          </AdminLayoutCover>
+        )}
+      </div>
+      <div
+        className="w-[calc(100vw-300px)] h-full flex items-center justify-center"
+        ref={ref}
+      >
+        {hasNextPage && (
+          <Button
+            variant="flat"
+            color="primary"
+            size="lg"
+            isLoading={isFetching}
+            onClick={fetchNextPage}
+          >
+            Load More
+          </Button>
+        )}
+        {!hasNextPage && isFetching && <Spinner />}
       </div>
     </div>
   );

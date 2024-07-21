@@ -1,20 +1,29 @@
 import connectDB from "@/lib/mongoose";
+import url from "./url";
 
-async function paginateModel(Model, request) {
+async function paginateModel({
+  Model,
+  request,
+  queryFunc,
+  processData,
+  bodyElements,
+  URLSearchParams = ["search"],
+}) {
   try {
-    const { searchParams } = new URL(request.url);
-    let search = searchParams.get("search");
-    let pageParam = +searchParams.get("pageParam") || 1;
-    let limit = +searchParams.get("limit") || 10;
+    const { searchParams } = url(request.url);
+    let [pageParam, limit, ...URLSearchParamsResult] = searchParams.getAll(
+      "pageParam",
+      "limit",
+      ...URLSearchParams
+    );
+    pageParam = +pageParam || 1;
+    limit = +limit || 10;
+    const body = await request.json();
+    console.log(body);
+    const bodyArray = bodyElements.map((bodyElem) => body[bodyElem]);
 
-    const query = search
-      ? {
-          $or: [
-            { name: { $regex: search, $options: "i" } },
-            { email: { $regex: search, $options: "i" } },
-            { role: { $regex: search, $options: "i" } },
-          ],
-        }
+    const query = queryFunc
+      ? queryFunc(...URLSearchParamsResult, ...bodyArray)
       : {};
     connectDB();
     const count = await Model.countDocuments(query);
@@ -30,7 +39,14 @@ async function paginateModel(Model, request) {
       .sort({ _id: -1 })
       .skip((pageParam - 1) * limit)
       .limit(limit);
-    return [{ info: { pageParam, limit, count, totalPages, nextPage }, data }];
+    const processedData = processData ? await processData(data) : data;
+
+    return [
+      {
+        info: { pageParam, limit, count, totalPages, nextPage },
+        data: processedData,
+      },
+    ];
   } catch (err) {
     console.log(err);
     return [{ err }, { status: 500 }];

@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { useDebouncedCallback } from "use-debounce";
-import CategoryCard from "@/components/CategoryCard";
+import CategoryCard from "@/components/cards/CategoryCard";
 
 export default function CategoriesPage() {
   const [categoryInputValue, setCategoryInputValue] = useState("");

@@ -31,7 +31,7 @@ const UserSchema = new mongoose.Schema({
       ref: "Order",
     },
   ],
-  cart : [
+  cart: [
     {
       product: {
         type: mongoose.Schema.Types.ObjectId,
@@ -53,5 +53,18 @@ UserSchema.pre("save", async function (next) {
 
   this.password = await bcrypt.hash(this.password, 10);
 });
+
+UserSchema.methods.addToCart = async function (productId, quantity = 1) {
+  const existingProductIndex = this.cart.findIndex(
+    (item) => item.product.toString() === productId.toString()
+  );
+  if (existingProductIndex >= 0) {
+    this.cart[existingProductIndex].quantity = +quantity;
+  } else {
+    this.cart.push({ product: productId, quantity });
+  }
+  await this.save();
+  return this.cart;
+};
 
 export default mongoose.models.User || mongoose.model("User", UserSchema);

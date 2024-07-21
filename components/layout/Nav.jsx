@@ -13,6 +13,7 @@ import {
 } from "@nextui-org/react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuthContext } from "../providers/AuthProvider";
+import Link from "next/link";
 
 export default function Nav() {
   const { user, setUser } = useAuthContext();
@@ -73,7 +74,9 @@ export default function Nav() {
   return (
     <Navbar isBordered isMenuOpen={isMenuOpen} onMenuOpenChange={setIsMenuOpen}>
       <NavbarBrand>
-        <p className="font-bold text-inherit">Bhrm Clothings</p>
+        <Link href={"/"} className="font-bold text-inherit">
+          Bhrm Clothings
+        </Link>
       </NavbarBrand>
       <NavbarContent justify="end">
         <NavbarItems className="hidden sm:flex" NavbarItem={NavbarItem} />

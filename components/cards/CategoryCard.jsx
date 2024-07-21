@@ -1,8 +1,8 @@
 import { Button, useDisclosure } from "@nextui-org/react";
 import React from "react";
 import { MdOutlineDelete, MdOutlineEdit } from "react-icons/md";
-import EditCategoryModal from "./modals/category/EditCategoryModal";
-import DeleteCategoryModal from "./modals/category/DeleteCategoryModal";
+import EditCategoryModal from "../modals/category/EditCategoryModal";
+import DeleteCategoryModal from "../modals/category/DeleteCategoryModal";
 
 function CategoryCard({ category , refetch }) {
   const {
