@@ -7,10 +7,10 @@ import AdminLayoutSpinner from "@/components/spinners/AdminLayoutSpinner";
 import { IoIosArrowForward } from "react-icons/io";
 
 // UTILS
-import { getUsers } from "@/fetch/user";
+import { getUsers, readAllUsers } from "@/fetch/user";
 
 // HOOKS
-import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
@@ -25,7 +25,7 @@ export default function UsersPage() {
     useInfiniteQuery({
       queryKey: ["users", searchValue],
       queryFn: (params) =>
-        getUsers({ ...params, limit: 20, search: searchValue }),
+        readAllUsers({ ...params, limit: 20, search: searchValue }),
       initialPageParam: 1,
       getNextPageParam: (lastPage) => {
         return lastPage.info.nextPage;
@@ -50,16 +50,16 @@ export default function UsersPage() {
   function User({ user }) {
     return (
       <div key={user._id} className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 md:gap-5">
           <Avatar
             onClick={() => router.push(`/admin/users/${user._id}/details`)}
-            className="w-12 h-12 cursor-pointer"
+            className="w-10 h-10 md:w-12 md:h-12 cursor-pointer"
             src={user.image}
             name={user.name}
           />
           <div className="">
-            <div>{user.name}</div>
-            <div className="text-sm">{user.email}</div>
+            <div className="text-sm md:text-medium">{user.name}</div>
+            <div className="text-xs md:text-sm">{user.email}</div>
           </div>
         </div>
         <div>
@@ -67,7 +67,8 @@ export default function UsersPage() {
             color="primary"
             variant="flat"
             isIconOnly
-            onClick={() => {
+            size="sm"
+            onPress={() => {
               router.push(`/admin/users/${user._id}/details`);
             }}
           >
@@ -80,7 +81,7 @@ export default function UsersPage() {
 
   return (
     <>
-      <div className="flex justify-end mr-10 mt-10">
+      <div className="flex justify-center md:justify-end p-3 md:p-10">
         <Input
           className="w-[300px]"
           isClearable
@@ -99,7 +100,7 @@ export default function UsersPage() {
           }}
         />
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 p-10 lg:p-14 w-[calc(100vw-300px)]">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 md:gap-10 lg:gap-14 pr-2 md:p-10 lg:p-14">
         {data ? (
           data.pages.map((page) => {
             return page.data.map((user) => {
@@ -123,7 +124,7 @@ export default function UsersPage() {
         )}
       </div>
       <div
-        className="w-[calc(100vw-300px)] h-full flex items-center justify-center"
+        className="h-full flex items-center justify-center"
         ref={ref}
       >
         {hasNextPage && (
@@ -132,7 +133,7 @@ export default function UsersPage() {
             color="primary"
             size="lg"
             isLoading={isFetching}
-            onClick={fetchNextPage}
+            onPress={fetchNextPage}
           >
             Load More
           </Button>

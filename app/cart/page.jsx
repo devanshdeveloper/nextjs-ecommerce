@@ -1,14 +1,18 @@
 "use client";
 
+// UI COMPONENTS
 import CartCard from "@/components/cards/CartCard";
-import ProductCard from "@/components/cards/ProductCard";
 import AdminLayoutCover from "@/components/layout/AdminLayoutCover";
-import { useAuthContext } from "@/components/providers/AuthProvider";
-import { getProductsByIds } from "@/fetch/product";
 import { Button, Spinner } from "@nextui-org/react";
+
+// HOOKS
+import { useAuthContext } from "@/components/providers/AuthProvider";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useInView } from "react-intersection-observer";
+import { readProductsByIds } from "@/fetch/product";
+
+// UTILS
 
 function CartPage() {
   const { user } = useAuthContext();
@@ -24,7 +28,7 @@ function CartPage() {
   } = useInfiniteQuery({
     queryKey: ["cartProducts"],
     queryFn: (params) =>
-      getProductsByIds({
+      readProductsByIds({
         ...params,
         limit: 20,
         productIds: user.cart.map((cartItem) => cartItem.product),
@@ -34,7 +38,7 @@ function CartPage() {
       return lastPage.info.nextPage;
     },
     refetchOnWindowFocus: false,
-    retries: false,
+    retry: false,
   });
 
   const { ref, inView } = useInView();
@@ -73,7 +77,7 @@ function CartPage() {
         )}
       </div>
       <div
-        className="w-[calc(100vw-300px)] h-full flex items-center justify-center"
+        className="h-full flex items-center justify-center"
         ref={ref}
       >
         {hasNextPage && (
@@ -82,7 +86,7 @@ function CartPage() {
             color="primary"
             size="lg"
             isLoading={isFetching}
-            onClick={fetchNextPage}
+            onPress={fetchNextPage}
           >
             Load More
           </Button>

@@ -6,6 +6,10 @@ const CategorySchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  favorite: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 export default mongoose.models.Category ||

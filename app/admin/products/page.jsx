@@ -1,15 +1,20 @@
 "use client";
 
+// UI COMPONENTS
 import AdminLayoutCover from "@/components/layout/AdminLayoutCover";
-import { getProducts } from "@/fetch/product";
-import parseError from "@/utils/parseError";
 import { Button, Input, Spinner } from "@nextui-org/react";
-import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
+import ProductCard from "@/components/cards/ProductCard";
+
+// UTILS
+import { readAllProducts } from "@/fetch/product";
+import parseError from "@/utils/parseError";
+
+// HOOKS
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { useDebouncedCallback } from "use-debounce";
-import ProductCard from "@/components/cards/ProductCard";
 
 export default function ProductsPage() {
   const router = useRouter();
@@ -27,13 +32,13 @@ export default function ProductsPage() {
   } = useInfiniteQuery({
     queryKey: ["products", searchValue],
     queryFn: (params) =>
-      getProducts({ ...params, limit: 20, search: searchValue }),
+      readAllProducts({ ...params, limit: 20, search: searchValue }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
       return lastPage.info.nextPage;
     },
     refetchOnWindowFocus: false,
-    retries: false,
+    retry: false,
   });
 
   const debouncedMutateSearchProduct = useDebouncedCallback((search) => {
@@ -55,7 +60,7 @@ export default function ProductsPage() {
         <Button
           variant="flat"
           color="primary"
-          onClick={() => router.push("/admin/products/create")}
+          onPress={() => router.push("/admin/products/create")}
         >
           Create
         </Button>
@@ -77,7 +82,7 @@ export default function ProductsPage() {
           }}
         />
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 p-10 lg:p-14 w-[calc(100vw-300px)]">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 p-10 lg:p-14">
         {data ? (
           data.pages.map((page) => {
             return page.data.map((product, i) => {
@@ -101,7 +106,7 @@ export default function ProductsPage() {
         )}
       </div>
       <div
-        className="w-[calc(100vw-300px)] h-full flex items-center justify-center"
+        className="h-full flex items-center justify-center"
         ref={ref}
       >
         {hasNextPage && (
@@ -110,7 +115,7 @@ export default function ProductsPage() {
             color="primary"
             size="lg"
             isLoading={isFetching}
-            onClick={fetchNextPage}
+            onPress={fetchNextPage}
           >
             Load More
           </Button>

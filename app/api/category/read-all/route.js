@@ -6,10 +6,10 @@ export async function GET(request) {
     ...(await paginateModel({
       Model: Category,
       request,
-      URLSearchParams : ["search"],
-      queryFunc: ( search ) =>
+      URLSearchParams: ["search"],
+      queryFunc: (search) =>
         search ? { name: { $regex: search, $options: "i" } } : {},
- 
     }))
   );
 }
+export const dynamic = "force-dynamic";

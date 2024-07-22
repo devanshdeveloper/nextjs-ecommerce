@@ -3,7 +3,7 @@ import MyModal from "../Modal";
 import { useMutation } from "@tanstack/react-query";
 import { Button, Input } from "@nextui-org/react";
 import parseError from "@/utils/parseError";
-import { editCategory } from "@/fetch/category";
+import { updateOneCategory } from "@/fetch/category";
 
 function EditCategoryModal({
   isOpenEditCategoryModal,
@@ -11,16 +11,16 @@ function EditCategoryModal({
   onOpenEditCategoryModal,
   onCloseEditCategoryModal,
   category,
-  refetch
+  refetch,
 }) {
   const [categoryInputValue, setCategoryInputValue] = useState(category.name);
 
   const mutateEditCategory = useMutation({
-    mutationFn: (name) =>
-      editCategory({ id: category._id, newDetails: { name } }),
+    mutationFn: (newCategory) =>
+      updateOneCategory({ id: category._id, newCategory }),
     onSuccess: () => {
       onCloseEditCategoryModal();
-      refetch()
+      refetch();
     },
   });
 
@@ -36,7 +36,7 @@ function EditCategoryModal({
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          mutateEditCategory.mutate(categoryInputValue);
+          mutateEditCategory.mutate({ name: categoryInputValue });
           setCategoryInputValue("");
         }}
         className="w-full flex flex-col items-center gap-2 "

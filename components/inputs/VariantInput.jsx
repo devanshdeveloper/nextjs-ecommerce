@@ -54,13 +54,13 @@ export default function VariantInput({ variants, setVariants }) {
           <Button
             variant="flat"
             color="primary"
-            onClick={() => addOption(variantIndex)}
+            onPress={() => addOption(variantIndex)}
           >
             Add Option
           </Button>
         </div>
       ))}
-      <Button variant="flat" color="primary" onClick={addVariant}>
+      <Button variant="flat" color="primary" onPress={addVariant}>
         Add Variant
       </Button>
     </div>

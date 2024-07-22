@@ -2,20 +2,20 @@ import MyModal from "../Modal";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "@nextui-org/react";
 import parseError from "@/utils/parseError";
-import { deleteCategory } from "@/fetch/category";
+import { deleteOneCategory } from "@/fetch/category";
 
-function DeleteCategoryModal({
-  isOpenDeleteCategoryModal,
-  onOpenChangeDeleteCategoryModal,
-  onOpenDeleteCategoryModal,
-  onCloseDeleteCategoryModal,
+function DeleteOneCategoryModal({
+  isOpenDeleteOneCategoryModal,
+  onOpenChangeDeleteOneCategoryModal,
+  onOpenDeleteOneCategoryModal,
+  onCloseDeleteOneCategoryModal,
   category,
   refetch,
 }) {
-  const mutateDeleteCategory = useMutation({
-    mutationFn: () => deleteCategory({ id: category._id }),
+  const mutateDeleteOneCategory = useMutation({
+    mutationFn: () => deleteOneCategory({ id: category._id }),
     onSuccess: () => {
-      onCloseDeleteCategoryModal();
+      onCloseDeleteOneCategoryModal();
       refetch();
     },
   });
@@ -23,26 +23,26 @@ function DeleteCategoryModal({
   return (
     <MyModal
       {...{
-        isOpen: isOpenDeleteCategoryModal,
-        onOpen: onOpenDeleteCategoryModal,
-        onOpenChange: onOpenChangeDeleteCategoryModal,
+        isOpen: isOpenDeleteOneCategoryModal,
+        onOpen: onOpenDeleteOneCategoryModal,
+        onOpenChange: onOpenChangeDeleteOneCategoryModal,
       }}
       title="Delete Category"
       Footer={() => {
         return (
           <>
             <Button
-              isLoading={mutateDeleteCategory.isPending}
+              isLoading={mutateDeleteOneCategory.isPending}
               variant="flat"
               className="px-10 py-7 text-md"
               color="danger"
-              onClick={mutateDeleteCategory.mutate}
+              onPress={mutateDeleteOneCategory.mutate}
             >
               Delete Category
             </Button>
-            {mutateDeleteCategory.error && (
+            {mutateDeleteOneCategory.error && (
               <span className="text-red-500">
-                {parseError(mutateDeleteCategory.error)}
+                {parseError(mutateDeleteOneCategory.error)}
               </span>
             )}
           </>
@@ -57,4 +57,4 @@ function DeleteCategoryModal({
   );
 }
 
-export default DeleteCategoryModal;
+export default DeleteOneCategoryModal;

@@ -1,22 +1,5 @@
-import { parseImages } from "@/utils/parseImages";
-import React from "react";
 import { BsImage } from "react-icons/bs";
 
-{
-  /* <Input
-isDisabled={mutateCreateProduct.isPending}
-className="w-[300px]"
-label="Images"
-name="images"
-onValueChange={(value) =>
-  setProductInputValue({ ...productInputValue, images: value })
-}
-value={productInputValue.images}
-type="file"
-accept="image/gif, image/jpeg, image/jpg, image/png"
-multiple
-/> */
-}
 
 function ImagesInput({ onValueChanges, ...props }) {
   return (

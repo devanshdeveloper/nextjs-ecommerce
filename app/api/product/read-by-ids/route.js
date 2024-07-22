@@ -1,6 +1,5 @@
 import Product from "@/models/Product";
 import paginateModel from "@/utils/paginateModel";
-import populateS3SignedURLs from "@/utils/populateS3SignedURLs";
 import mongoose from "mongoose";
 
 export async function POST(request) {
@@ -19,7 +18,6 @@ export async function POST(request) {
         );
         return { _id: { $in: validProductIds } };
       },
-      processData: populateS3SignedURLs,
     }))
   );
 }

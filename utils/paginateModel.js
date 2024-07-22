@@ -6,7 +6,7 @@ async function paginateModel({
   request,
   queryFunc,
   processData,
-  bodyElements,
+  bodyElements = [],
   URLSearchParams = ["search"],
 }) {
   try {
@@ -18,9 +18,13 @@ async function paginateModel({
     );
     pageParam = +pageParam || 1;
     limit = +limit || 10;
-    const body = await request.json();
-    console.log(body);
-    const bodyArray = bodyElements.map((bodyElem) => body[bodyElem]);
+    console.log("working till here...");
+
+    let bodyArray = [];
+    if (bodyElements.length > 0) {
+      const body = await request.json();
+      bodyArray = bodyElements.map((bodyElem) => body[bodyElem]);
+    }
 
     const query = queryFunc
       ? queryFunc(...URLSearchParamsResult, ...bodyArray)

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-export default function useWindowSize({ onChange }) {
+export default function useWindowSize({ onChange = () => {} }) {
   const [windowSize, setWindowSize] = useState(0);
 
   const handleResize = useCallback(() => {

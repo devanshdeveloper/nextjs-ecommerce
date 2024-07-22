@@ -19,7 +19,7 @@ export default function AsyncAutoCompete({
       return lastPage.info.nextPage;
     },
     refetchOnWindowFocus: false,
-    retries: false,
+    retry: false,
   });
 
   const debouncedMutateSearchCategory = useDebouncedCallback((search) => {

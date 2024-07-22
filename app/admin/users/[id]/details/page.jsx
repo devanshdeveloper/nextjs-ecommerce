@@ -2,7 +2,11 @@
 
 import AdminLayoutSpinner from "@/components/spinners/AdminLayoutSpinner";
 import AdminLayoutCover from "@/components/layout/AdminLayoutCover";
-import { getUserById, deleteUserById, updateUserById } from "@/fetch/user";
+import {
+  readOneUser,
+  deleteOneUser,
+  updateOneUser,
+} from "@/fetch/user";
 import { Avatar, Button, Select, SelectItem } from "@nextui-org/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
@@ -14,21 +18,21 @@ function UserDetailsPage() {
 
   const { data: pageUser, isPending } = useQuery({
     queryKey: [`user_${id}`],
-    queryFn: () => getUserById({ id }),
+    queryFn: () => readOneUser({ id }),
     retry: false,
   });
 
   const mutateDeleteUserById = useMutation({
-    mutationFn: () => deleteUserById({ id }),
+    mutationFn: () => deleteOneUser({ id }),
     onSuccess: () => {
       router.push("/admin/users");
     },
   });
 
-  const mutateUpdateUserById = useMutation({
-    mutationFn: (newDetails) => updateUserById({ id, newDetails }),
+  const mutateUpdateOneUser = useMutation({
+    mutationFn: (newUser) => updateOneUser({ id, newUser }),
     onSuccess: (data) => {
-      queryClient.setQueryData([`user_${id}`] , () => ({...data.user}))
+      queryClient.setQueryData([`user_${id}`], () => ({ ...data.user }));
     },
   });
 
@@ -56,20 +60,20 @@ function UserDetailsPage() {
 
   return (
     <div>
-      <div className="w-[calc(100vw-300px)] p-10 flex flex-col items-center gap-10">
+      <div className="p-10 flex flex-col items-center gap-10">
         <div className="w-full flex items-center justify-between">
           <div className="text-2xl">User Details : {pageUser.name}</div>
           <div className="flex gap-5 items-center">
             <Select
               label="Role"
-              isLoading={mutateUpdateUserById.isPending}
+              isLoading={mutateUpdateOneUser.isPending}
               onSelectionChange={(value) => {
-                mutateUpdateUserById.mutate({ role: [...value][0] });
+                mutateUpdateOneUser.mutate({ role: [...value][0] });
               }}
               selectedKeys={new Set([pageUser.role])}
               className="w-[200px]"
             >
-              {["User", "Admin" , "Blocked"].map((role) => (
+              {["User", "Admin", "Blocked"].map((role) => (
                 <SelectItem key={role}>{role}</SelectItem>
               ))}
             </Select>

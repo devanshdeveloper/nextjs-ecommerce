@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
-import { getUserById } from "../../fetch/user";
+import { getUserById, readOneUser } from "../../fetch/user";
 import FullScreenSpinner from "../spinners/FullScreenSpinner";
 import FullScreenLayout from "../layout/FullScreenLayout";
 import Link from "next/link";
@@ -20,7 +20,7 @@ function AuthProvider({ children }) {
         return;
       }
       try {
-        const updatedUser = await getUserById({ id: user._id });
+        const updatedUser = await readOneUser({ id: user._id });
         setUser(updatedUser);
       } catch (error) {
         console.error(error);

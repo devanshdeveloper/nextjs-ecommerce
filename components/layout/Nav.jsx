@@ -1,6 +1,10 @@
 "use client";
+// HOOKS
+import  { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useAuthContext } from "../providers/AuthProvider";
 
-import React, { useState } from "react";
+// UI COMPONENTS
 import {
   Navbar,
   NavbarBrand,
@@ -11,15 +15,18 @@ import {
   NavbarMenuItem,
   Button,
 } from "@nextui-org/react";
-import { usePathname, useRouter } from "next/navigation";
-import { useAuthContext } from "../providers/AuthProvider";
 import Link from "next/link";
 
 export default function Nav() {
+  // CONTEXT
   const { user, setUser } = useAuthContext();
+  
+  // STATE
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  
+  // NEXT/NAVIGATION
   const router = useRouter();
   const pathname = usePathname();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const menuItems = [
     { href: "/shop", text: "Shop", show: true },
@@ -48,7 +55,7 @@ export default function Nav() {
               className="w-full"
               color="primary"
               variant="flat"
-              onClick={(e) => {
+              onPress={(e) => {
                 setIsMenuOpen(false);
                 item.onClick(e);
               }}

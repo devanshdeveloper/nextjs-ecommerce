@@ -1,6 +1,8 @@
-function AdminLayoutCover({ children }) {
+function AdminLayoutCover({ children, className }) {
   return (
-    <div className="w-[calc(100vw-300px)] h-[calc(100vh-68px)] flex items-center justify-center">
+    <div
+      className={`w-full h-[calc(100vh-4rem)] flex items-center justify-center ${className}`}
+    >
       {children}
     </div>
   );

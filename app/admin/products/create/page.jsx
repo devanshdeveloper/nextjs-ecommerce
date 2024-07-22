@@ -1,43 +1,27 @@
-//   name: {
-//     type: String,
-//     required: [true, "Please enter product name"],
-//   },
-//   description: {
-//     type: String,
-//     required: [true, "Please enter product description"],
-//   },
-//   price: {
-//     type: Number,
-//     required: [true, "Please enter product price"],
-//   },
-//   actualPrice: {
-//     type: Number,
-//   },
-//   images: [{ type: String }],
-//   category: {
-//     type: mongoose.Schema.Types.ObjectId,
-//     ref: "Category",
-//     required: [true, "Please enter product category"],
-//   },
 "use client";
+
+// UI COMPONENTS
 import ImagesInput from "@/components/inputs/ImagesInput";
 import AsyncAutoCompete from "@/components/inputs/AsyncAutoComplete";
-import { createProduct } from "@/fetch/product";
 import { Button, Input, Textarea } from "@nextui-org/react";
-import { useMutation } from "@tanstack/react-query";
 import Image from "next/image";
-import { useState } from "react";
-import { getCategories } from "@/fetch/category";
+import VariantInput from "@/components/inputs/VariantInput";
+
+// UTILS
+import { createOneProduct } from "@/fetch/product";
+import { readAllCategory } from "@/fetch/category";
 import {
   getImagesFromBucket,
   uploadImagesToBucket,
 } from "@/utils/s3-bucket-front";
 import { v4 } from "uuid";
 import { parseImages } from "@/utils/parseImages";
-import VariantInput from "@/components/inputs/VariantInput";
 import { defaultProductFormValue } from "@/utils/defaultFormValue";
 import parseError from "@/utils/parseError";
-import { mockDataArray } from "@/dummy/products";
+
+// HOOKS
+import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
 
 function CreateProductPage() {
   const [productInputValue, setProductInputValue] = useState(
@@ -54,7 +38,7 @@ function CreateProductPage() {
           fileType: image.type,
         }))
       );
-      return await createProduct({
+      return await createOneProduct({
         ...productInputValue,
         images: imageKeys,
         _id: uuid,
@@ -68,7 +52,7 @@ function CreateProductPage() {
     <form
       onSubmit={async (e) => {
         e.preventDefault();
-        mutateCreateProduct.mutate(e)
+        mutateCreateProduct.mutate(e);
       }}
       className="w-full flex flex-col gap-2 p-10"
     >
@@ -132,7 +116,7 @@ function CreateProductPage() {
               height={100}
             />
             <Button
-              onClick={() =>
+              onPress={() =>
                 setProductInputValue({
                   ...productInputValue,
                   images: productInputValue.images.filter(
@@ -146,28 +130,9 @@ function CreateProductPage() {
           </div>
         );
       })}
-      <Button
-        onPress={() => {
-          uploadImagesToBucket(productInputValue.images, (image) => {
-            return `product/T-Shirts/${image.name}`;
-          });
-        }}
-      >
-        Upload
-      </Button>
-      <Button
-        onPress={async () => {
-          const url = await getImagesFromBucket(
-            "product/T-Shirts/Screenshot 2024-06-29 203138.png",
-            "product/T-Shirts/Screenshot 2024-07-02 184033.png"
-          );
-        }}
-      >
-        get
-      </Button>
       <AsyncAutoCompete
         queryKey="categories"
-        queryFn={(params) => getCategories({ ...params, limit: 10 })}
+        queryFn={(params) => readAllCategory({ ...params, limit: 10 })}
         value={productInputValue.category}
         setValue={(value) =>
           setProductInputValue({ ...productInputValue, category: value })

@@ -7,6 +7,7 @@ export default async function fetchApi(url, options) {
     requestOptions.headers["Content-Type"] = "application/json";
     requestOptions.body = JSON.stringify(requestOptions.body);
   }
+
   const response = await fetch(url, requestOptions);
 
   if (!response.ok) {

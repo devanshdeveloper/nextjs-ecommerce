@@ -1,19 +1,26 @@
 "use client";
 
+// UI COMPONENTS
 import AdminLayoutCover from "@/components/layout/AdminLayoutCover";
-import { createCategory, getCategories } from "@/fetch/category";
-import parseError from "@/utils/parseError";
 import { Button, Input, Spinner } from "@nextui-org/react";
+import CategoryCard from "@/components/cards/CategoryCard";
+
+// UTILS
+import { createOneCategory, readAllCategory } from "@/fetch/category";
+import parseError from "@/utils/parseError";
+
+// HOOKS
 import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { useDebouncedCallback } from "use-debounce";
-import CategoryCard from "@/components/cards/CategoryCard";
 
 export default function CategoriesPage() {
-  const [categoryInputValue, setCategoryInputValue] = useState("");
   const router = useRouter();
+
+  // STATE
+  const [categoryInputValue, setCategoryInputValue] = useState("");
   const [searchInputValue, setSearchInputValue] = useState("");
   const [searchValue, setSearchValue] = useState("");
 
@@ -28,13 +35,13 @@ export default function CategoriesPage() {
   } = useInfiniteQuery({
     queryKey: ["categories", searchValue],
     queryFn: (params) =>
-      getCategories({ ...params, limit: 20, search: searchValue }),
+      readAllCategory({ ...params, limit: 20, search: searchValue }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
       return lastPage.info.nextPage;
     },
     refetchOnWindowFocus: false,
-    retries: false,
+    retry: false,
   });
 
   const debouncedMutateSearchCategory = useDebouncedCallback((search) => {
@@ -43,7 +50,7 @@ export default function CategoriesPage() {
   }, 2000);
 
   const mutateCreateCategory = useMutation({
-    mutationFn: (name) => createCategory({ name }),
+    mutationFn: (name) => createOneCategory({ name }),
     onSuccess: () => {
       refetch();
     },
@@ -59,14 +66,14 @@ export default function CategoriesPage() {
 
   return (
     <>
-      <div className="flex justify-between items-center p-10">
+      <div className="flex justify-between items-center p-2 md:p-10">
         <form
           onSubmit={(e) => {
             e.preventDefault();
             mutateCreateCategory.mutate(categoryInputValue);
             setCategoryInputValue("");
           }}
-          className="w-full flex items-center gap-2 "
+          className="w-full flex  flex-col md:flex-row items-center gap-2 "
         >
           <Input
             isDisabled={mutateCreateCategory.isPending}
@@ -74,16 +81,17 @@ export default function CategoriesPage() {
             type="text"
             label="Category"
             name="category"
+            size="sm"
             onValueChange={(value) => setCategoryInputValue(value)}
             value={categoryInputValue}
-          />
+            />
           <Button
             isLoading={mutateCreateCategory.isPending}
             variant="flat"
-            className="px-10 py-7 text-md"
+            size="sm"
             color="primary"
             type="submit"
-          >
+            >
             Add Category
           </Button>
           {mutateCreateCategory.error && (
@@ -95,6 +103,7 @@ export default function CategoriesPage() {
         <Input
           className="w-[300px]"
           isClearable
+          size="sm"
           isInvalid={
             searchInputValue.length < 3 && searchInputValue.length !== 0
           }
@@ -110,7 +119,7 @@ export default function CategoriesPage() {
           }}
         />
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 p-10 lg:p-14 w-[calc(100vw-300px)]">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 md:gap-10 lg:gap-14 p-2 sm:p-5 md:p-10 lg:p-14">
         {data ? (
           data.pages.map((page) => {
             return page.data.map((category, i) => {
@@ -134,7 +143,7 @@ export default function CategoriesPage() {
         )}
       </div>
       <div
-        className="w-[calc(100vw-300px)] h-full flex items-center justify-center"
+        className="h-full flex items-center justify-center"
         ref={ref}
       >
         {hasNextPage && (
@@ -143,7 +152,7 @@ export default function CategoriesPage() {
             color="primary"
             size="lg"
             isLoading={isFetching}
-            onClick={fetchNextPage}
+            onPress={fetchNextPage}
           >
             Load More
           </Button>

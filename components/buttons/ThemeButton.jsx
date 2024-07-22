@@ -9,7 +9,7 @@ function ThemeButton() {
   return (
     <Button
       isIconOnly
-      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      onPress={() => setTheme(theme === "dark" ? "light" : "dark")}
       className="fixed bottom-10 left-10 z-[1000]"
     >
       <MoonIcon />

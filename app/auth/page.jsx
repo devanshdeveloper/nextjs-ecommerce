@@ -1,20 +1,23 @@
 "use client";
 
+// UI COMPONENTS
 import PasswordInput from "@/components/inputs/PasswordInput";
 import { Button, Input } from "@nextui-org/react";
-import React from "react";
+import { useAuthContext } from "@/components/providers/AuthProvider";
+
+// HOOKS
 import useURL from "@/hooks/useURL";
 import { useMutation } from "@tanstack/react-query";
-import { createUser, logInUser } from "@/fetch/user";
-import getFormData from "@/utils/getFormData";
-import { useAuthContext } from "@/components/providers/AuthProvider";
 import { useRouter } from "next/navigation";
+
+// UTILS
+import { createOneUser, logInUser } from "@/fetch/user";
+import getFormData from "@/utils/getFormData";
 import parseError from "@/utils/parseError";
-import { dummyUsers } from "@/dummy/users";
 
 function AuthPage() {
-  const { user, setUser } = useAuthContext();
-  const [getSearchParams, setSearchParams] = useURL();
+  const { setUser } = useAuthContext();
+  const [getSearchParams] = useURL();
   const router = useRouter();
 
   const isLoginPage = getSearchParams("action").action === "login";
@@ -24,8 +27,8 @@ function AuthPage() {
     router.push(user.user ? "/shop" : "/verify-email");
   }
 
-  const mutate_createUser = useMutation({
-    mutationFn: createUser,
+  const mutate_createOneUser = useMutation({
+    mutationFn: createOneUser,
     onSuccess,
   });
 
@@ -39,7 +42,7 @@ function AuthPage() {
     if (isLoginPage) {
       mutate_logInUser.mutate(getFormData(e, "email", "password"));
     } else {
-      mutate_createUser.mutate(getFormData(e, "name", "email", "password"));
+      mutate_createOneUser.mutate(getFormData(e, "name", "email", "password"));
     }
   }
 
@@ -56,17 +59,17 @@ function AuthPage() {
           <div className="flex flex-col gap-2">
             <Button
               isLoading={
-                mutate_createUser.isPending || mutate_logInUser.isPending
+                mutate_createOneUser.isPending || mutate_logInUser.isPending
               }
               type="submit"
               color="primary"
             >
               {isLoginPage ? "Log in" : "Sign In"}
             </Button>
-            {(mutate_createUser.error || mutate_logInUser.error) && (
+            {(mutate_createOneUser.error || mutate_logInUser.error) && (
               <span className="text-red-500">
                 {parseError(
-                  isLoginPage ? mutate_logInUser.error : mutate_createUser.error
+                  isLoginPage ? mutate_logInUser.error : mutate_createOneUser.error
                 )}
               </span>
             )}

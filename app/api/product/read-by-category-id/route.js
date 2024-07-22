@@ -1,8 +1,7 @@
 import Product from "@/models/Product";
 import paginateModel from "@/utils/paginateModel";
-import populateS3SignedURLs from "@/utils/populateS3SignedURLs";
 
-export async function GET(request) {
+export async function POST(request) {
   return Response.json(
     ...(await paginateModel({
       Model: Product,
@@ -22,7 +21,6 @@ export async function GET(request) {
               ],
             }
           : { category: categoryId },
-      processData: populateS3SignedURLs,
     }))
   );
 }
