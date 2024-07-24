@@ -56,7 +56,7 @@ export default function ProductsPage() {
 
   return (
     <>
-      <div className="flex justify-between items-center p-10">
+      <div className="flex flex-col md:flex-row justify-between items-center p-5 gap-5 md:px-10">
         <Button
           variant="flat"
           color="primary"
@@ -82,7 +82,7 @@ export default function ProductsPage() {
           }}
         />
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 p-10 lg:p-14">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-10 p-2 md:p-5 lg:p-10">
         {data ? (
           data.pages.map((page) => {
             return page.data.map((product, i) => {

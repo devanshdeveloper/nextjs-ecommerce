@@ -41,7 +41,7 @@ export default function AdminLayout({ children }) {
   return (
     <div className="flex">
       <ScrollShadow
-        className={`fixed z-10 h-[calc(100vh-64px)] no-scrollbar transition-all duration-200 ${
+        className={`fixed z-20 h-[calc(100vh-64px)] no-scrollbar transition-all duration-200 ${
           isSidebarOpen ? (isMobile ? "w-screen" : "w-[300px]") : "w-[50px]"
         }`}
       >
@@ -74,7 +74,10 @@ export default function AdminLayout({ children }) {
             },
           ]}
           aria-label="Dynamic Actions"
-          onAction={(key) => router.push(key)}
+          onAction={(key) => {
+            setIsSidebarOpen(false);
+            router.push(key);
+          }}
         >
           {(item) => (
             <ListboxItem
@@ -101,15 +104,16 @@ export default function AdminLayout({ children }) {
         <div className="h-16"></div>
       </ScrollShadow>
       <div
-        className={`fixed transition-all duration-200 ${
+        className={`fixed transition-all duration-200 h-[calc(100vh-64px)] overflow-y-scroll ${
           isSidebarOpen
             ? isMobile
-              ? "left-full w-[0px]"
+              ? "left-[200vw] w-[0px]"
               : "left-[300px] w-[calc(100vw-300px)]"
             : "left-[50px] w-[calc(100vw-50px)]"
         }`}
       >
         {children}
+        <div className="h-16"></div>
       </div>
     </div>
   );

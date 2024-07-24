@@ -41,8 +41,9 @@ export async function readByNameCategory({ name }) {
   });
 }
 
-export async function addToFavoritesCategory({ id }) {
-  return await fetchApi(`/api/category/add-to-favorites?id=${id}`, {
+export async function addToFavoritesCategory({ id, favorite }) {
+  return await fetchApi(`/api/category/add-to-favorites`, {
     method: "PUT",
+    body: { id, favorite },
   });
 }

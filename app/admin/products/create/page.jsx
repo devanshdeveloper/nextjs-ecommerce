@@ -22,6 +22,7 @@ import parseError from "@/utils/parseError";
 // HOOKS
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
+import { IoRemoveCircle } from "react-icons/io5";
 
 function CreateProductPage() {
   const [productInputValue, setProductInputValue] = useState(
@@ -49,116 +50,137 @@ function CreateProductPage() {
     },
   });
   return (
-    <form
-      onSubmit={async (e) => {
-        e.preventDefault();
-        mutateCreateProduct.mutate(e);
-      }}
-      className="w-full flex flex-col gap-2 p-10"
-    >
-      <Input
-        isDisabled={mutateCreateProduct.isPending}
-        className="w-[300px]"
-        type="text"
-        label="Product"
-        name="Product"
-        onValueChange={(value) =>
-          setProductInputValue({ ...productInputValue, name: value })
-        }
-        value={productInputValue.name}
-      />
-      <Textarea
-        isDisabled={mutateCreateProduct.isPending}
-        className="w-[300px]"
-        type="text"
-        label="Description"
-        name="description"
-        onValueChange={(value) =>
-          setProductInputValue({ ...productInputValue, description: value })
-        }
-        value={productInputValue.description}
-      />
-      <Input
-        isDisabled={mutateCreateProduct.isPending}
-        className="w-[300px]"
-        type="number"
-        label="Price"
-        name="price"
-        onValueChange={(value) =>
-          setProductInputValue({ ...productInputValue, price: value })
-        }
-        value={productInputValue.price}
-      />
-      <Input
-        isDisabled={mutateCreateProduct.isPending}
-        className="w-[300px]"
-        type="number"
-        label="Actual Price"
-        name="actualPrice"
-        onValueChange={(value) =>
-          setProductInputValue({ ...productInputValue, actualPrice: value })
-        }
-        value={productInputValue.actualPrice}
-      />
-      <ImagesInput
-        onValueChanges={(values) => {
-          setProductInputValue({ ...productInputValue, images: [...values] });
+    <div className="flex flex-col items-center">
+      <form
+        onSubmit={async (e) => {
+          e.preventDefault();
+          mutateCreateProduct.mutate(e);
         }}
-      />
-      {parseImages(productInputValue.images).map((image) => {
-        return (
-          <div key={image.filename} className="flex gap-2">
-            <Image
-              src={image.image}
-              alt=""
-              className="w-[100px]"
-              width={100}
-              height={100}
+        className="w-[min(80vw,1000px)] flex flex-col gap-5 py-3 lg:py-10"
+      >
+        <div className="text-xl lg:text-5xl  lg:pb-5">Create Product</div>
+        <div className="flex flex-col lg:flex-row gap-5 lg:gap-10">
+          <Textarea
+            isDisabled={mutateCreateProduct.isPending}
+            type="text"
+            label="Product"
+            name="Product"
+            onValueChange={(value) =>
+              setProductInputValue({ ...productInputValue, name: value })
+            }
+            value={productInputValue.name}
+            isRequired
             />
-            <Button
-              onPress={() =>
+          <Textarea
+            isDisabled={mutateCreateProduct.isPending}
+            type="text"
+            label="Description"
+            name="description"
+            onValueChange={(value) =>
+              setProductInputValue({ ...productInputValue, description: value })
+            }
+            value={productInputValue.description}
+            isRequired
+            />
+        </div>
+        <div className="flex flex-col lg:flex-row gap-5 lg:gap-10">
+          <Input
+            isDisabled={mutateCreateProduct.isPending}
+            type="number"
+            label="Price"
+            name="price"
+            onValueChange={(value) =>
+              setProductInputValue({ ...productInputValue, price: value })
+            }
+            value={productInputValue.price}
+            isRequired
+            />
+          <Input
+            isDisabled={mutateCreateProduct.isPending}
+            type="number"
+            label="Actual Price"
+            name="actualPrice"
+            onValueChange={(value) =>
+              setProductInputValue({ ...productInputValue, actualPrice: value })
+            }
+            value={productInputValue.actualPrice}
+            isRequired
+            />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <ImagesInput
+              required
+              onValueChanges={(values) => {
                 setProductInputValue({
                   ...productInputValue,
-                  images: productInputValue.images.filter(
-                    (i) => i.name !== image.filename
-                  ),
-                })
-              }
-            >
-              Remove
-            </Button>
+                  images: [...values],
+                });
+              }}
+              />
+            {parseImages(productInputValue.images).map((image) => {
+              return (
+                <div
+                key={image.filename}
+                className="relative flex flex-col gap-5"
+                >
+                  <Image
+                    src={image.image}
+                    alt=""
+                    className="w-full"
+                    width={100}
+                    height={100}
+                    />
+                  <Button
+                    className="absolute left-5 top-5"
+                    isIconOnly
+                    size="sm"
+                    onPress={() =>
+                      setProductInputValue({
+                        ...productInputValue,
+                        images: productInputValue.images.filter(
+                          (i) => i.name !== image.filename
+                        ),
+                      })
+                    }
+                    >
+                    <IoRemoveCircle />
+                  </Button>
+                </div>
+              );
+            })}
           </div>
-        );
-      })}
-      <AsyncAutoCompete
-        queryKey="categories"
-        queryFn={(params) => readAllCategory({ ...params, limit: 10 })}
-        value={productInputValue.category}
-        setValue={(value) =>
-          setProductInputValue({ ...productInputValue, category: value })
-        }
-      />
-      <VariantInput
-        variants={productInputValue.variants}
-        setVariants={(variants) =>
-          setProductInputValue({ ...productInputValue, variants })
-        }
-      />
-      <Button
-        isLoading={mutateCreateProduct.isPending}
-        variant="flat"
-        className="px-10 py-7 text-md"
-        color="primary"
-        type="submit"
-      >
-        Add Product
-      </Button>
-      {mutateCreateProduct.error && (
-        <span className="text-red-500">
-          {parseError(mutateCreateProduct.error)}
-        </span>
-      )}
-    </form>
+        <AsyncAutoCompete
+          isRequired
+          queryKey="categories"
+          queryFn={(params) => readAllCategory({ ...params, limit: 10 })}
+          value={productInputValue.category}
+          setValue={(value) =>
+            setProductInputValue({ ...productInputValue, category: value })
+          }
+          />
+        <VariantInput
+          isRequired
+          variants={productInputValue.variants}
+          setVariants={(variants) =>
+            setProductInputValue({ ...productInputValue, variants })
+          }
+          />
+        <Button
+          isLoading={mutateCreateProduct.isPending}
+          variant="flat"
+          className="px-10 py-7 text-md"
+          color="primary"
+          type="submit"
+          >
+          Add Product
+        </Button>
+        {mutateCreateProduct.error && (
+          <span className="text-red-500">
+            {parseError(mutateCreateProduct.error)}
+          </span>
+        )}
+      </form>
+    </div>
   );
 }
 

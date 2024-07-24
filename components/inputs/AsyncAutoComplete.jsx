@@ -8,6 +8,7 @@ export default function AsyncAutoCompete({
   queryFn,
   value,
   setValue,
+  ...props
 }) {
   const [inputValue, setInputValue] = useState("");
   const [searchValue, setSearchValue] = useState("");
@@ -30,6 +31,7 @@ export default function AsyncAutoCompete({
 
   return (
     <Autocomplete
+      {...props}
       className="max-w-xs"
       isLoading={isFetching}
       defaultItems={defaultItems || []}

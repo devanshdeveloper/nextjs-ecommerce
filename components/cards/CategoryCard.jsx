@@ -1,22 +1,24 @@
-import { Button, useDisclosure } from "@nextui-org/react";
-import React from "react";
+import { Button } from "@nextui-org/react";
 import { MdOutlineDelete, MdOutlineEdit } from "react-icons/md";
-import EditCategoryModal from "../modals/category/EditCategoryModal";
-import DeleteOneCategoryModal from "../modals/category/DeleteOneCategoryModal";
+import { FaRegHeart } from "react-icons/fa";
+import { FaHeart } from "react-icons/fa";
+import { useMutation } from "@tanstack/react-query";
+import { addToFavoritesCategory } from "@/fetch/category";
 
-function CategoryCard({ category , refetch }) {
-  const {
-    isOpen: isOpenEditCategoryModal,
-    onOpen: onOpenEditCategoryModal,
-    onOpenChange: onOpenChangeEditCategoryModal,
-    onClose: onCloseEditCategoryModal,
-  } = useDisclosure();
-  const {
-    isOpen: isOpenDeleteOneCategoryModal,
-    onOpen: onOpenDeleteOneCategoryModal,
-    onOpenChange: onOpenChangeDeleteOneCategoryModal,
-    onClose: onCloseDeleteOneCategoryModal,
-  } = useDisclosure();
+function CategoryCard({
+  category,
+  onOpenChangeDeleteOneCategoryModal,
+  onOpenChangeEditCategoryModal,
+  setCurrentActionCategory,
+  refetch,
+}) {
+  const mutate_AddToFavorite = useMutation({
+    mutationFn: (value) =>
+      addToFavoritesCategory({ id: category._id, favorite: value }),
+    onSuccess: () => {
+      refetch();
+    },
+  });
 
   return (
     <>
@@ -28,7 +30,26 @@ function CategoryCard({ category , refetch }) {
             variant="flat"
             color="primary"
             size="sm"
-            onPress={onOpenChangeDeleteOneCategoryModal}
+            isLoading={mutate_AddToFavorite.isPending}
+            onPress={() => {
+              mutate_AddToFavorite.mutate(!category.favorite);
+            }}
+          >
+            {category.favorite ? (
+              <FaRegHeart size={20} />
+            ) : (
+              <FaHeart size={20} />
+            )}
+          </Button>
+          <Button
+            isIconOnly
+            variant="flat"
+            color="primary"
+            size="sm"
+            onPress={() => {
+              onOpenChangeDeleteOneCategoryModal();
+              setCurrentActionCategory({ action: "delete", category });
+            }}
           >
             <MdOutlineDelete size={20} />
           </Button>
@@ -37,32 +58,15 @@ function CategoryCard({ category , refetch }) {
             variant="flat"
             color="danger"
             size="sm"
-            onPress={onOpenChangeEditCategoryModal}
+            onPress={() => {
+              onOpenChangeEditCategoryModal();
+              setCurrentActionCategory({ action: "edit", category });
+            }}
           >
             <MdOutlineEdit size={20} />
           </Button>
         </div>
       </div>
-      <EditCategoryModal
-        {...{
-          isOpenEditCategoryModal,
-          onOpenChangeEditCategoryModal,
-          onOpenEditCategoryModal,
-          onCloseEditCategoryModal,
-          category,
-          refetch
-        }}
-      />
-      <DeleteOneCategoryModal
-        {...{
-          isOpenDeleteOneCategoryModal,
-          onOpenChangeDeleteOneCategoryModal,
-          onOpenDeleteOneCategoryModal,
-          onCloseDeleteOneCategoryModal,
-          category,
-          refetch
-        }}
-      />
     </>
   );
 }

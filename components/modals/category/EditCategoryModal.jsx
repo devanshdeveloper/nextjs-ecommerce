@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MyModal from "../Modal";
 import { useMutation } from "@tanstack/react-query";
 import { Button, Input } from "@nextui-org/react";
@@ -23,6 +23,10 @@ function EditCategoryModal({
       refetch();
     },
   });
+
+  useEffect(() => {
+    setCategoryInputValue(category.name);
+  }, [category.name]);
 
   return (
     <MyModal

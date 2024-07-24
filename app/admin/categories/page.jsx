@@ -2,7 +2,7 @@
 
 // UI COMPONENTS
 import AdminLayoutCover from "@/components/layout/AdminLayoutCover";
-import { Button, Input, Spinner } from "@nextui-org/react";
+import { Button, Input, Spinner, useDisclosure } from "@nextui-org/react";
 import CategoryCard from "@/components/cards/CategoryCard";
 
 // UTILS
@@ -15,14 +15,33 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { useDebouncedCallback } from "use-debounce";
+import EditCategoryModal from "@/components/modals/category/EditCategoryModal";
+import DeleteOneCategoryModal from "@/components/modals/category/DeleteOneCategoryModal";
 
 export default function CategoriesPage() {
   const router = useRouter();
 
   // STATE
+  const [currentActionCategory, setCurrentActionCategory] = useState({
+    action: null,
+    category: null,
+  });
   const [categoryInputValue, setCategoryInputValue] = useState("");
   const [searchInputValue, setSearchInputValue] = useState("");
   const [searchValue, setSearchValue] = useState("");
+
+  const {
+    isOpen: isOpenEditCategoryModal,
+    onOpen: onOpenEditCategoryModal,
+    onOpenChange: onOpenChangeEditCategoryModal,
+    onClose: onCloseEditCategoryModal,
+  } = useDisclosure();
+  const {
+    isOpen: isOpenDeleteOneCategoryModal,
+    onOpen: onOpenDeleteOneCategoryModal,
+    onOpenChange: onOpenChangeDeleteOneCategoryModal,
+    onClose: onCloseDeleteOneCategoryModal,
+  } = useDisclosure();
 
   const {
     data,
@@ -66,7 +85,7 @@ export default function CategoriesPage() {
 
   return (
     <>
-      <div className="flex justify-between items-center p-2 md:p-10">
+      <div className="flex flex-col md:flex-row gap-5 justify-between items-center p-2 md:p-10">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -84,14 +103,14 @@ export default function CategoriesPage() {
             size="sm"
             onValueChange={(value) => setCategoryInputValue(value)}
             value={categoryInputValue}
-            />
+          />
           <Button
             isLoading={mutateCreateCategory.isPending}
             variant="flat"
             size="sm"
             color="primary"
             type="submit"
-            >
+          >
             Add Category
           </Button>
           {mutateCreateCategory.error && (
@@ -110,7 +129,6 @@ export default function CategoriesPage() {
           errorMessage="Enter atleast three characters to search"
           type="text"
           label="Search"
-          variant="bordered"
           isDisabled={status === "pending"}
           value={searchInputValue}
           onValueChange={(value) => {
@@ -119,11 +137,22 @@ export default function CategoriesPage() {
           }}
         />
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 md:gap-10 lg:gap-14 p-2 sm:p-5 md:p-10 lg:p-14">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 md:gap-10  p-2 sm:p-5 md:p-10 !pt-0">
         {data ? (
           data.pages.map((page) => {
             return page.data.map((category, i) => {
-              return <CategoryCard key={i} {...{ category, refetch }} />;
+              return (
+                <CategoryCard
+                  key={i}
+                  {...{
+                    category,
+                    onOpenChangeDeleteOneCategoryModal,
+                    onOpenChangeEditCategoryModal,
+                    setCurrentActionCategory,
+                    refetch
+                  }}
+                />
+              );
             });
           })
         ) : status === "pending" ? null : (
@@ -142,10 +171,7 @@ export default function CategoriesPage() {
           </AdminLayoutCover>
         )}
       </div>
-      <div
-        className="h-full flex items-center justify-center"
-        ref={ref}
-      >
+      <div className="h-full flex items-center justify-center" ref={ref}>
         {hasNextPage && (
           <Button
             variant="flat"
@@ -159,6 +185,34 @@ export default function CategoriesPage() {
         )}
         {!hasNextPage && isFetching && <Spinner />}
       </div>
+      {currentActionCategory.action === "edit" && (
+        <EditCategoryModal
+          {...{
+            isOpenEditCategoryModal,
+            onOpenChangeEditCategoryModal,
+            onOpenEditCategoryModal,
+            onCloseEditCategoryModal,
+            category:
+              currentActionCategory.action === "edit" &&
+              currentActionCategory.category,
+            refetch,
+          }}
+        />
+      )}
+      {currentActionCategory.action === "delete" && (
+        <DeleteOneCategoryModal
+          {...{
+            isOpenDeleteOneCategoryModal,
+            onOpenChangeDeleteOneCategoryModal,
+            onOpenDeleteOneCategoryModal,
+            onCloseDeleteOneCategoryModal,
+            category:
+              currentActionCategory.action === "delete" &&
+              currentActionCategory.category,
+            refetch,
+          }}
+        />
+      )}
     </>
   );
 }

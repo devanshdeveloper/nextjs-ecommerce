@@ -2,7 +2,7 @@ import connectDB from "@/lib/mongoose";
 import User from "@/models/User";
 
 export async function PUT(request) {
-  const { id, newDetails } = await request.json();
+  const { id, newUser } = await request.json();
   
   try {
     await connectDB();
@@ -10,9 +10,9 @@ export async function PUT(request) {
     if (!user) {
       return Response.json({ error: "User not found" }, { status: 404 });
     }
-    for (const key in newDetails) {
-      if (newDetails.hasOwnProperty(key)) {
-        user[key] = newDetails[key];
+    for (const key in newUser) {
+      if (newUser.hasOwnProperty(key)) {
+        user[key] = newUser[key];
       }
     }
     await user.save();

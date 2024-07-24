@@ -2,7 +2,7 @@ import connectDB from "@/lib/mongoose";
 import Category from "@/models/Category";
 
 export async function PUT(request) {
-  const { id, newDetails } = await request.json();
+  const { id, newCategory } = await request.json();
   
   try {
     await connectDB();
@@ -10,9 +10,9 @@ export async function PUT(request) {
     if (!category) {
       return Response.json({ error: "Category not found" }, { status: 404 });
     }
-    for (const key in newDetails) {
-      if (newDetails.hasOwnProperty(key)) {
-        category[key] = newDetails[key];
+    for (const key in newCategory) {
+      if (newCategory.hasOwnProperty(key)) {
+        category[key] = newCategory[key];
       }
     }
     await category.save();

@@ -3,11 +3,10 @@
 // COMPONENTS
 import AdminLayoutCover from "@/components/layout/AdminLayoutCover";
 import { Avatar, Button, Spinner, Input } from "@nextui-org/react";
-import AdminLayoutSpinner from "@/components/spinners/AdminLayoutSpinner";
 import { IoIosArrowForward } from "react-icons/io";
 
 // UTILS
-import { getUsers, readAllUsers } from "@/fetch/user";
+import {  readAllUsers } from "@/fetch/user";
 
 // HOOKS
 import { useInfiniteQuery } from "@tanstack/react-query";

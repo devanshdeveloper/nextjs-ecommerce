@@ -1,6 +1,6 @@
 "use client";
 // HOOKS
-import  { useState } from "react";
+import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuthContext } from "../providers/AuthProvider";
 
@@ -20,10 +20,10 @@ import Link from "next/link";
 export default function Nav() {
   // CONTEXT
   const { user, setUser } = useAuthContext();
-  
+
   // STATE
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  
+
   // NEXT/NAVIGATION
   const router = useRouter();
   const pathname = usePathname();
@@ -79,22 +79,32 @@ export default function Nav() {
   }
 
   return (
-    <Navbar isBordered isMenuOpen={isMenuOpen} onMenuOpenChange={setIsMenuOpen}>
-      <NavbarBrand>
-        <Link href={"/"} className="font-bold text-inherit">
-          Bhrm Clothings
-        </Link>
-      </NavbarBrand>
-      <NavbarContent justify="end">
-        <NavbarItems className="hidden sm:flex" NavbarItem={NavbarItem} />
-        <NavbarMenuToggle
-          aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-          className="sm:hidden"
-        />
-      </NavbarContent>
-      <NavbarMenu>
-        <NavbarItems NavbarItem={NavbarMenuItem} />
-      </NavbarMenu>
-    </Navbar>
+    <>
+      <Navbar
+        isBordered
+        classNames={{ base: "fixed" }}
+        isMenuOpen={isMenuOpen}
+        onMenuOpenChange={setIsMenuOpen}
+      >
+        <NavbarContent>
+          <NavbarBrand>
+            <Link href={"/"} className="font-bold text-inherit">
+              Bhrm Clothings
+            </Link>
+          </NavbarBrand>
+        </NavbarContent>
+        <NavbarContent justify="end">
+          <NavbarItems className="hidden sm:flex" NavbarItem={NavbarItem} />
+          <NavbarMenuToggle
+            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+            className="sm:hidden"
+          />
+        </NavbarContent>
+        <NavbarMenu>
+          <NavbarItems NavbarItem={NavbarMenuItem} />
+        </NavbarMenu>
+      </Navbar>
+      <div className="h-16"></div>
+    </>
   );
 }
