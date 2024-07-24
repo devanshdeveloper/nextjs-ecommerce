@@ -60,9 +60,9 @@ function UserDetailsPage() {
 
   return (
     <div>
-      <div className="p-10 flex flex-col items-center gap-10">
-        <div className="w-full flex items-center justify-between">
-          <div className="text-2xl">User Details : {pageUser.name}</div>
+      <div className="px-5 lg:p-10 flex flex-col items-center gap-10">
+        <div className="w-full flex flex-col lg:flex-row justify-between">
+          <div className="text-lg lg:text-2xl py-5">User Details : {pageUser.name}</div>
           <div className="flex gap-5 items-center">
             <Select
               label="Role"

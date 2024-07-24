@@ -6,6 +6,7 @@ import Providers from "@/components/providers";
 import Nav from "@/components/layout/Nav";
 import ThemeButton from "@/components/buttons/ThemeButton";
 import useIsClient from "@/hooks/useIsClient";
+import Footer from "@/components/layout/Footer";
 
 const poppins = Poppins({ weight: "400", subsets: ["latin"] });
 
@@ -24,7 +25,8 @@ export default function RootLayout({ children }) {
             <main className="text-foreground bg-background">
               <Nav />
               {children}
-              <ThemeButton />
+              {/* <ThemeButton /> */}
+              <Footer />
             </main>
           </Providers>
         )}

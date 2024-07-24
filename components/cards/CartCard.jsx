@@ -7,6 +7,7 @@ import { useMutation } from "@tanstack/react-query";
 import { addToCart } from "@/fetch/user";
 import { useAuthContext } from "../providers/AuthProvider";
 import { useDebouncedCallback } from "use-debounce";
+import parseAmount from "@/utils/parseAmount";
 export default function CartCard({
   actualPrice,
   category,
@@ -57,41 +58,47 @@ export default function CartCard({
 
   // return
   return (
-    <Card as={"div"} className="group relative border-1 border-foreground-200">
-      {images[0] && (
-        <Image
-          className={
-            images[1] &&
-            `${
-              images[1] && "absolute"
-            } z-10 group-hover:invisible w-full h-[300px]`
-          }
-          src={images[0]}
-          width={500}
-          height={500}
-          alt={name}
-        />
-      )}
-      {images[1] && (
-        <Image
-          className="group-hover:visible w-full h-[300px]"
-          src={images[1]}
-          width={500}
-          height={500}
-          alt={name}
-        />
-      )}
-      {!images[0] && (
-        <div className="w-full h-[300px] flex items-center justify-center">
-          <MdImageNotSupported size={100} />
-        </div>
-      )}
-      <CardFooter className="justify-between">
+    <Card
+      as={"div"}
+      className="group flex-row relative border-1 border-foreground-200 h-[300px]"
+    >
+      <div>
+        {images[0] && (
+          <Image
+            className={
+              images[1] &&
+              `${images[1] && "absolute"} z-10 group-hover:invisible  h-[100px]`
+            }
+            src={images[0]}
+            width={250}
+            height={250}
+            alt={name}
+          />
+        )}
+        {images[1] && (
+          <Image
+            className="group-hover:visible  h-[100px]"
+            src={images[1]}
+            width={250}
+            height={250}
+            alt={name}
+          />
+        )}
+        {!images[0] && (
+          <div className=" h-[100px] flex items-center justify-center">
+            <MdImageNotSupported size={100} />
+          </div>
+        )}
+      </div>
+      <div className="flex flex-col justify-between p-5">
         <div className="flex flex-col items-start">
           <h4 className="font-bold sm:text-sm md:text-md lg:text-large">
             {name}
           </h4>
-          <small className="text-default-500">Rs {price}</small>
+          <small className="text-default-250">
+            Rs {parseAmount(price)} * {cartItem?.quantity} ={" "}
+            {parseAmount(price * cartItem?.quantity)}
+          </small>
         </div>
         <div className="flex gap-2">
           <Button
@@ -125,7 +132,7 @@ export default function CartCard({
             <BiPlus size={30} />
           </Button>
         </div>
-      </CardFooter>
+      </div>
     </Card>
   );
 }

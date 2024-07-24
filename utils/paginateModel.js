@@ -18,8 +18,6 @@ async function paginateModel({
     );
     pageParam = +pageParam || 1;
     limit = +limit || 10;
-    console.log("working till here...");
-
     let bodyArray = [];
     if (bodyElements.length > 0) {
       const body = await request.json();
@@ -44,6 +42,7 @@ async function paginateModel({
       .skip((pageParam - 1) * limit)
       .limit(limit);
     const processedData = processData ? await processData(data) : data;
+    
 
     return [
       {

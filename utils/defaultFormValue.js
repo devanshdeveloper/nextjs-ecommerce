@@ -9,3 +9,9 @@ export function defaultProductFormValue() {
     variants: [],
   };
 }
+
+export function defaultCheckoutFormValue() {
+  return {
+    
+  }
+}
