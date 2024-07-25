@@ -30,7 +30,6 @@ export async function uploadImageToBucket({ Key, imageToUpload }) {
         console.error("Failed to parse JSON response", error);
       }
 
-      console.log(`UPLOAD ${Key} `, imageToUpload, res, json);
     } else {
       throw new Error("Failed to get the S3 bucket URL");
     }

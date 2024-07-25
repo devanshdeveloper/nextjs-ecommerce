@@ -1,40 +1,51 @@
 "use client";
 
 // UI COMPONENTS
-import ImagesInput from "@/components/inputs/ImagesInput";
 import AsyncAutoCompete from "@/components/inputs/AsyncAutoComplete";
 import { Button, Input, Textarea } from "@nextui-org/react";
-import Image from "next/image";
 import VariantInput from "@/components/inputs/VariantInput";
 
 // UTILS
 import { createOneProduct } from "@/fetch/product";
 import { readAllCategory } from "@/fetch/category";
-import {
-  getImagesFromBucket,
-  uploadImagesToBucket,
-} from "@/utils/s3-bucket-front";
+import { uploadImagesToBucket } from "@/utils/s3-bucket-front";
 import { v4 } from "uuid";
-import { parseImages } from "@/utils/parseImages";
 import { defaultProductFormValue } from "@/utils/defaultFormValue";
-import parseError from "@/utils/parseError";
+import parseError, { recursiveError } from "@/utils/parseError";
 
 // HOOKS
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import { IoRemoveCircle } from "react-icons/io5";
-
+import ImageUploader from "@/components/inputs/ImageUploaderInput";
+import imageCompression from "browser-image-compression";
+import { validateProductForm } from "@/utils/formValidation";
 function CreateProductPage() {
   const [productInputValue, setProductInputValue] = useState(
     defaultProductFormValue()
   );
-
+  
+  const [errors, setErrors] = useState([]);
   const mutateCreateProduct = useMutation({
     mutationFn: async () => {
+      const validationErrors = validateProductForm(productInputValue);
+      console.log(validationErrors);
+      if (validationErrors) {
+        setErrors(recursiveError(validationErrors));
+        return;
+      }
       const uuid = v4().replace(/-/g, "").substring(0, 24);
+      const compressedFiles = await Promise.all(
+        productInputValue.images.map((image) => {
+          return imageCompression(image, {
+            maxSizeMB: 2,
+            maxWidthOrHeight: 1920,
+            useWebWorker: true,
+          });
+        })
+      );
       const imageKeys = await uploadImagesToBucket(
-        productInputValue.images.map((image) => ({
-          Key: `product/${uuid}/${uuid}-${image.name}`,
+        compressedFiles.map((image) => ({
+          Key: `product/${productInputValue.category.name}/${image.name}`,
           file: image,
           fileType: image.type,
         }))
@@ -47,8 +58,10 @@ function CreateProductPage() {
     },
     onSuccess: (data) => {
       setProductInputValue(defaultProductFormValue());
+      router.push(`/admin/products/${data._id}/details`);
     },
   });
+
   return (
     <div className="flex flex-col items-center">
       <form
@@ -70,7 +83,7 @@ function CreateProductPage() {
             }
             value={productInputValue.name}
             isRequired
-            />
+          />
           <Textarea
             isDisabled={mutateCreateProduct.isPending}
             type="text"
@@ -81,7 +94,7 @@ function CreateProductPage() {
             }
             value={productInputValue.description}
             isRequired
-            />
+          />
         </div>
         <div className="flex flex-col lg:flex-row gap-5 lg:gap-10">
           <Input
@@ -90,24 +103,38 @@ function CreateProductPage() {
             label="Price"
             name="price"
             onValueChange={(value) =>
-              setProductInputValue({ ...productInputValue, price: value })
+              setProductInputValue({ ...productInputValue, price: +value })
             }
             value={productInputValue.price}
             isRequired
-            />
+          />
           <Input
             isDisabled={mutateCreateProduct.isPending}
             type="number"
             label="Actual Price"
             name="actualPrice"
             onValueChange={(value) =>
-              setProductInputValue({ ...productInputValue, actualPrice: value })
+              setProductInputValue({
+                ...productInputValue,
+                actualPrice: +value,
+              })
             }
             value={productInputValue.actualPrice}
             isRequired
-            />
+          />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <ImageUploader
+          acceptedImages={productInputValue.images}
+          setAcceptedImages={(value) => {
+            setProductInputValue((prev) => ({
+              ...prev,
+              images: [
+                ...(typeof value === "function" ? value(prev.images) : value),
+              ],
+            }));
+          }}
+        />
+        {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <ImagesInput
               required
               onValueChanges={(values) => {
@@ -148,7 +175,7 @@ function CreateProductPage() {
                 </div>
               );
             })}
-          </div>
+          </div> */}
         <AsyncAutoCompete
           isRequired
           queryKey="categories"
@@ -157,23 +184,28 @@ function CreateProductPage() {
           setValue={(value) =>
             setProductInputValue({ ...productInputValue, category: value })
           }
-          />
+        />
         <VariantInput
           isRequired
           variants={productInputValue.variants}
           setVariants={(variants) =>
             setProductInputValue({ ...productInputValue, variants })
           }
-          />
+        />
         <Button
           isLoading={mutateCreateProduct.isPending}
           variant="flat"
           className="px-10 py-7 text-md"
           color="primary"
           type="submit"
-          >
+        >
           Add Product
         </Button>
+        {errors.map((err, i) => (
+          <span key={i} className="text-red-500">
+            {err}
+          </span>
+        ))}
         {mutateCreateProduct.error && (
           <span className="text-red-500">
             {parseError(mutateCreateProduct.error)}

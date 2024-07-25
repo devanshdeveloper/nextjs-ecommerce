@@ -16,7 +16,7 @@ const RefundsCancellations = () => {
             <h2 className="text-xl font-semibold">2. Exception</h2>
             <p>
               In case of any issues or concerns with your purchase, please
-              contact our support team at [Your Support Email] within 24 hours
+              contact our support team at {process.env.EMAIL_USER} within 24 hours
               of purchase for assistance.
             </p>
           </section>

@@ -52,11 +52,20 @@ const ProductSchema = new mongoose.Schema({
   },
 });
 
+async function populateS3SignedURLs(data, next) {
 
-async function populateS3SignedURLs(data , next) {
+  if (!data) {
+    next();
+    return;
+  }
   for (let i = 0; i < data.length; i++) {
     const product = data[i];
     const images = product.images;
+    if (!images?.length) {
+      console.log("No images found for product " + product.name);
+      continue;
+    }
+
     for (let j = 0; j < images.length; j++) {
       const imageURL = images[j];
       if (imageURL.startsWith("/") || imageURL.startsWith("http")) {
@@ -74,10 +83,9 @@ async function populateS3SignedURLs(data , next) {
   next();
 }
 
-ProductSchema.post("find" , populateS3SignedURLs)
-ProductSchema.post("findOne" , populateS3SignedURLs)
-ProductSchema.post("findById" , populateS3SignedURLs)
-
+ProductSchema.post("find", populateS3SignedURLs);
+ProductSchema.post("findOne", populateS3SignedURLs);
+ProductSchema.post("findById", populateS3SignedURLs);
 
 export default mongoose.models.Product ||
   mongoose.model("Product", ProductSchema);

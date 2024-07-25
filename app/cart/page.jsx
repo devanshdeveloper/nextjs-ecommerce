@@ -53,15 +53,48 @@ function CartPage() {
 
   const products = data && data.pages.flatMap((page) => page.data);
 
+  console.log({ products, user });
+
   function calculateAmount(cart, products) {
     if (!cart || !products) return 0;
     let amount = 0;
     for (let i = 0; i < cart.length; i++) {
       const cartItem = cart[i];
       const product = products.find((p) => p._id === cartItem.product);
+      if (!product) {
+        console.error("Product not found in cart: ", cartItem.product);
+        continue;
+      }
       amount += product.price * cartItem.quantity;
     }
     return parseAmount(amount);
+  }
+
+  if (status === "pending") {
+    return (
+      <div className="flex flex-col items-center justify-center h-full">
+        <Spinner size="xl" />
+      </div>
+    );
+  }
+  console.log(products);
+
+  if (!products.length) {
+    return (
+      <AdminLayoutCover>
+        <div className="flex flex-col items-center gap-10">
+          <div className="text-3xl">No Products Found</div>
+          <Button
+            variant="flat"
+            color="primary"
+            size="lg"
+            onPress={() => router.back()}
+          >
+            Back
+          </Button>
+        </div>
+      </AdminLayoutCover>
+    );
   }
 
   return (

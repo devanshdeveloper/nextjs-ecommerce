@@ -15,7 +15,6 @@ export async function POST(request) {
     if (!user) {
       return Response.json({ error: "User doesn't exists" }, { status: 500 });
     }
-    console.log(JSON.stringify(user , null, 2));
     const updatedCart = await user.addToCart(productId, quantity);
     return Response.json(updatedCart);
   } catch (err) {

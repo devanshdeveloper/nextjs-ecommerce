@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { Poppins } from "next/font/google";
 import "./globals.css";
@@ -9,7 +9,6 @@ import useIsClient from "@/hooks/useIsClient";
 import Footer from "@/components/layout/Footer";
 
 const poppins = Poppins({ weight: "400", subsets: ["latin"] });
-
 
 export default function RootLayout({ children }) {
   const [isClient] = useIsClient();
@@ -23,9 +22,11 @@ export default function RootLayout({ children }) {
         {isClient && (
           <Providers>
             <main className="text-foreground bg-background">
-              <Nav />
-              {children}
-              {/* <ThemeButton /> */}
+              <div className="min-h-[calc(100vh)]">
+                <Nav />
+                {children}
+                {/* <ThemeButton /> */}
+              </div>
               <Footer />
             </main>
           </Providers>

@@ -27,7 +27,7 @@ export default function AsyncAutoCompete({
     if (search.length < 3) return setSearchValue("");
     setSearchValue(search);
   }, 2000);
-  const defaultItems = data?.pages.map((page) => page.data)?.[0];
+  const defaultItems = data?.pages.flatMap((page) => page.data);
 
   return (
     <Autocomplete
@@ -43,7 +43,7 @@ export default function AsyncAutoCompete({
           (category) => category.name === value
         )?._id;
         if (id) {
-          setValue(id);
+          setValue({ id, name: value });
         }
       }}
       inputValue={inputValue}

@@ -1,17 +1,17 @@
+import Link from "next/link";
 import React from "react";
 
 function Footer() {
   return (
-    <footer className="bg-background rounded-lg shadow m-4 ">
-      <div className="w-full mx-auto max-w-screen-xl p-4 md:flex md:items-center md:justify-between">
-        <span className="text-sm text-gray-500 sm:text-center dark:text-gray-400">
+    <footer className="flex flex-wrap flex-col md:flex-row p-5 gap-5 bg-background justify-between">
+        <span className="text-sm text-foreground-400">
           © 2024{" "}
-          <a href="https://flowbite.com/" className="hover:underline">
+          <Link href="/" className="hover:underline">
             Bhrm Clothing
-          </a>
+          </Link>
           . All Rights Reserved.
         </span>
-        <ul className="flex flex-wrap items-center mt-3 text-sm font-medium text-gray-500 dark:text-gray-400 sm:mt-0">
+        <ul className="flex flex-wrap items-center text-sm font-medium text-foreground-400 gap-2">
           {[
             { href: "/policies/pricing", text: "Pricing" },
             { href: "/policies/privacy-policy", text: "Privacy Policy" },
@@ -22,14 +22,13 @@ function Footer() {
           ].map((item, index) => {
             return (
               <li key={index}>
-                <a href={item.href} className="hover:underline me-4 md:me-6">
+                <Link href={item.href} className="hover:underline me-4 md:me-6">
                   {item.text}
-                </a>
+                </Link>
               </li>
             );
           })}
         </ul>
-      </div>
     </footer>
   );
 }

@@ -67,7 +67,7 @@ export default function CartCard({
           <Image
             className={
               images[1] &&
-              `${images[1] && "absolute"} z-10 group-hover:invisible  h-[100px]`
+              `${images[1] && "absolute"} z-10 group-hover:invisible `
             }
             src={images[0]}
             width={250}
@@ -77,7 +77,7 @@ export default function CartCard({
         )}
         {images[1] && (
           <Image
-            className="group-hover:visible  h-[100px]"
+            className="group-hover:visible "
             src={images[1]}
             width={250}
             height={250}
@@ -85,7 +85,7 @@ export default function CartCard({
           />
         )}
         {!images[0] && (
-          <div className=" h-[100px] flex items-center justify-center">
+          <div className="flex items-center justify-center">
             <MdImageNotSupported size={100} />
           </div>
         )}
@@ -117,7 +117,6 @@ export default function CartCard({
             className="w-[100px]"
             isDisabled={mutateAddToCart.isPending}
             onValueChange={(value) => {
-              console.log("onValueChange", value);
               handleQuantityChange(value);
             }}
           />

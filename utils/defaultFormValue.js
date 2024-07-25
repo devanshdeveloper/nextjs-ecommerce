@@ -5,13 +5,11 @@ export function defaultProductFormValue() {
     price: 0,
     actualPrice: 0,
     images: [],
-    category: "",
+    category: { id: "", name: "" },
     variants: [],
   };
 }
 
 export function defaultCheckoutFormValue() {
-  return {
-    
-  }
+  return {};
 }
