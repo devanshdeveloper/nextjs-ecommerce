@@ -23,7 +23,7 @@ function CreateProductPage() {
   const [productInputValue, setProductInputValue] = useState(
     defaultProductFormValue()
   );
-  
+
   const [errors, setErrors] = useState([]);
   const mutateCreateProduct = useMutation({
     mutationFn: async () => {
@@ -37,7 +37,7 @@ function CreateProductPage() {
       const compressedFiles = await Promise.all(
         productInputValue.images.map((image) => {
           return imageCompression(image, {
-            maxSizeMB: 2,
+            maxSizeMB: 1,
             maxWidthOrHeight: 1920,
             useWebWorker: true,
           });

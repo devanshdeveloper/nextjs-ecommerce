@@ -1,6 +1,5 @@
 import Product from "@/models/Product";
 import Category from "@/models/Category";
-import { getObjectURL } from "@/utils/s3-bucket";
 
 export async function GET() {
   try {
