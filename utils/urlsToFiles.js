@@ -7,6 +7,7 @@ export async function urlToFile(url) {
       headers: {
         'Content-Type': 'image/' + url.split('.')[url.split('.').length - 1],
       },
+      mode: 'no-cors',
     });
     console.log("response: " + JSON.stringify(response));
     
