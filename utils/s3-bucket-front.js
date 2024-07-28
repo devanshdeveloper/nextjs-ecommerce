@@ -89,12 +89,12 @@ export async function getImagesFromBucket(...keys) {
         keys = keys.filter((currentKey) => currentKey === key);
       }
     });
-    let fetchedKeys = [];
+    let fetchedKeys = {};
     if (keys.length > 0) {
-      fetchedKeys = await fetchApi(`/api/s3-bucket/get/many`, {
-        method: "POST",
-        body: keys,
-      });
+      keys.forEach(
+        (key) =>
+          (fetchedKeys[key] = `${process.env.NEXT_PUBLIC_AWS_URL}/${key}`)
+      );
     }
     let totalKeys = {
       ...imageKeys,
