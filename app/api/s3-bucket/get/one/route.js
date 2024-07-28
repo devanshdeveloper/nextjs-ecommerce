@@ -12,7 +12,6 @@ export async function POST(request) {
     const response = await getObjectURL({
       Bucket: process.env.AWS_BUCKET_NAME,
       Key: Key,
-      Expires: 60,
     });
     return Response.json(response);
   } catch (error) {
