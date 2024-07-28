@@ -27,7 +27,7 @@ async function paginateModel({
     const query = queryFunc
       ? queryFunc(...URLSearchParamsResult, ...bodyArray)
       : {};
-    connectDB();
+    await connectDB();
     const count = await Model.countDocuments(query);
     const totalPages = Math.ceil(count / limit);
     if (pageParam > totalPages) {
@@ -42,7 +42,6 @@ async function paginateModel({
       .skip((pageParam - 1) * limit)
       .limit(limit);
     const processedData = processData ? await processData(data) : data;
-    
 
     return [
       {

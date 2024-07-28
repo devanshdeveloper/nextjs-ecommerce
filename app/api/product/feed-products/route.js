@@ -4,7 +4,7 @@ import connectDB from "@/lib/mongoose";
 
 export async function GET() {
   try {
-    connectDB();
+    await connectDB();
     const categories = await Category.find().sort({ favorite: -1 }).limit(5);
     const categoryWithProducts = [];
     for (const category of categories) {
