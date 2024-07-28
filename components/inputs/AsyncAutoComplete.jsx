@@ -1,6 +1,6 @@
 import { Autocomplete, AutocompleteItem } from "@nextui-org/react";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 
 export default function AsyncAutoCompete({
@@ -23,6 +23,10 @@ export default function AsyncAutoCompete({
     retry: false,
   });
 
+  useEffect(() => {
+    setInputValue(value);
+  }, [value]);
+
   const debouncedMutateSearchCategory = useDebouncedCallback((search) => {
     if (search.length < 3) return setSearchValue("");
     setSearchValue(search);
@@ -37,7 +41,6 @@ export default function AsyncAutoCompete({
       defaultItems={defaultItems || []}
       label="Select a Category"
       onInputChange={(value) => {
-        setInputValue(value);
         debouncedMutateSearchCategory(value);
         const id = defaultItems?.find(
           (category) => category.name === value
@@ -47,7 +50,6 @@ export default function AsyncAutoCompete({
         }
       }}
       inputValue={inputValue}
-      value={value}
     >
       {(item) => {
         return (

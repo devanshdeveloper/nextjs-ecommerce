@@ -16,8 +16,11 @@ export default function VariantInput({ variants, setVariants, isRequired }) {
     setVariants(newVariants);
   };
 
-  const addVariant = () => {
-    setVariants([...variants, { name: "", options: [""] }]);
+  const addVariant = (newVariant = { name: "", options: [""] }) => {
+    setVariants([...variants, newVariant]);
+  };
+  const deleteVariant = (variantIndex) => {
+    setVariants([...variants.filter((_, index) => index !== variantIndex)]);
   };
 
   const addOption = (variantIndex) => {
@@ -52,8 +55,21 @@ export default function VariantInput({ variants, setVariants, isRequired }) {
             isRequired={isRequired}
             value={variant.name}
             onChange={(event) => handleVariantChange(variantIndex, event)}
+            endContent={
+              <div className="flex items-center justify-center">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  color="gray"
+                  className="flex items-center justify-center"
+                  onPress={() => deleteVariant(variantIndex)}
+                >
+                  <CircleX />
+                </Button>
+              </div>
+            }
             required
-            />
+          />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 place-items-start gap-5">
             {variant.options.map((option, optionIndex) => (
               <div key={optionIndex}>
@@ -93,9 +109,32 @@ export default function VariantInput({ variants, setVariants, isRequired }) {
           </div>
         </div>
       ))}
-      <Button variant="flat" color="primary" onPress={addVariant}>
-        Add Variant
-      </Button>
+      <div className="flex gap-2">
+        <Button
+          variant="flat"
+          color="primary"
+          onPress={() =>
+            addVariant({ name: "Size", options: ["S", "M", "L", "XL"] })
+          }
+        >
+          Add Size Variant
+        </Button>
+        <Button
+          variant="flat"
+          color="primary"
+          onPress={() =>
+            addVariant({
+              name: "Size",
+              options: ["#1feeee", "#ffffff", "#000000", "#fff000"],
+            })
+          }
+        >
+          Add Color Variant
+        </Button>
+        <Button variant="flat" color="primary" onPress={() => addVariant()}>
+          Add Custom Variant
+        </Button>
+      </div>
     </div>
   );
 }

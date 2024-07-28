@@ -29,23 +29,10 @@ const ProductSchema = z.object({
     .optional(),
 });
 
-// Example product data
-const product = {
-  name: "",
-  description: "",
-  price: 0,
-  actualPrice: 0,
-  images: ["https://example.com/image1.jpg"],
-  category: { id: "cat123", name: "Category Name" },
-  variants: [
-    { color: "red", size: "M", stock: 10 },
-    { color: "blue", size: "L", stock: 5 },
-  ],
-};
 
-export function validateProductForm(product) {
+export function validateForm(schema, data) {
   try {
-    const validation = ProductSchema.parse(product);
+    const validation = schema.parse(data);
   } catch (error) {
     if (error instanceof z.ZodError) {
       return error.format();
@@ -53,4 +40,8 @@ export function validateProductForm(product) {
       return error;
     }
   }
+}
+
+export function validateProductForm(product) {
+  return validateForm(ProductSchema, product);
 }

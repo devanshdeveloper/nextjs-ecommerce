@@ -2,7 +2,7 @@ import React from "react";
 import PageLayout from "../layout/PageLayout";
 import { Spinner } from "@nextui-org/react";
 
-function FullScreenSpinner() {
+function PageLayoutSpinner() {
   return (
     <PageLayout>
       <Spinner />
@@ -10,4 +10,4 @@ function FullScreenSpinner() {
   );
 }
 
-export default FullScreenSpinner;
+export default PageLayoutSpinner;

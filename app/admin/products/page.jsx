@@ -3,7 +3,6 @@
 // UI COMPONENTS
 import AdminLayoutCover from "@/components/layout/AdminLayoutCover";
 import { Button, Input, Spinner } from "@nextui-org/react";
-import ProductCard from "@/components/cards/ProductCard";
 
 // UTILS
 import { readAllProducts } from "@/fetch/product";
@@ -15,6 +14,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { useDebouncedCallback } from "use-debounce";
+import AdminProductCard from "@/components/cards/AdminProductCard";
 
 export default function ProductsPage() {
   const router = useRouter();
@@ -86,7 +86,7 @@ export default function ProductsPage() {
         {data ? (
           data.pages.map((page) => {
             return page.data.map((product, i) => {
-              return <ProductCard key={i} {...{ ...product }} />;
+              return <AdminProductCard key={i} {...{ ...product  , refetch}} />;
             });
           })
         ) : status === "pending" ? null : (

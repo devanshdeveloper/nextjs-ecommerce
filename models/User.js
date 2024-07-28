@@ -14,7 +14,9 @@ const UserSchema = new mongoose.Schema({
   isEmailVerified: { type: Boolean, default: false },
   password: {
     type: String,
-    required: [true, "Please enter your password"],
+    required: function () {
+      return this.provider === "email";
+    },
     minLength: [6, "Your password must be longer than 6 characters"],
     select: false,
   },
@@ -40,6 +42,10 @@ const UserSchema = new mongoose.Schema({
       quantity: Number,
     },
   ],
+  provider: {
+    type: String,
+    default: "email",
+  },
   createdAt: {
     type: Date,
     default: Date.now,
@@ -51,7 +57,11 @@ UserSchema.pre("save", async function (next) {
     next();
   }
 
-  this.password = await bcrypt.hash(this.password, 10);
+  if (this.provider === "email") {
+    this.password = await bcrypt.hash(this.password, 10);
+  }
+
+  next();
 });
 
 UserSchema.methods.addToCart = async function (productId, quantity = 1) {

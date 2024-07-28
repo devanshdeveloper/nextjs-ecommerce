@@ -1,5 +1,7 @@
 import fetchApi from "./fetchApi";
 
+let cachedKeys = {};
+
 export async function uploadImageToBucket({ Key, imageToUpload }) {
   try {
     const fileType = encodeURIComponent(imageToUpload.type);
@@ -29,7 +31,6 @@ export async function uploadImageToBucket({ Key, imageToUpload }) {
       } catch (error) {
         console.error("Failed to parse JSON response", error);
       }
-
     } else {
       throw new Error("Failed to get the S3 bucket URL");
     }
@@ -77,22 +78,30 @@ export async function getImageFromBucket({ Key }) {
   }
 }
 export async function getImagesFromBucket(...keys) {
-  let imageKeys = {};
-  keys.forEach((key) => {
-    if (key.startsWith("/") || key.startsWith("http")) {
-      imageKeys[key] = key;
-      keys.filter((currentKey) => currentKey === key);
-    }
-  });
-
   try {
-    return {
-      ...imageKeys,
-      ...(await fetchApi(`/api/s3-bucket/get/many`, {
+    let imageKeys = {};
+    keys.forEach((key) => {
+      if (key.startsWith("/") || key.startsWith("http")) {
+        imageKeys[key] = key;
+        keys = keys.filter((currentKey) => currentKey === key);
+      } else if (Object.keys(cachedKeys).includes(key)) {
+        imageKeys[key] = cachedKeys[key];
+        keys = keys.filter((currentKey) => currentKey === key);
+      }
+    });
+    let fetchedKeys = [];
+    if (keys.length > 0) {
+      fetchedKeys = await fetchApi(`/api/s3-bucket/get/many`, {
         method: "POST",
         body: keys,
-      })),
+      });
+    }
+    let totalKeys = {
+      ...imageKeys,
+      ...fetchedKeys,
     };
+    cachedKeys = { ...cachedKeys, ...totalKeys };
+    return totalKeys;
   } catch (error) {
     console.log(error);
   }

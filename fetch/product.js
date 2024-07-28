@@ -1,4 +1,14 @@
 import fetchApi from "@/utils/fetchApi";
+import { getImagesFromBucket } from "@/utils/s3-bucket-front";
+
+async function getImagesForProducts(products) {
+  const keys = products.flatMap((product) => product.images);
+  const urls = await getImagesFromBucket(...keys);
+  return products.map((product) => ({
+    ...product,
+    images: product.images.map((image) => urls[image]),
+  }));
+}
 
 export async function createOneProduct(body) {
   return await fetchApi("/api/product/create-one", {
@@ -7,15 +17,16 @@ export async function createOneProduct(body) {
 }
 
 export async function readOneProduct({ id }) {
-  return await fetchApi(`/api/product/read-one?id=${id}`, {
+  const product = await fetchApi(`/api/product/read-one?id=${id}`, {
     method: "GET",
   });
+  return (await getImagesForProducts([product]))[0];
 }
 
-export async function updateOneProduct({ id, newProduct }) {
-  return await fetchApi(`/api/product/updateOne?id=${id}`, {
+export async function updateOneProduct(product) {
+  return await fetchApi(`/api/product/update-one`, {
     method: "PUT",
-    body: { id, newProduct },
+    body: { id: product._id, newProduct: product },
   });
 }
 
@@ -27,22 +38,30 @@ export async function deleteOneProduct({ id }) {
 }
 
 export async function readAllProducts({ pageParam, limit, search }) {
-  return await fetchApi(
+  const result = await fetchApi(
     `/api/product/read-all?pageParam=${pageParam}&limit=${limit}&search=${search}`,
     {
       method: "GET",
     }
   );
+  return {
+    ...result,
+    data: await getImagesForProducts(result.data),
+  };
 }
 
 export async function readProductsByIds({ pageParam, limit, productIds }) {
-  return await fetchApi(
+  const result = await fetchApi(
     `/api/product/read-by-ids?pageParam=${pageParam}&limit=${limit}`,
     {
       body: { productIds },
       method: "POST",
     }
   );
+  return {
+    ...result,
+    data: await getImagesForProducts(result.data),
+  };
 }
 
 export async function readProductsByCategoryId({
@@ -51,17 +70,34 @@ export async function readProductsByCategoryId({
   categoryId,
   search,
 }) {
-  return await fetchApi(
+  const result = await fetchApi(
     `/api/product/read-by-category-id?pageParam=${pageParam}&limit=${limit}&categoryId=${categoryId}&search=${search}`,
     {
       method: "POST",
-      body: {},
     }
   );
+  return {
+    ...result,
+    data: await getImagesForProducts(result.data),
+  };
 }
 
 export async function feedProducts() {
-  return await fetchApi(`/api/product/feed-products`, {
+  const result = await fetchApi(`/api/product/feed-products`, {
     method: "GET",
   });
+  const returnedProducts = {
+    categories: await Promise.all(
+      result.categories.map((category) => {
+        return new Promise(async (resolve, reject) => {
+          const products = await getImagesForProducts(category.products);
+          resolve({
+            category: category.category,
+            products: products,
+          });
+        });
+      })
+    ),
+  };
+  return returnedProducts;
 }

@@ -41,19 +41,20 @@ export default function CartCard({
     if (cartItem.quantity === +value) {
       return;
     }
-
     setUser({
       ...user,
       cart: [
         ...user.cart.map((cartItem) => {
           if (cartItem.product === _id) {
-            return { ...cartItem, quantity: parseInt(value) };
+            return { ...cartItem, quantity: value };
           }
           return cartItem;
         }),
       ],
     });
-    debouncedInputChange();
+    if (!(isNaN(value) || value === "")) {
+      debouncedInputChange();
+    }
   };
 
   // return
@@ -96,7 +97,7 @@ export default function CartCard({
             {name}
           </h4>
           <small className="text-default-250">
-            Rs {parseAmount(price)} * {cartItem?.quantity} ={" "}
+            Rs {parseAmount(price)} * {cartItem?.quantity} = Rs{" "}
             {parseAmount(price * cartItem?.quantity)}
           </small>
         </div>

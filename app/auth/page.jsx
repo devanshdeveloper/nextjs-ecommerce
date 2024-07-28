@@ -2,7 +2,7 @@
 
 // UI COMPONENTS
 import PasswordInput from "@/components/inputs/PasswordInput";
-import { Button, Input } from "@nextui-org/react";
+import { Button, Divider, Input } from "@nextui-org/react";
 import { useAuthContext } from "@/components/providers/AuthProvider";
 
 // HOOKS
@@ -11,9 +11,12 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
 // UTILS
-import { createOneUser, logInUser } from "@/fetch/user";
+import { continueWithGoogleUser, createOneUser, logInUser } from "@/fetch/user";
 import getFormData from "@/utils/getFormData";
 import parseError from "@/utils/parseError";
+import { BsGoogle } from "react-icons/bs";
+import loadScript from "@/utils/loadScript";
+import { fetchGoogleUserDetails } from "@/utils/google-auth";
 
 function AuthPage() {
   const { setUser } = useAuthContext();
@@ -37,6 +40,47 @@ function AuthPage() {
     onSuccess,
   });
 
+  const mutate_logInWithGoogle = useMutation({
+    mutationFn: async () => {
+      return new Promise(async (resolve, reject) => {
+        await loadScript("https://accounts.google.com/gsi/client", {
+          async: true,
+          defer: true,
+        });
+        const client = window?.google?.accounts?.oauth2.initTokenClient({
+          client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+          scope: `openid profile email`,
+          callback: async (credentialResponse) => {
+            console.log("client", credentialResponse);
+            const googleUser = await fetchGoogleUserDetails(
+              credentialResponse.access_token
+            );
+            if (googleUser) {
+              resolve(
+                await continueWithGoogleUser({
+                  name: googleUser.name,
+                  email: googleUser.email,
+                  isEmailVerified: googleUser.verified_email,
+                  image: googleUser.picture,
+                  provider: "google",
+                })
+              );
+            } else {
+              reject("Failed to get Google user");
+            }
+          },
+          error_callback: reject,
+        });
+        client.requestAccessToken();
+      });
+    },
+    onSuccess(user) {
+      setUser(user);
+      console.log(user);
+      router.push("/shop");
+    },
+  });
+
   async function handleSubmit(e) {
     e.preventDefault();
     if (isLoginPage) {
@@ -48,7 +92,7 @@ function AuthPage() {
 
   return (
     <div className="flex justify-center items-center">
-      <div className="w-[min(80vw,500px)] flex flex-col items-center">
+      <div className="w-[min(80vw,500px)] flex flex-col gap-10 items-center">
         <div className="text-5xl font-semibold my-20">
           {isLoginPage ? "Log in" : "Sign In"}
         </div>
@@ -69,12 +113,28 @@ function AuthPage() {
             {(mutate_createOneUser.error || mutate_logInUser.error) && (
               <span className="text-red-500">
                 {parseError(
-                  isLoginPage ? mutate_logInUser.error : mutate_createOneUser.error
+                  isLoginPage
+                    ? mutate_logInUser.error
+                    : mutate_createOneUser.error
                 )}
               </span>
             )}
           </div>
         </form>
+        <Divider />
+        <div>
+          <Button
+            type="button"
+            variant="faded"
+            size="lg"
+            color="primary"
+            isIconOnly
+            onPress={() => mutate_logInWithGoogle.mutate()}
+            isLoading={mutate_logInWithGoogle.isPending}
+          >
+            <BsGoogle size={20} />
+          </Button>
+        </div>
       </div>
     </div>
   );

@@ -7,6 +7,7 @@ import { useMutation } from "@tanstack/react-query";
 import { addToCart } from "@/fetch/user";
 import { useAuthContext } from "../providers/AuthProvider";
 import { deleteOneProduct } from "@/fetch/product";
+import { Delete, Edit } from "lucide-react";
 export default function AdminProductCard({
   refetch,
   actualPrice,
@@ -74,22 +75,28 @@ export default function AdminProductCard({
           </h4>
           <small className="text-default-500">Rs {price}</small>
         </div>
-        <Button
-          isLoading={mutateAddToCart.isPending}
-          isIconOnly
-          variant="flat"
-          color="primary"
-          radius="lg"
-          onPress={() =>
-            mutateAddToCart.mutate({
-              userId: user._id,
-              productId: _id,
-              quantity: 1,
-            })
-          }
-        >
-          <BiPlus size={30} />
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            isLoading={mutate_deleteOneProduct.isPending}
+            isIconOnly
+            variant="flat"
+            color="primary"
+            radius="lg"
+            onPress={() => router.push(`/admin/products/${_id}/edit`)}
+          >
+            <Edit size={30} />
+          </Button>
+          <Button
+            isLoading={mutate_deleteOneProduct.isPending}
+            isIconOnly
+            variant="flat"
+            color="danger"
+            radius="lg"
+            onPress={() => mutate_deleteOneProduct.mutate({ id: _id })}
+          >
+            <Delete size={30} />
+          </Button>
+        </div>
       </CardFooter>
     </Card>
   );

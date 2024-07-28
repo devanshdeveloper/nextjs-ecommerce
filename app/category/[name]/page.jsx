@@ -26,8 +26,6 @@ export default function CategoryPage() {
     retry: false,
   });
 
-  console.log(category);
-
   const {
     data,
     status,

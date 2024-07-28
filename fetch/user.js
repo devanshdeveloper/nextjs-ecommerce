@@ -11,6 +11,11 @@ export async function logInUser({ email, password }) {
     body: { email, password },
   });
 }
+export async function continueWithGoogleUser(body) {
+  return await fetchApi("/api/user/continue-with-google", {
+    body,
+  });
+}
 
 export async function readAllUsers({ pageParam, limit, search }) {
   return await fetchApi(
