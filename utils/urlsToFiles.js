@@ -4,7 +4,7 @@ export async function urlToFile(url) {
   console.log(url);
   try {
     // Fetch the image data from the URL
-    const response = await fetch(await getImageFromBucket({ Key: url }), {
+    const response = await fetch((await getImageFromBucket({ Key: url }))[url], {
       method: "GET",
       headers: {
         "Content-Type": "image/" + url.split(".")[url.split(".").length - 1],
