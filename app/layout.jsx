@@ -25,7 +25,7 @@ export default function RootLayout({ children }) {
               <div className="min-h-[calc(100vh)]">
                 <Nav />
                 {children}
-                {/* <ThemeButton /> */}
+                <ThemeButton />
               </div>
               <Footer />
             </main>

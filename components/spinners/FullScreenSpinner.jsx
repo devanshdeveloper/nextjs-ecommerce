@@ -4,7 +4,7 @@ import { Spinner } from "@nextui-org/react";
 
 function FullScreenSpinner() {
   return (
-    <FullScreenLayout>
+    <FullScreenLayout className="bg-background">
       <Spinner />
     </FullScreenLayout>
   );

@@ -23,6 +23,10 @@ const ProductSchema = new mongoose.Schema({
     ref: "Category",
     required: [true, "Please enter product category"],
   },
+  isPreOrderable: {
+    type: Boolean,
+    default: false,
+  },
   favorite: {
     type: Boolean,
     default: false,
@@ -32,6 +36,10 @@ const ProductSchema = new mongoose.Schema({
       name: {
         type: String,
         required: [true, "Please enter variant name"],
+      },
+      inventory: {
+        type: Number,
+        required: [true, "Please enter variant inventory"],
       },
       options: [
         {

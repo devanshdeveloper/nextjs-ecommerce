@@ -33,7 +33,6 @@ function AuthProvider({ children }) {
     asyncHandler();
   }, []);
 
-
   if (user && user.role === "Blocked") {
     return (
       <FullScreenLayout className="flex-col gap-5">
@@ -55,7 +54,8 @@ function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider value={{ user, setUser }}>
-      {loading ? <FullScreenSpinner /> : children}
+      {loading && <FullScreenSpinner />}
+      {children}
     </AuthContext.Provider>
   );
 }
