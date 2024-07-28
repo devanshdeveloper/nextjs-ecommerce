@@ -2,7 +2,12 @@ export async function urlToFile(url) {
   console.log(url);
   try {
     // Fetch the image data from the URL
-    const response = await fetch(url);
+    const response = await fetch(url , {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'image/' + url.split('.')[url.split('.').length - 1],
+      },
+    });
     console.log("response: " + JSON.stringify(response));
     
     if (!response.ok) {
