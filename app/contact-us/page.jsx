@@ -18,6 +18,10 @@ const ContactUs = () => {
               {process.env.EMAIL_USER}
             </a>
           </li>
+          <li>
+            <strong>Address:</strong> 617, Sadhu Vaswani Nagar, Navlakha,
+            Indore, 452001, India
+          </li>
         </ul>
       </div>
     </div>

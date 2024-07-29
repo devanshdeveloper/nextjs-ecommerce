@@ -2,8 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
-import { getUserById, readOneUser } from "../../fetch/user";
-import FullScreenSpinner from "../spinners/FullScreenSpinner";
+import { readOneUser } from "../../fetch/user";
 import FullScreenLayout from "../layout/FullScreenLayout";
 import Link from "next/link";
 
@@ -11,12 +10,10 @@ export const AuthContext = createContext(null);
 
 function AuthProvider({ children }) {
   const [user, setUser] = useLocalStorage("user", null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function asyncHandler() {
       if (!user || !user._id) {
-        setLoading(false);
         return;
       }
       try {
@@ -25,8 +22,6 @@ function AuthProvider({ children }) {
       } catch (error) {
         console.error(error);
         setUser(null);
-      } finally {
-        setLoading(false);
       }
     }
 
@@ -54,7 +49,6 @@ function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider value={{ user, setUser }}>
-      {loading && <FullScreenSpinner />}
       {children}
     </AuthContext.Provider>
   );

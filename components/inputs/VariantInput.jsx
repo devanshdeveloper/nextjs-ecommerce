@@ -16,7 +16,7 @@ export default function VariantInput({ variants, setVariants, isRequired }) {
     setVariants(newVariants);
   };
 
-  const addVariant = (newVariant = { name: "", options: [""] }) => {
+  const addVariant = (newVariant = { name: "", options: [""] , inventory : ""}) => {
     setVariants([...variants, newVariant]);
   };
   const deleteVariant = (variantIndex) => {
