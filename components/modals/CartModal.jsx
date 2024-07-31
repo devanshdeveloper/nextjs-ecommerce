@@ -14,6 +14,7 @@ import { useAuthContext } from "../providers/AuthProvider";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
 import { readProductsByIds } from "@/fetch/product";
+import parseAmount from "@/utils/parseAmount";
 function CartModal() {
   const [getSearchParams, setSearchParams] = useURL();
   const { showCartModal } = getSearchParams("showCartModal");
@@ -171,35 +172,23 @@ function CartModal() {
             <h2 className="text-3xl font-bold text-foreground-700 mb-5">
               Cart
             </h2>
-            {products &&
-              user?.cart.map((cartItem, i) => {
-                return (
-                  <SmallCartCard
-                    key={i}
-                    {...{
-                      product: products.find(
-                        (product) => cartItem.product === product._id
-                      ),
-                      cartItem,
-                    }}
-                  />
-                );
-              })}
-            <div className="h-full flex items-center justify-center" ref={ref}>
-              {hasNextPage && (
-                <Button
-                  variant="flat"
-                  color="primary"
-                  size="lg"
-                  isLoading={isFetching}
-                  onPress={fetchNextPage}
-                >
-                  Load More
-                </Button>
-              )}
-              {!hasNextPage && isFetching && <Spinner />}
+            <div className="flex flex-col gap-5">
+              {products &&
+                user?.cart.map((cartItem, i) => {
+                  return (
+                    <SmallCartCard
+                      key={i}
+                      {...{
+                        product: products.find(
+                          (product) => cartItem.product === product._id
+                        ),
+                        cartItem,
+                      }}
+                    />
+                  );
+                })}
             </div>
-            <Divider />
+            <Divider className="mt-10" />
             <div className="flex flex-col gap-5 my-10">
               <div className="flex w-full justify-between">
                 <div className="text-2xl">Amount : </div>
@@ -216,6 +205,20 @@ function CartModal() {
                   Continue to Checkout
                 </Button>
               </div>
+            </div>
+            <div className="h-full flex items-center justify-center" ref={ref}>
+              {hasNextPage && (
+                <Button
+                  variant="flat"
+                  color="primary"
+                  size="lg"
+                  isLoading={isFetching}
+                  onPress={fetchNextPage}
+                >
+                  Load More
+                </Button>
+              )}
+              {!hasNextPage && isFetching && <Spinner />}
             </div>
           </>
         )}
