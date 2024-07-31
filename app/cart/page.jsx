@@ -15,11 +15,16 @@ import parseAmount from "@/utils/parseAmount";
 import { useRouter } from "next/navigation";
 import PageLayoutSpinner from "@/components/spinners/PageLayoutSpinner";
 import { updateOneUser } from "@/fetch/user";
+import { AnimatePresence } from "framer-motion";
+import ProductModal from "@/components/modals/ProductModal";
+import useURL from "@/hooks/useURL";
+import CustomGrid from "@/components/layout/CustomGrid";
 
 // UTILS
 
 function CartPage() {
   const { user, setUser } = useAuthContext();
+  const [getSearchParams, setSearchParams] = useURL();
   const router = useRouter();
   const {
     data,
@@ -69,16 +74,19 @@ function CartPage() {
       }
       amount += product.price * cartItem.quantity;
     }
-    console.log(notFoundProducts);
     if (notFoundProducts.length) {
       const newCart = user.cart.filter(
         (cartProduct) => !notFoundProducts.includes(cartProduct.product)
       );
-      setUser({...user, cart: newCart });
+      setUser({ ...user, cart: newCart });
       updateOneUser({ id: user._id, newUser: { cart: newCart } });
     }
     return parseAmount(amount);
   }
+
+  const product =
+    products &&
+    products.find(({ name }) => name === getSearchParams("product").product);
 
   if (!user) {
     return (
@@ -127,53 +135,48 @@ function CartPage() {
       </PageLayout>
     );
   }
-
   if (status === "pending") {
     return <PageLayoutSpinner />;
   }
-
   return (
-    <>
-      <div className="flex flex-col items-center">
-        <div
-          className={`flex flex-col gap-3 md:gap-5 lg:gap-8 items-center w-[min(80vw,1000px)] m-5 lg:m-10`}
-        >
-          {data ? (
-            data.pages.map((page) => {
-              return page.data.map((product, i) => {
-                return <CartCard key={i} {...{ ...product }} />;
-              });
+    <div className="flex flex-col items-center ">
+      <div className="w-[min(80vw,1250px)]">
+        <CustomGrid
+          title={"Cart"}
+          items={
+            products &&
+            user.cart.map((cartItem, i) => {
+              return (
+                <CartCard
+                  key={i}
+                  {...{
+                    product: products.find(
+                      (product) => cartItem.product === product._id
+                    ),
+                    cartItem,
+                  }}
+                />
+              );
             })
-          ) : status === "pending" ? null : (
-            <PageLayout>
-              <div className="flex flex-col items-center gap-10">
-                <div className="text-3xl">No Products Found</div>
-                <Button
-                  variant="flat"
-                  color="primary"
-                  size="lg"
-                  onPress={() => router.back()}
-                >
-                  Back
-                </Button>
-              </div>
-            </PageLayout>
+          }
+        />
+
+        <div className="h-full flex items-center justify-center" ref={ref}>
+          {hasNextPage && (
+            <Button
+              variant="flat"
+              color="primary"
+              size="lg"
+              isLoading={isFetching}
+              onPress={fetchNextPage}
+            >
+              Load More
+            </Button>
           )}
-          <div className="h-full flex items-center justify-center" ref={ref}>
-            {hasNextPage && (
-              <Button
-                variant="flat"
-                color="primary"
-                size="lg"
-                isLoading={isFetching}
-                onPress={fetchNextPage}
-              >
-                Load More
-              </Button>
-            )}
-            {!hasNextPage && isFetching && <Spinner />}
-          </div>
-          <Divider />
+          {!hasNextPage && isFetching && <Spinner />}
+        </div>
+        <Divider />
+        <div className="flex flex-col gap-5 my-10">
           <div className="flex w-full justify-between">
             <div className="text-2xl">Amount : </div>
             <div className="text-2xl">
@@ -191,7 +194,10 @@ function CartPage() {
           </div>
         </div>
       </div>
-    </>
+      <AnimatePresence>
+        {product && <ProductModal product={product} />}
+      </AnimatePresence>
+    </div>
   );
 }
 

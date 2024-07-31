@@ -1,31 +1,27 @@
 import { motion } from "framer-motion";
 import { CgClose } from "react-icons/cg";
 import ImageListViewer from "../lists/ImageListViewer";
-import { useMutation } from "@tanstack/react-query";
-import { useCallback, useEffect } from "react";
-import { addToCart } from "@/fetch/user";
+import { useCallback } from "react";
 import useURL from "@/hooks/useURL";
 import { twMerge } from "tailwind-merge";
 import { Spinner } from "@nextui-org/react";
-import { useAuthContext } from "../providers/AuthProvider";
+import useCart from "@/hooks/useCart";
 function ProductModal({ product }) {
   const [getSearchParams, setSearchParams] = useURL();
-  const { user } = useAuthContext();
-  const mutateAddToCart = useMutation({
-    mutationFn: addToCart,
-    onSuccess() {
-      router.push("/cart");
-    },
+  const {
+    currentVariants,
+    handleQuantityChange,
+    cartProduct,
+    mutateAddToCart,
+  } = useCart({
+    product,
   });
+
   const modalVariants = {
     hidden: { opacity: 0, scale: 0.8 },
     visible: { opacity: 1, scale: 1, transition: { duration: 0.3 } },
     exit: { opacity: 0, scale: 0.8 },
   };
-
-  const currentVariants = getSearchParams(
-    ...product.variants.map((variant) => variant.name)
-  );
 
   const closeModal = useCallback(() => {
     const removeVariants = {};
@@ -79,7 +75,6 @@ function ProductModal({ product }) {
               </small>
             </div>
             {product.variants.map((variant) => {
-              console.log(currentVariants);
               return (
                 <div key={variant.name} className="flex flex-col gap-2">
                   <div>{variant.name}</div>
@@ -106,26 +101,67 @@ function ProductModal({ product }) {
                 </div>
               );
             })}
-            <button
-              className="border border-foreground py-2 my-2"
-              onClick={() => {
-                mutateAddToCart.mutate({
-                  productId: product._id,
-                  userId: user._id,
-                  quantity: 1,
-                  variants: Object.keys(currentVariants).map((variantKey) => ({
-                    name: variantKey,
-                    value: currentVariants[variantKey],
-                  })),
-                });
-              }}
-            >
-              {mutateAddToCart.isPending ? (
-                <Spinner color="white" />
-              ) : (
-                "Add to Cart"
-              )}
-            </button>
+            {cartProduct && (
+              <div>
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center justify-between w-3/4">
+                    <button
+                      onClick={() => {
+                        handleQuantityChange(cartProduct.quantity - 1);
+                      }}
+                      className="border border-foreground px-3 py-1.5 my-2 text-2xl"
+                    >
+                      -
+                    </button>
+                    <span className="text-2xl">{cartProduct.quantity}</span>
+                    <button
+                      onClick={() => {
+                        handleQuantityChange(cartProduct.quantity + 1);
+                      }}
+                      className="border border-foreground px-3 py-1.5 my-2 text-2xl"
+                    >
+                      +
+                    </button>
+                  </div>
+                  <div className="flex flex-col justify-between gap-2 items-end w-1/4">
+                    <div className="h-5">
+                      {mutateAddToCart.isPending && (
+                        <Spinner size="sm" color="white" />
+                      )}
+                    </div>
+                    <div className="text-default-500">
+                      Total: Rs {cartProduct.quantity * product.price}
+                    </div>
+                  </div>
+                </div>
+                <button
+                  className="border border-foreground py-2 my-2 w-full"
+                  onClick={() => {}}
+                >
+                  Move to cart
+                </button>
+                <button
+                  className="hover:underline text-foreground-500 py-2 my-2 w-full"
+                  onClick={closeModal}
+                >
+                  Continue Shopping
+                </button>
+              </div>
+            )}
+            {!cartProduct && (
+              <button
+                className="border border-foreground py-2 my-2 flex items-center justify-center"
+                onClick={() => {
+                  handleQuantityChange(1);
+                }}
+              >
+                {mutateAddToCart.isPending ? (
+                  <Spinner size="sm" color="white" />
+                ) : (
+                  "Add to Cart"
+                )}
+              </button>
+            )}
           </div>
         </div>
       </motion.div>

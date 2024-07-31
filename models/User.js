@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
+import { areVariantsEqual } from "@/utils/areVariantsEqual";
 
 const UserSchema = new mongoose.Schema({
   name: {
@@ -70,14 +71,39 @@ UserSchema.pre("save", async function (next) {
   next();
 });
 
-UserSchema.methods.addToCart = async function (productId, quantity = 1) {
+UserSchema.methods.addToCart = async function (
+  productId,
+  quantity = 1,
+  variants
+) {
   const existingProductIndex = this.cart.findIndex(
-    (item) => item.product.toString() === productId.toString()
+    (item) =>
+      item.product.toString() === productId.toString() &&
+      areVariantsEqual(item.variants, variants)
   );
+
+  const newQuantity = +quantity < 0 ? 1 : +quantity;
+
   if (existingProductIndex >= 0) {
-    this.cart[existingProductIndex].quantity = +quantity;
+    if (newQuantity === 0) {
+      this.cart = this.cart.filter(
+        (item) =>
+          item.product.toString() !== productId.toString() ||
+          !areVariantsEqual(item.variants, variants)
+      );
+      await this.save();
+      return this.cart;
+    }
+    this.cart[existingProductIndex].quantity = newQuantity;
   } else {
-    this.cart.push({ product: productId, quantity, variants });
+    this.cart.push({
+      product: productId,
+      quantity: newQuantity,
+      variants: Object.keys(variants).map((variantKey) => ({
+        name: variantKey,
+        value: variants[variantKey],
+      })),
+    });
   }
   await this.save();
   return this.cart;

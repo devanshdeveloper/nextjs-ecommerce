@@ -1,6 +1,12 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { readOneUser } from "../../fetch/user";
 import FullScreenLayout from "../layout/FullScreenLayout";
@@ -28,6 +34,19 @@ function AuthProvider({ children }) {
     asyncHandler();
   }, []);
 
+  const refetchUser = useCallback(async () => {
+    if (!user || !user._id) {
+      return;
+    }
+    try {
+      const updatedUser = await readOneUser({ id: user._id });
+      setUser(updatedUser);
+    } catch (error) {
+      console.error(error);
+      setUser(null);
+    }
+  }, []);
+
   if (user && user.role === "Blocked") {
     return (
       <FullScreenLayout className="flex-col gap-5">
@@ -48,7 +67,7 @@ function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, setUser }}>
+    <AuthContext.Provider value={{ user, setUser, refetchUser }}>
       {children}
     </AuthContext.Provider>
   );

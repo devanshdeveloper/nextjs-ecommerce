@@ -1,138 +1,158 @@
-import { Button, Card, CardFooter, Input } from "@nextui-org/react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { MdImageNotSupported } from "react-icons/md";
-import { BiMinus, BiPlus } from "react-icons/bi";
-import { useMutation } from "@tanstack/react-query";
-import { addToCart } from "@/fetch/user";
+import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import useURL from "@/hooks/useURL";
 import { useAuthContext } from "../providers/AuthProvider";
-import { useDebouncedCallback } from "use-debounce";
-import parseAmount from "@/utils/parseAmount";
-export default function CartCard({
-  actualPrice,
-  category,
-  description,
-  images,
-  name,
-  price,
-  ratings,
-  reviews,
-  variants,
-  _id,
-}) {
-  const router = useRouter();
-  const { user, setUser } = useAuthContext();
+import useCart from "@/hooks/useCart";
+import { Spinner } from "@nextui-org/react";
 
-  const cartItem = user.cart.find((cartItem) => cartItem.product === _id);
+export default function CartCard({ product, cartItem }) {
+  const [isCardHovered, setCardHovered] = useState(false);
+  const { user } = useAuthContext();
 
-  const mutateAddToCart = useMutation({
-    mutationFn: addToCart,
+  const nowVariants = {};
+  cartItem.variants.forEach((variant) => {
+    nowVariants[variant.name] = variant.value;
+  });
+  const {
+    currentVariants,
+    handleQuantityChange,
+    cartProduct,
+    mutateAddToCart,
+  } = useCart({
+    product,
+    nowVariants,
   });
 
-  const debouncedInputChange = useDebouncedCallback(() => {
-    mutateAddToCart.mutate({
-      userId: user._id,
-      productId: _id,
-      quantity: cartItem?.quantity || 1,
-    });
-  }, 2000);
-
-  const handleQuantityChange = (value) => {
-    if (cartItem.quantity === +value) {
-      return;
-    }
-    setUser({
-      ...user,
-      cart: [
-        ...user.cart.map((cartItem) => {
-          if (cartItem.product === _id) {
-            return { ...cartItem, quantity: value };
-          }
-          return cartItem;
-        }),
-      ],
-    });
-    if (!(isNaN(value) || value === "")) {
-      debouncedInputChange();
-    }
+  const cardVariants = {
+    hidden: { opacity: 0, y: 50 },
+    visible: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: -50 },
   };
+  const [getSearchParams, setSearchParams] = useURL();
 
-  // return
   return (
-    <Card
-      as={"div"}
-      className="group flex-row relative border-1 border-foreground-200 h-[300px]"
+    <motion.div
+      className="border border-foreground-200 rounded-lg cursor-pointer"
+      variants={cardVariants}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+      onClick={() => {
+        const cartVariants = user?.cart.find(
+          (cartItem) => cartItem.product === product._id
+        )?.variants;
+        const defaultVariants = {};
+        if (cartVariants) {
+          cartVariants.forEach((variant) => {
+            defaultVariants[variant.name] = variant.value;
+          });
+        } else {
+          variants.forEach((variant) => {
+            defaultVariants[variant.name] = variant.options[0];
+          });
+        }
+        setSearchParams({ product: product.name, ...defaultVariants });
+      }}
+      onMouseOver={() => {
+        setCardHovered(true);
+      }}
+      onMouseLeave={() => {
+        setCardHovered(false);
+      }}
     >
-      <div>
-        {images[0] && (
-          <Image
-            className={
-              images[1] &&
-              `${images[1] && "absolute"} z-10 group-hover:invisible `
-            }
-            src={images[0]}
-            width={250}
-            height={250}
-            alt={name}
-          />
+      <div className="relative">
+        {product.images[0] && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            animate={{ opacity: isCardHovered ? 0 : 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <Image
+              className="z-10 w-full"
+              src={product.images[0]}
+              width={500}
+              height={500}
+              alt={product.name}
+            />
+          </motion.div>
         )}
-        {images[1] && (
-          <Image
-            className="group-hover:visible "
-            src={images[1]}
-            width={250}
-            height={250}
-            alt={name}
-          />
+        {product.images[1] && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: isCardHovered ? 1 : 0 }}
+            transition={{ duration: 0.5 }}
+            className="absolute top-0 left-0 w-full h-full"
+          >
+            <Image
+              className="w-full"
+              src={product.images[1]}
+              width={500}
+              height={500}
+              alt={product.name}
+            />
+          </motion.div>
         )}
-        {!images[0] && (
-          <div className="flex items-center justify-center">
+        {!product.images[0] && !product.images[1] && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            className="w-full h-[300px] flex items-center justify-center"
+          >
             <MdImageNotSupported size={100} />
+          </motion.div>
+        )}
+      </div>
+      <div className="flex flex-col items-start p-3 pt-0">
+        <h4 className="font-bold sm:text-sm md:text-md lg:text-large">
+          {`${product.name} (${cartItem.variants
+            .map((variant) => `${variant.name} - ${variant.value}`)
+            .join(", ")})`}
+        </h4>
+        <div className="flex gap-2">
+          <small className="text-default-500">Rs {product.price}</small>
+          <small className="text-default-500 line-through">
+            Rs {product.actualPrice}
+          </small>
+        </div>
+        {cartProduct && (
+          <div className="flex flex-col items-start justify-between w-full pt-1">
+            <div className="flex items-center justify-between  w-full">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleQuantityChange(cartProduct.quantity - 1);
+                }}
+                className="border border-foreground px-3 py-1.5 text-2xl"
+              >
+                -
+              </button>
+              <span className="text-2xl">{cartProduct.quantity}</span>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleQuantityChange(cartProduct.quantity + 1);
+                }}
+                className="border border-foreground px-3 py-1.5 text-2xl"
+              >
+                +
+              </button>
+            </div>
+            <div className="flex justify-between w-full mt-2">
+              <div className="text-default-500">
+                Total: Rs {cartProduct.quantity * product.price}
+              </div>
+              <div className="h-5">
+                {mutateAddToCart.isPending && (
+                  <Spinner size="sm" color="white" />
+                )}
+              </div>
+            </div>
           </div>
         )}
       </div>
-      <div className="flex flex-col justify-between p-5">
-        <div className="flex flex-col items-start">
-          <h4 className="font-bold sm:text-sm md:text-md lg:text-large">
-            {name}
-          </h4>
-          <small className="text-default-250">
-            Rs {parseAmount(price)} * {cartItem?.quantity} = Rs{" "}
-            {parseAmount(price * cartItem?.quantity)}
-          </small>
-        </div>
-        <div className="flex gap-2">
-          <Button
-            isLoading={mutateAddToCart.isPending}
-            isIconOnly
-            variant="flat"
-            color="primary"
-            radius="lg"
-            onPress={() => handleQuantityChange(cartItem.quantity - 1)}
-          >
-            <BiMinus size={30} />
-          </Button>
-          <Input
-            type="number"
-            value={cartItem?.quantity}
-            className="w-[100px]"
-            isDisabled={mutateAddToCart.isPending}
-            onValueChange={(value) => {
-              handleQuantityChange(value);
-            }}
-          />
-          <Button
-            isLoading={mutateAddToCart.isPending}
-            isIconOnly
-            variant="flat"
-            color="primary"
-            radius="lg"
-            onPress={() => handleQuantityChange(cartItem.quantity + 1)}
-          >
-            <BiPlus size={30} />
-          </Button>
-        </div>
-      </div>
-    </Card>
+    </motion.div>
   );
 }
