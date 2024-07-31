@@ -1,11 +1,9 @@
-import { Button, Card, CardFooter } from "@nextui-org/react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { MdImageNotSupported } from "react-icons/md";
-import { BiPlus } from "react-icons/bi";
-import { useMutation } from "@tanstack/react-query";
-import { addToCart } from "@/fetch/user";
-import { useAuthContext } from "../providers/AuthProvider";
+import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import useURL from "@/hooks/useURL";
+
 export default function ProductCard({
   actualPrice,
   category,
@@ -18,77 +16,90 @@ export default function ProductCard({
   variants,
   _id,
 }) {
-  const router = useRouter();
-  const { user } = useAuthContext();
+  const [isCardHovered, setCardHovered] = useState(false);
 
-  const mutateAddToCart = useMutation({
-    mutationFn: addToCart,
-    onSuccess() {
-      router.push("/cart");
-    },
-  });
+  const cardVariants = {
+    hidden: { opacity: 0, y: 50 },
+    visible: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: -50 },
+  };
+  const [getSearchParams, setSearchParams] = useURL();
 
-  // return
   return (
-    <Card
-      as={"div"}
-      isHoverable
-      isPressable
-      onClick={() => router.push("/product/" + _id)}
-      className="group relative border-1 border-foreground-200"
-    >
-      {images[0] && (
-        <Image
-          className={
-            images[1] &&
-            `${
-              images[1] && "absolute"
-            } z-10 group-hover:invisible w-full h-[300px]`
-          }
-          src={images[0]}
-          width={500}
-          height={500}
-          alt={name}
-        />
-      )}
-      {images[1] && (
-        <Image
-          className="group-hover:visible w-full h-[300px]"
-          src={images[1]}
-          width={500}
-          height={500}
-          alt={name}
-        />
-      )}
-      {!images[0] && (
-        <div className="w-full h-[300px] flex items-center justify-center">
-          <MdImageNotSupported size={100} />
-        </div>
-      )}
-      <CardFooter className="justify-between">
-        <div className="flex flex-col items-start">
-          <h4 className="font-bold sm:text-sm md:text-md lg:text-large">
-            {name}
-          </h4>
-          <small className="text-default-500">Rs {price}</small>
-        </div>
-        <Button
-          isLoading={mutateAddToCart.isPending}
-          isIconOnly
-          variant="flat"
-          color="primary"
-          radius="lg"
-          onPress={() =>
-            mutateAddToCart.mutate({
-              userId: user._id,
-              productId: _id,
-              quantity: 1,
-            })
-          }
+    <div>
+      <AnimatePresence>
+        <motion.div
+          key={_id}
+          className="border border-foreground-200 rounded-lg cursor-pointer"
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+          layoutId={`card-${_id}`}
+          onClick={() => setSearchParams({ product: name })}
+          onMouseOver={() => {
+            setCardHovered(true);
+          }}
+          onMouseLeave={() => {
+            setCardHovered(false);
+          }}
         >
-          <BiPlus size={30} />
-        </Button>
-      </CardFooter>
-    </Card>
+          <div className="relative">
+            {images[0] && (
+              <motion.div
+                initial={{ opacity: 1 }}
+                animate={{ opacity: isCardHovered ? 0 : 1 }}
+                transition={{ duration: 0.5 }}
+              >
+                <Image
+                  className="z-10 w-full"
+                  src={images[0]}
+                  width={500}
+                  height={500}
+                  alt={name}
+                />
+              </motion.div>
+            )}
+            {images[1] && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: isCardHovered ? 1 : 0 }}
+                transition={{ duration: 0.5 }}
+                className="absolute top-0 left-0 w-full h-full"
+              >
+                <Image
+                  className="w-full"
+                  src={images[1]}
+                  width={500}
+                  height={500}
+                  alt={name}
+                />
+              </motion.div>
+            )}
+            {!images[0] && !images[1] && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+                className="w-full h-[300px] flex items-center justify-center"
+              >
+                <MdImageNotSupported size={100} />
+              </motion.div>
+            )}
+          </div>
+          <div className="flex flex-col items-start p-3 pt-0">
+            <h4 className="font-bold sm:text-sm md:text-md lg:text-large">
+              {name}
+            </h4>
+            <div className="flex gap-2">
+              <small className="text-default-500">Rs {price}</small>
+              <small className="text-default-500 line-through">
+                Rs {actualPrice}
+              </small>
+            </div>
+          </div>
+        </motion.div>
+      </AnimatePresence>
+    </div>
   );
 }

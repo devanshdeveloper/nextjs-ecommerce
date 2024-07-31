@@ -79,7 +79,6 @@ function CartPage() {
     }
     return parseAmount(amount);
   }
-  console.log(user);
 
   if (!user) {
     return (

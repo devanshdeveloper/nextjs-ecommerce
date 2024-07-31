@@ -51,7 +51,6 @@ function AuthPage() {
           client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
           scope: `openid profile email`,
           callback: async (credentialResponse) => {
-            console.log("client", credentialResponse);
             const googleUser = await fetchGoogleUserDetails(
               credentialResponse.access_token
             );
