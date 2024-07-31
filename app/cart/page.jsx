@@ -40,7 +40,7 @@ function CartPage() {
       readProductsByIds({
         ...params,
         limit: 20,
-        productIds: user.cart.map((cartItem) => cartItem.product),
+        productIds: user?.cart.map((cartItem) => cartItem.product),
       }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
@@ -75,7 +75,7 @@ function CartPage() {
       amount += product.price * cartItem.quantity;
     }
     if (notFoundProducts.length) {
-      const newCart = user.cart.filter(
+      const newCart = user?.cart.filter(
         (cartProduct) => !notFoundProducts.includes(cartProduct.product)
       );
       setUser({ ...user, cart: newCart });
@@ -116,7 +116,7 @@ function CartPage() {
     );
   }
 
-  if (!user.cart.length) {
+  if (!user?.cart.length) {
     return (
       <PageLayout>
         <div className="flex flex-col items-center gap-10">
@@ -145,7 +145,7 @@ function CartPage() {
           title={"Cart"}
           items={
             products &&
-            user.cart.map((cartItem, i) => {
+            user?.cart.map((cartItem, i) => {
               return (
                 <CartCard
                   key={i}
@@ -180,7 +180,7 @@ function CartPage() {
           <div className="flex w-full justify-between">
             <div className="text-2xl">Amount : </div>
             <div className="text-2xl">
-              Rs {calculateAmount(user.cart, products)}
+              Rs {calculateAmount(user?.cart, products)}
             </div>
           </div>
           <div className="flex w-full justify-end">

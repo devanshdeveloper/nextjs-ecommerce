@@ -4,7 +4,7 @@ import ImageListViewer from "../lists/ImageListViewer";
 import { useCallback, useEffect } from "react";
 import useURL from "@/hooks/useURL";
 import { twMerge } from "tailwind-merge";
-import { Button, Spinner } from "@nextui-org/react";
+import { Button, Divider, Spinner } from "@nextui-org/react";
 import useCart from "@/hooks/useCart";
 import SmallCartCard from "../cards/SmallCartCard";
 import { useRouter } from "next/navigation";
@@ -33,7 +33,7 @@ function CartModal() {
       readProductsByIds({
         ...params,
         limit: 20,
-        productIds: user.cart.map((cartItem) => cartItem.product),
+        productIds: user?.cart.map((cartItem) => cartItem.product),
       }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
@@ -69,7 +69,7 @@ function CartModal() {
       amount += product.price * cartItem.quantity;
     }
     if (notFoundProducts.length) {
-      const newCart = user.cart.filter(
+      const newCart = user?.cart.filter(
         (cartProduct) => !notFoundProducts.includes(cartProduct.product)
       );
       setUser({ ...user, cart: newCart });
@@ -87,7 +87,7 @@ function CartModal() {
 
   let contents = null;
 
-  if (!user.cart.length) {
+  if (!user?.cart?.length) {
     contents = (
       <div className="h-[calc(100vh-200px)] flex flex-col items-center justify-center gap-10">
         <div className="text-3xl">Your Cart is Empty</div>
@@ -172,7 +172,7 @@ function CartModal() {
               Cart
             </h2>
             {products &&
-              user.cart.map((cartItem, i) => {
+              user?.cart.map((cartItem, i) => {
                 return (
                   <SmallCartCard
                     key={i}
@@ -185,6 +185,38 @@ function CartModal() {
                   />
                 );
               })}
+            <div className="h-full flex items-center justify-center" ref={ref}>
+              {hasNextPage && (
+                <Button
+                  variant="flat"
+                  color="primary"
+                  size="lg"
+                  isLoading={isFetching}
+                  onPress={fetchNextPage}
+                >
+                  Load More
+                </Button>
+              )}
+              {!hasNextPage && isFetching && <Spinner />}
+            </div>
+            <Divider />
+            <div className="flex flex-col gap-5 my-10">
+              <div className="flex w-full justify-between">
+                <div className="text-2xl">Amount : </div>
+                <div className="text-2xl">
+                  Rs {calculateAmount(user?.cart, products)}
+                </div>
+              </div>
+              <div className="flex w-full justify-end">
+                <Button
+                  variant="bordered"
+                  color="primary"
+                  onPress={() => router.push("/checkout")}
+                >
+                  Continue to Checkout
+                </Button>
+              </div>
+            </div>
           </>
         )}
       </motion.div>

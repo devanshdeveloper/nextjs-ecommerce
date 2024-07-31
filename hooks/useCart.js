@@ -26,7 +26,7 @@ function useCart({ product, nowVariants }) {
   const cartProduct = useMemo(() => {
     return (
       user &&
-      user.cart.find((cartItem) => {
+      user?.cart.find((cartItem) => {
         return (
           cartItem.product === product._id &&
           areVariantsEqual(cartItem.variants, currentVariants)
@@ -58,7 +58,7 @@ function useCart({ product, nowVariants }) {
         router.push("/auth?action=login");
         return;
       }
-      if (user.cart.length === 0) {
+      if (user?.cart.length === 0) {
         setSearchParams({ showCartModal: true });
       }
       const newQuantity = +value < 0 ? 1 : +value;
@@ -81,7 +81,7 @@ function useCart({ product, nowVariants }) {
       }
 
       setCart(
-        user.cart.map((cartItem) => {
+        user?.cart.map((cartItem) => {
           if (
             cartItem.product === product._id &&
             areVariantsEqual(cartItem.variants, currentVariants)
