@@ -68,7 +68,10 @@ function useCart({ product, nowVariants }) {
       }
       setCart(
         user.cart.map((cartItem) => {
-          if (cartItem.product === product._id) {
+          if (
+            cartItem.product === product._id &&
+            areVariantsEqual(cartItem.variants, currentVariants)
+          ) {
             return { ...cartItem, quantity: newQuantity };
           }
           return cartItem;
