@@ -41,7 +41,7 @@ function AuthPage() {
         variants,
         userId: user._id,
       });
-      user?.cart = newCart;
+      user.cart = newCart;
       return user;
     } else return user;
   }, []);
