@@ -16,6 +16,7 @@ import { useInView } from "react-intersection-observer";
 import { readProductsByIds } from "@/fetch/product";
 function CartModal() {
   const [getSearchParams, setSearchParams] = useURL();
+  const { showCartModal } = getSearchParams("showCartModal");
   const { user, setUser } = useAuthContext();
   const router = useRouter();
   const {
@@ -141,7 +142,7 @@ function CartModal() {
 
   console.log(products);
 
-  return (
+  return showCartModal ? (
     <motion.div
       className="fixed inset-0 z-50 flex items-center justify-end bg-foreground-50 bg-opacity-50 backdrop-blur-sm"
       variants={modalVariants}
@@ -188,7 +189,7 @@ function CartModal() {
         )}
       </motion.div>
     </motion.div>
-  );
+  ) : null;
 }
 
 export default CartModal;

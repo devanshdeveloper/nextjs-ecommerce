@@ -14,9 +14,7 @@ import useURL from "@/hooks/useURL";
 const poppins = Poppins({ weight: "400", subsets: ["latin"] });
 
 export default function RootLayout({ children }) {
-  const [getSearchParams, setSearchParams] = useURL();
   const [isClient] = useIsClient();
-  const { showCartModal } = getSearchParams("showCartModal");
 
   return (
     <html lang="en">
@@ -34,7 +32,7 @@ export default function RootLayout({ children }) {
               </div>
               <Footer />
               <AnimatePresence>
-                {showCartModal && <CartModal />}
+                <CartModal />
               </AnimatePresence>
             </main>
           </Providers>
