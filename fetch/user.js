@@ -39,13 +39,11 @@ export async function updateOneUser({ id, newUser }) {
   });
 }
 
-export async function addToCart({ userId, productId, quantity }) {
-  return await fetchApi(
-    `/api/user/add-to-cart?userId=${userId}&productId=${productId}&quantity=${quantity}`,
-    {
-      method: "POST",
-    }
-  );
+export async function addToCart({ userId, productId, variants, quantity }) {
+  return await fetchApi(`/api/user/add-to-cart`, {
+    method: "POST",
+    body: { userId, productId, quantity, variants },
+  });
 }
 
 export async function deleteOneUser({ id }) {

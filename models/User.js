@@ -39,6 +39,12 @@ const UserSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Product",
       },
+      variants: [
+        {
+          name: { type: String },
+          value: { type: String },
+        },
+      ],
       quantity: Number,
     },
   ],
@@ -71,7 +77,7 @@ UserSchema.methods.addToCart = async function (productId, quantity = 1) {
   if (existingProductIndex >= 0) {
     this.cart[existingProductIndex].quantity = +quantity;
   } else {
-    this.cart.push({ product: productId, quantity });
+    this.cart.push({ product: productId, quantity, variants });
   }
   await this.save();
   return this.cart;

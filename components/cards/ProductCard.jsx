@@ -36,7 +36,13 @@ export default function ProductCard({
           animate="visible"
           exit="exit"
           layoutId={`card-${_id}`}
-          onClick={() => setSearchParams({ product: name })}
+          onClick={() => {
+            const defaultVariants = {};
+            variants.forEach((variant) => {
+              defaultVariants[variant.name] = variant.options[0];
+            });
+            setSearchParams({ product: name, ...defaultVariants });
+          }}
           onMouseOver={() => {
             setCardHovered(true);
           }}
