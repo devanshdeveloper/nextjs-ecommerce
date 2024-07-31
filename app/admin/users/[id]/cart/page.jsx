@@ -3,16 +3,22 @@
 // UI COMPONENTS
 import CartCard from "@/components/cards/CartCard";
 import PageLayout from "@/components/layout/PageLayout";
-import { Button } from "@nextui-org/react";
+import { Button, Divider, Spinner } from "@nextui-org/react";
 
 // HOOKS
 import { useAuthContext } from "@/components/providers/AuthProvider";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useInView } from "react-intersection-observer";
 import { readProductsByIds } from "@/fetch/product";
-import { useRouter } from "next/navigation";
+import parseAmount from "@/utils/parseAmount";
+import { useParams, useRouter } from "next/navigation";
 import PageLayoutSpinner from "@/components/spinners/PageLayoutSpinner";
+import { readOneUser, updateOneUser } from "@/fetch/user";
 import { AnimatePresence } from "framer-motion";
 import ProductModal from "@/components/modals/ProductModal";
 import useURL from "@/hooks/useURL";
@@ -21,9 +27,18 @@ import CartFooter from "@/components/CartFooter";
 
 // UTILS
 
-function CartPage() {
-  const { user, setUser } = useAuthContext();
+function AdminCartPage() {
   const [getSearchParams, setSearchParams] = useURL();
+  const { id } = useParams();
+
+  const { data: pageUser, isPending } = useQuery({
+    queryKey: [`user_${id}`],
+    queryFn: () => readOneUser({ id }),
+    retry: false,
+  });
+
+  console.log(pageUser);
+
   const router = useRouter();
   const {
     data,
@@ -34,12 +49,12 @@ function CartPage() {
     hasNextPage,
     refetch,
   } = useInfiniteQuery({
-    queryKey: ["cartProducts"],
+    queryKey: [`cartProducts_${id}`],
     queryFn: (params) =>
       readProductsByIds({
         ...params,
         limit: 20,
-        productIds: user?.cart.map((cartItem) => cartItem.product),
+        productIds: pageUser?.cart.map((cartItem) => cartItem.product),
       }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
@@ -47,11 +62,11 @@ function CartPage() {
     },
     refetchOnWindowFocus: false,
     retry: false,
-    enabled: !!user?.cart?.length,
+    enabled: !!pageUser?.cart?.length,
   });
 
   const { ref: loaderRef, inView } = useInView();
-
+  const queryClient = useQueryClient();
   useEffect(() => {
     if (inView) {
       fetchNextPage();
@@ -64,47 +79,19 @@ function CartPage() {
     products &&
     products.find(({ name }) => name === getSearchParams("product").product);
 
-  if (!user) {
+  if (!pageUser?.cart?.length) {
     return (
       <PageLayout>
         <div className="flex flex-col items-center gap-10">
-          <div className="text-3xl">You are not signed In</div>
+          <div className="text-3xl">{pageUser?.name ?? "User"} Cart is Empty</div>
           <div className="flex gap-5">
             <Button
               variant="flat"
               color="primary"
               size="lg"
-              onPress={() => router.push("/shop")}
+              onPress={() => router.back()}
             >
-              Go to Shop
-            </Button>
-            <Button
-              variant="flat"
-              color="primary"
-              size="lg"
-              onPress={() => router.push("/auth?action=signin")}
-            >
-              Go to Sign In
-            </Button>
-          </div>
-        </div>
-      </PageLayout>
-    );
-  }
-
-  if (!user?.cart.length) {
-    return (
-      <PageLayout>
-        <div className="flex flex-col items-center gap-10">
-          <div className="text-3xl">Your Cart is Empty</div>
-          <div className="flex gap-5">
-            <Button
-              variant="flat"
-              color="primary"
-              size="lg"
-              onPress={() => router.push("/shop")}
-            >
-              Go to Shop
+             Back
             </Button>
           </div>
         </div>
@@ -114,6 +101,10 @@ function CartPage() {
   if (status === "pending") {
     return <PageLayoutSpinner />;
   }
+  const setUser = (...args) =>
+    queryClient.setQueryData([`user_${id}`], ...args)
+
+  console.log(products, pageUser);
   return (
     <div className="flex flex-col items-center ">
       <div className="w-[min(80vw,1250px)]">
@@ -121,7 +112,7 @@ function CartPage() {
           title={"Cart"}
           items={
             products &&
-            user?.cart.map((cartItem, i) => {
+            pageUser?.cart.map((cartItem, i) => {
               return (
                 <CartCard
                   key={i}
@@ -130,8 +121,8 @@ function CartPage() {
                       (product) => cartItem.product === product?._id
                     ),
                     cartItem,
-                    user,
-                    setUser
+                    user: pageUser,
+                    setUser,
                   }}
                 />
               );
@@ -145,7 +136,7 @@ function CartPage() {
             hasNextPage,
             fetchNextPage,
             isFetching,
-            user ,
+            user : pageUser, 
             setUser
           }}
         />
@@ -157,4 +148,4 @@ function CartPage() {
   );
 }
 
-export default CartPage;
+export default AdminCartPage;

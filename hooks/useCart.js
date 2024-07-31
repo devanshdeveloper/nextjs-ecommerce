@@ -7,8 +7,7 @@ import { areVariantsEqual } from "@/utils/areVariantsEqual";
 import { useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 
-function useCart({ product, nowVariants }) {
-  const { user, setUser } = useAuthContext();
+function useCart({ product, nowVariants, user, setUser }) {
   const router = useRouter();
   const [getSearchParams, setSearchParams] = useURL();
   const mutateAddToCart = useMutation({
@@ -19,6 +18,8 @@ function useCart({ product, nowVariants }) {
       setUser({ ...user, cart });
     },
   });
+
+  console.log("Running");
 
   const currentVariants =
     nowVariants ||
@@ -36,6 +37,7 @@ function useCart({ product, nowVariants }) {
       })
     );
   }, [currentVariants, product?._id, user]);
+  console.log("Running");
 
   const debouncedInputChange = useDebouncedCallback((newQuantity) => {
     mutateAddToCart.mutate({
@@ -46,6 +48,7 @@ function useCart({ product, nowVariants }) {
     });
   }, 1000);
 
+  console.log("Running");
   const handleQuantityChange = useCallback(
     (value) => {
       if (!user) {
@@ -77,6 +80,7 @@ function useCart({ product, nowVariants }) {
         });
         return;
       }
+      console.log("Running");
 
       function setCart(cart) {
         setUser({ ...user, cart });
@@ -94,6 +98,7 @@ function useCart({ product, nowVariants }) {
         })
       );
       debouncedInputChange(newQuantity);
+      console.log("Running");
     },
     [
       currentVariants,
@@ -107,6 +112,7 @@ function useCart({ product, nowVariants }) {
       setSearchParams,
     ]
   );
+  console.log("Running");
   return {
     currentVariants,
     handleQuantityChange,

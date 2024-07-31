@@ -10,7 +10,7 @@ import { Delete } from "lucide-react";
 
 export default function SmallCartCard({ product, cartItem }) {
   const [isCardHovered, setCardHovered] = useState(false);
-  const { user } = useAuthContext();
+  const { user, setUser } = useAuthContext();
 
   const nowVariants = {};
   cartItem.variants.forEach((variant) => {
@@ -24,6 +24,8 @@ export default function SmallCartCard({ product, cartItem }) {
   } = useCart({
     product,
     nowVariants,
+    user,
+    setUser,
   });
 
   const cardVariants = {

@@ -6,8 +6,12 @@ import useURL from "@/hooks/useURL";
 import { twMerge } from "tailwind-merge";
 import { Spinner } from "@nextui-org/react";
 import useCart from "@/hooks/useCart";
+import { useAuthContext } from "../providers/AuthProvider";
 function ProductModal({ product }) {
   const [getSearchParams, setSearchParams] = useURL();
+
+  const { user, setUser } = useAuthContext();
+
   const {
     currentVariants,
     handleQuantityChange,
@@ -15,6 +19,8 @@ function ProductModal({ product }) {
     mutateAddToCart,
   } = useCart({
     product,
+    user,
+    setUser,
   });
 
   const modalVariants = {
@@ -67,7 +73,7 @@ function ProductModal({ product }) {
             <div className="h-[200px] overflow-y-scroll">
               <p className="text-gray-700">{product.description}</p>
             </div>
-     
+
             <div className="flex gap-2">
               <small className="text-default-500">Rs {product.price}</small>
               <small className="text-default-500 line-through">

@@ -5,10 +5,11 @@ import parseAmount from "@/utils/parseAmount";
 import promoCodes from "@/utils/PromoCodes";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { updateOneUser } from "@/fetch/user";
 
 const CartFooter = forwardRef(
-  ({ products, hasNextPage, fetchNextPage, isFetching }, ref) => {
-    const { user, setUser } = useAuthContext();
+  ({ products, hasNextPage, fetchNextPage, isFetching , user , setUser }, ref) => {
+    
     const router = useRouter();
     const [promoCodeInput, setPromoCodeInput] = useState("");
     const [showPartGIF, setShowPartyGIF] = useState(false);

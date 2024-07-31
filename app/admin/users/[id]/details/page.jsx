@@ -2,14 +2,11 @@
 
 import AdminLayoutSpinner from "@/components/spinners/AdminLayoutSpinner";
 import AdminLayoutCover from "@/components/layout/AdminLayoutCover";
-import {
-  readOneUser,
-  deleteOneUser,
-  updateOneUser,
-} from "@/fetch/user";
+import { readOneUser, deleteOneUser, updateOneUser } from "@/fetch/user";
 import { Avatar, Button, Select, SelectItem } from "@nextui-org/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 
 function UserDetailsPage() {
   const { id } = useParams();
@@ -62,7 +59,9 @@ function UserDetailsPage() {
     <div>
       <div className="px-5 lg:p-10 flex flex-col items-center gap-10">
         <div className="w-full flex flex-col lg:flex-row justify-between">
-          <div className="text-lg lg:text-2xl py-5">User Details : {pageUser.name}</div>
+          <div className="text-lg lg:text-2xl py-5">
+            User Details : {pageUser.name}
+          </div>
           <div className="flex gap-5 items-center">
             <Select
               label="Role"
@@ -98,6 +97,9 @@ function UserDetailsPage() {
           <div className="font-bold text-2xl">{pageUser.name}</div>
           <div>{pageUser.email}</div>
         </div>
+      </div>
+      <div className="w-full">
+        <Link href={`/admin/users/${pageUser._id}/cart`}>View Cart</Link>
       </div>
     </div>
   );

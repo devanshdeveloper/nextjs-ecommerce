@@ -1,21 +1,17 @@
 import { motion } from "framer-motion";
 import { CgClose } from "react-icons/cg";
-import ImageListViewer from "../lists/ImageListViewer";
 import { useCallback, useEffect } from "react";
 import useURL from "@/hooks/useURL";
-import { twMerge } from "tailwind-merge";
-import { Button, Divider, Spinner } from "@nextui-org/react";
-import useCart from "@/hooks/useCart";
+import { Button } from "@nextui-org/react";
 import SmallCartCard from "../cards/SmallCartCard";
 import { useRouter } from "next/navigation";
-import PageLayout from "../layout/PageLayout";
-import PageLayoutSpinner from "../spinners/PageLayoutSpinner";
 import { useAuthContext } from "../providers/AuthProvider";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
 import { readProductsByIds } from "@/fetch/product";
-import parseAmount from "@/utils/parseAmount";
 import CartFooter from "../CartFooter";
+
+
 function CartModal() {
   const [getSearchParams, setSearchParams] = useURL();
   const { showCartModal } = getSearchParams("showCartModal");
@@ -173,6 +169,8 @@ function CartModal() {
                 hasNextPage,
                 fetchNextPage,
                 isFetching,
+                user, 
+                setUser
               }}
             />
           </>

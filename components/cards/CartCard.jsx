@@ -7,14 +7,14 @@ import { useAuthContext } from "../providers/AuthProvider";
 import useCart from "@/hooks/useCart";
 import { Spinner } from "@nextui-org/react";
 
-export default function CartCard({ product, cartItem }) {
+export default function CartCard({ product, cartItem, user, setUser }) {
   const [isCardHovered, setCardHovered] = useState(false);
-  const { user } = useAuthContext();
 
   const nowVariants = {};
   cartItem.variants.forEach((variant) => {
     nowVariants[variant.name] = variant.value;
   });
+
   const {
     currentVariants,
     handleQuantityChange,
@@ -23,6 +23,8 @@ export default function CartCard({ product, cartItem }) {
   } = useCart({
     product,
     nowVariants,
+    user,
+    setUser,
   });
 
   const cardVariants = {
