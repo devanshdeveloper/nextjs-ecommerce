@@ -19,6 +19,7 @@ import { AnimatePresence } from "framer-motion";
 import ProductModal from "@/components/modals/ProductModal";
 import useURL from "@/hooks/useURL";
 import CustomGrid from "@/components/layout/CustomGrid";
+import CartFooter from "@/components/CartFooter";
 
 // UTILS
 
@@ -51,7 +52,7 @@ function CartPage() {
     enabled: !!user?.cart?.length,
   });
 
-  const { ref, inView } = useInView();
+  const { ref: loaderRef, inView } = useInView();
 
   useEffect(() => {
     if (inView) {
@@ -61,28 +62,6 @@ function CartPage() {
 
   const products = data && data.pages.flatMap((page) => page.data);
 
-  function calculateAmount(cart, products) {
-    if (!cart || !products) return 0;
-    let amount = 0;
-    let notFoundProducts = [];
-    for (let i = 0; i < cart.length; i++) {
-      const cartItem = cart[i];
-      const product = products.find((p) => p._id === cartItem.product);
-      if (!product) {
-        notFoundProducts.push(cartItem.product);
-        continue;
-      }
-      amount += product.price * cartItem.quantity;
-    }
-    if (notFoundProducts.length) {
-      const newCart = user?.cart.filter(
-        (cartProduct) => !notFoundProducts.includes(cartProduct.product)
-      );
-      setUser({ ...user, cart: newCart });
-      updateOneUser({ id: user._id, newUser: { cart: newCart } });
-    }
-    return parseAmount(amount);
-  }
 
   const product =
     products &&
@@ -160,39 +139,15 @@ function CartPage() {
             })
           }
         />
-
-        <div className="h-full flex items-center justify-center" ref={ref}>
-          {hasNextPage && (
-            <Button
-              variant="flat"
-              color="primary"
-              size="lg"
-              isLoading={isFetching}
-              onPress={fetchNextPage}
-            >
-              Load More
-            </Button>
-          )}
-          {!hasNextPage && isFetching && <Spinner />}
-        </div>
-        <Divider />
-        <div className="flex flex-col gap-5 my-10">
-          <div className="flex w-full justify-between">
-            <div className="text-2xl">Amount : </div>
-            <div className="text-2xl">
-              Rs {calculateAmount(user?.cart, products)}
-            </div>
-          </div>
-          <div className="flex w-full justify-end">
-            <Button
-              variant="bordered"
-              color="primary"
-              onPress={() => router.push("/checkout")}
-            >
-              Continue to Checkout
-            </Button>
-          </div>
-        </div>
+        <CartFooter
+          {...{
+            products,
+            ref: loaderRef,
+            hasNextPage,
+            fetchNextPage,
+            isFetching,
+          }}
+        />
       </div>
       <AnimatePresence>
         {product && <ProductModal product={product} />}

@@ -24,6 +24,8 @@ function useCart({ product, nowVariants }) {
     nowVariants ||
     getSearchParams(...product.variants.map((variant) => variant.name));
   const cartProduct = useMemo(() => {
+    if (!product._id) return;
+
     return (
       user &&
       user?.cart.find((cartItem) => {

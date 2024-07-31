@@ -35,7 +35,7 @@ export default function SmallCartCard({ product, cartItem }) {
 
   return (
     <motion.div
-      className="flex items-center p-2 border border-foreground-200 rounded-lg cursor-pointer"
+      className="flex items-center p-1 md:p-2 border border-foreground-200 rounded-lg cursor-pointer"
       variants={cardVariants}
       initial="hidden"
       animate="visible"
@@ -67,7 +67,7 @@ export default function SmallCartCard({ product, cartItem }) {
         setCardHovered(false);
       }}
     >
-      <div className="relative h-[200px]">
+      <div className="relative w-[220px] h-[200px]">
         {product.images[0] && (
           <motion.div
             initial={{ opacity: 1 }}
@@ -75,7 +75,7 @@ export default function SmallCartCard({ product, cartItem }) {
             transition={{ duration: 0.5 }}
           >
             <Image
-              className="z-10  h-[200px]"
+              className="z-10 h-[200px]"
               src={product.images[0]}
               width={200}
               height={200}
@@ -127,35 +127,37 @@ export default function SmallCartCard({ product, cartItem }) {
         {cartProduct && (
           <div className="flex flex-col items-start justify-between pt-1 w-full">
             <div className="flex justify-between w-full gap-2">
-              <div className="flex items-center justify-between w-full">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleQuantityChange(cartProduct.quantity - 1);
-                  }}
-                  className="border border-foreground px-3 py-1.5 text-2xl"
-                >
-                  -
-                </button>
-                <span className="text-2xl">{cartProduct.quantity}</span>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleQuantityChange(cartProduct.quantity + 1);
-                  }}
-                  className="border border-foreground px-3 py-1.5 text-2xl"
-                >
-              +
-                </button>
+              <div className="flex flex-col sm:flex-row w-full">
+                <div className="flex items-center justify-between w-full">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleQuantityChange(cartProduct.quantity - 1);
+                    }}
+                    className="border border-foreground px-2 md:px-3 md:py-1.5 text-2xl"
+                  >
+                    -
+                  </button>
+                  <span className="text-2xl">{cartProduct.quantity}</span>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleQuantityChange(cartProduct.quantity + 1);
+                    }}
+                    className="border border-foreground px-2 md:px-3 md:py-1.5 text-2xl"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   handleQuantityChange(0);
                 }}
-                className="border border-red-500 px-3 py-1.5 text-2xl"
+                className="border border-red-500 px-2 py-1 md:px-3 md:py-1.5 text-2xl"
               >
-                  <MdDelete color="red" />
+                <MdDelete color="red" />
               </button>
             </div>
             <div className="flex justify-between w-full mt-2">

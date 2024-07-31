@@ -15,6 +15,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
 import { readProductsByIds } from "@/fetch/product";
 import parseAmount from "@/utils/parseAmount";
+import CartFooter from "../CartFooter";
 function CartModal() {
   const [getSearchParams, setSearchParams] = useURL();
   const { showCartModal } = getSearchParams("showCartModal");
@@ -45,7 +46,7 @@ function CartModal() {
     enabled: !!user?.cart?.length,
   });
 
-  const { ref, inView } = useInView();
+  const { ref: loaderRef, inView } = useInView();
 
   useEffect(() => {
     if (inView) {
@@ -56,32 +57,9 @@ function CartModal() {
 
   const products = data && data.pages.flatMap((page) => page.data);
 
-  function calculateAmount(cart, products) {
-    if (!cart || !products) return 0;
-    let amount = 0;
-    let notFoundProducts = [];
-    for (let i = 0; i < cart.length; i++) {
-      const cartItem = cart[i];
-      const product = products.find((p) => p._id === cartItem.product);
-      if (!product) {
-        notFoundProducts.push(cartItem.product);
-        continue;
-      }
-      amount += product.price * cartItem.quantity;
-    }
-    if (notFoundProducts.length) {
-      const newCart = user?.cart.filter(
-        (cartProduct) => !notFoundProducts.includes(cartProduct.product)
-      );
-      setUser({ ...user, cart: newCart });
-      updateOneUser({ id: user._id, newUser: { cart: newCart } });
-    }
-    return parseAmount(amount);
-  }
-
-  const product =
-    products &&
-    products.find(({ name }) => name === getSearchParams("product").product);
+  // const product =
+  //   products &&
+  //   products.find(({ name }) => name === getSearchParams("product").product);
   const closeModal = useCallback(() => {
     setSearchParams({ showCartModal: "" });
   }, [setSearchParams]);
@@ -188,38 +166,15 @@ function CartModal() {
                   );
                 })}
             </div>
-            <Divider className="mt-10" />
-            <div className="flex flex-col gap-5 my-10">
-              <div className="flex w-full justify-between">
-                <div className="text-2xl">Amount : </div>
-                <div className="text-2xl">
-                  Rs {calculateAmount(user?.cart, products)}
-                </div>
-              </div>
-              <div className="flex w-full justify-end">
-                <Button
-                  variant="bordered"
-                  color="primary"
-                  onPress={() => router.push("/checkout")}
-                >
-                  Continue to Checkout
-                </Button>
-              </div>
-            </div>
-            <div className="h-full flex items-center justify-center" ref={ref}>
-              {hasNextPage && (
-                <Button
-                  variant="flat"
-                  color="primary"
-                  size="lg"
-                  isLoading={isFetching}
-                  onPress={fetchNextPage}
-                >
-                  Load More
-                </Button>
-              )}
-              {!hasNextPage && isFetching && <Spinner />}
-            </div>
+            <CartFooter
+              {...{
+                products,
+                ref: loaderRef,
+                hasNextPage,
+                fetchNextPage,
+                isFetching,
+              }}
+            />
           </>
         )}
       </motion.div>
