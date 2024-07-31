@@ -42,7 +42,7 @@ export default function SmallCartCard({ product, cartItem }) {
       exit="exit"
       onClick={() => {
         const cartVariants = user?.cart.find(
-          (cartItem) => cartItem.product === product._id
+          (cartItem) => cartItem.product === product?._id
         )?.variants;
         const defaultVariants = {};
         if (cartVariants) {

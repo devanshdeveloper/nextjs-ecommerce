@@ -26,7 +26,7 @@ export async function readOneProduct({ id }) {
 export async function updateOneProduct(product) {
   return await fetchApi(`/api/product/update-one`, {
     method: "PUT",
-    body: { id: product._id, newProduct: product },
+    body: { id: product?._id, newProduct: product },
   });
 }
 

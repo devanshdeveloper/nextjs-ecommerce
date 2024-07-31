@@ -42,7 +42,7 @@ function ProductModal({ product }) {
     >
       <motion.div
         className="relative w-[min(100vw,1000px)] bg-background h-screen md:h-[600px] overflow-y-scroll shadow-xl rounded-2xl py-20 px-5 md:p-10"
-        layoutId={`card-${product._id}`}
+        layoutId={`card-${product?._id}`}
         onClick={(e) => e.stopPropagation()}
       >
         <button

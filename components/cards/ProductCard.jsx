@@ -27,6 +27,8 @@ export default function ProductCard({
   };
   const [getSearchParams, setSearchParams] = useURL();
 
+  console.log(images);
+
   return (
     <motion.div
       key={_id}

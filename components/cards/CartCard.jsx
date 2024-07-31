@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { MdImageNotSupported } from "react-icons/md";
+import { MdDelete, MdImageNotSupported } from "react-icons/md";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import useURL from "@/hooks/useURL";
@@ -41,7 +41,7 @@ export default function CartCard({ product, cartItem }) {
       exit="exit"
       onClick={() => {
         const cartVariants = user?.cart.find(
-          (cartItem) => cartItem.product === product._id
+          (cartItem) => cartItem.product === product?._id
         )?.variants;
         const defaultVariants = {};
         if (cartVariants) {
@@ -119,25 +119,38 @@ export default function CartCard({ product, cartItem }) {
         </div>
         {cartProduct && (
           <div className="flex flex-col items-start justify-between w-full pt-1">
-            <div className="flex items-center justify-between  w-full">
+            <div className="flex justify-between w-full gap-2">
+              <div className="flex flex-col sm:flex-row w-full">
+                <div className="flex items-center justify-between w-full">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleQuantityChange(cartProduct.quantity - 1);
+                    }}
+                    className="border border-foreground px-2 md:px-3 md:py-1.5 text-2xl"
+                  >
+                    -
+                  </button>
+                  <span className="text-2xl">{cartProduct.quantity}</span>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleQuantityChange(cartProduct.quantity + 1);
+                    }}
+                    className="border border-foreground px-2 md:px-3 md:py-1.5 text-2xl"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
               <button
                 onClick={(e) => {
-                  e.stopPropagation()
-                  handleQuantityChange(cartProduct.quantity - 1);
+                  e.stopPropagation();
+                  handleQuantityChange(0);
                 }}
-                className="border border-foreground px-3 py-1.5 text-2xl"
+                className="border border-red-500 px-2 py-1 md:px-3 md:py-1.5 text-2xl"
               >
-                -
-              </button>
-              <span className="text-2xl">{cartProduct.quantity}</span>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation()
-                  handleQuantityChange(cartProduct.quantity + 1);
-                }}
-                className="border border-foreground px-3 py-1.5 text-2xl"
-              >
-                +
+                <MdDelete color="red" />
               </button>
             </div>
             <div className="flex justify-between w-full mt-2">

@@ -158,7 +158,7 @@ function CartModal() {
                       key={i}
                       {...{
                         product: products.find(
-                          (product) => cartItem.product === product._id
+                          (product) => cartItem.product === product?._id
                         ),
                         cartItem,
                       }}

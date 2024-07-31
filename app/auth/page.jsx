@@ -120,11 +120,16 @@ function AuthPage() {
     }
   }
 
+  const pendingAddToCart = localStorage.getItem("addToCartPending");
+
   return (
     <div className="flex justify-center items-center">
       <div className="w-[min(80vw,500px)] flex flex-col gap-10 items-center">
-        <div className="text-5xl font-semibold my-20">
+        <div className="flex flex-col gap-2 text-5xl font-semibold my-20">
           {isLoginPage ? "Log in" : "Sign In"}
+          <div className="text-foreground-500 text-xs md:text-sm">
+            Login to continue the action
+          </div>
         </div>
         <form onSubmit={handleSubmit} className="flex flex-col w-full gap-5">
           {!isLoginPage && <Input type="text" label="Name" name="name" />}

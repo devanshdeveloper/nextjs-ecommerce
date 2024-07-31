@@ -24,13 +24,13 @@ function useCart({ product, nowVariants }) {
     nowVariants ||
     getSearchParams(...product.variants.map((variant) => variant.name));
   const cartProduct = useMemo(() => {
-    if (!product._id) return;
+    if (!product?._id) return;
 
     return (
       user &&
       user?.cart.find((cartItem) => {
         return (
-          cartItem.product === product._id &&
+          cartItem.product === product?._id &&
           areVariantsEqual(cartItem.variants, currentVariants)
         );
       })
@@ -39,7 +39,7 @@ function useCart({ product, nowVariants }) {
 
   const debouncedInputChange = useDebouncedCallback((newQuantity) => {
     mutateAddToCart.mutate({
-      productId: product._id,
+      productId: product?._id,
       userId: user._id,
       quantity: newQuantity,
       variants: currentVariants,
@@ -52,7 +52,7 @@ function useCart({ product, nowVariants }) {
         localStorage.setItem(
           "addToCartPending",
           JSON.stringify({
-            productId: product._id,
+            productId: product?._id,
             quantity: 1,
             variants: currentVariants,
           })
@@ -70,7 +70,7 @@ function useCart({ product, nowVariants }) {
 
       if (!cartProduct || newQuantity === 0) {
         mutateAddToCart.mutate({
-          productId: product._id,
+          productId: product?._id,
           userId: user._id,
           quantity: newQuantity,
           variants: currentVariants,
@@ -85,7 +85,7 @@ function useCart({ product, nowVariants }) {
       setCart(
         user?.cart.map((cartItem) => {
           if (
-            cartItem.product === product._id &&
+            cartItem.product === product?._id &&
             areVariantsEqual(cartItem.variants, currentVariants)
           ) {
             return { ...cartItem, quantity: newQuantity };
