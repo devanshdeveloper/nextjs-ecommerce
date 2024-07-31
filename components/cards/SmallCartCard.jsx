@@ -1,13 +1,14 @@
 import Image from "next/image";
-import { MdImageNotSupported } from "react-icons/md";
+import { MdDelete, MdImageNotSupported } from "react-icons/md";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import useURL from "@/hooks/useURL";
 import { useAuthContext } from "../providers/AuthProvider";
 import useCart from "@/hooks/useCart";
 import { Spinner } from "@nextui-org/react";
+import { Delete } from "lucide-react";
 
-export default function CartCard({ product, cartItem }) {
+export default function SmallCartCard({ product, cartItem }) {
   const [isCardHovered, setCardHovered] = useState(false);
   const { user } = useAuthContext();
 
@@ -34,7 +35,7 @@ export default function CartCard({ product, cartItem }) {
 
   return (
     <motion.div
-      className="border border-foreground-200 rounded-lg cursor-pointer"
+      className="flex items-center p-2 border border-foreground-200 rounded-lg cursor-pointer"
       variants={cardVariants}
       initial="hidden"
       animate="visible"
@@ -53,7 +54,11 @@ export default function CartCard({ product, cartItem }) {
             defaultVariants[variant.name] = variant.options[0];
           });
         }
-        setSearchParams({ product: product.name, ...defaultVariants });
+        setSearchParams({
+          product: product.name,
+          showCartModal: "",
+          ...defaultVariants,
+        });
       }}
       onMouseOver={() => {
         setCardHovered(true);
@@ -62,7 +67,7 @@ export default function CartCard({ product, cartItem }) {
         setCardHovered(false);
       }}
     >
-      <div className="relative">
+      <div className="relative h-[200px]">
         {product.images[0] && (
           <motion.div
             initial={{ opacity: 1 }}
@@ -70,10 +75,10 @@ export default function CartCard({ product, cartItem }) {
             transition={{ duration: 0.5 }}
           >
             <Image
-              className="z-10 w-full"
+              className="z-10  h-[200px]"
               src={product.images[0]}
-              width={500}
-              height={500}
+              width={200}
+              height={200}
               alt={product.name}
             />
           </motion.div>
@@ -83,13 +88,13 @@ export default function CartCard({ product, cartItem }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: isCardHovered ? 1 : 0 }}
             transition={{ duration: 0.5 }}
-            className="absolute top-0 left-0 w-full h-full"
+            className="absolute top-0 left-0  h-full"
           >
             <Image
-              className="w-full"
+              className=" h-[200px]"
               src={product.images[1]}
-              width={500}
-              height={500}
+              width={150}
+              height={200}
               alt={product.name}
             />
           </motion.div>
@@ -105,44 +110,59 @@ export default function CartCard({ product, cartItem }) {
           </motion.div>
         )}
       </div>
-      <div className="flex flex-col items-start p-3 pt-0">
-        <h4 className="font-bold sm:text-sm md:text-md lg:text-large">
-          {`${product.name} (${cartItem.variants
-            .map((variant) => `${variant.name} - ${variant.value}`)
-            .join(", ")})`}
-        </h4>
-        <div className="flex gap-2">
-          <small className="text-default-500">Rs {product.price}</small>
-          <small className="text-default-500 line-through">
-            Rs {product.actualPrice}
-          </small>
+      <div className="flex flex-col md:flex-row justify-between p-3 pt-0 w-full">
+        <div className="flex flex-col gap-2 w-full">
+          <h4 className="font-bold sm:text-sm md:text-md lg:text-large">
+            {`${product.name} (${cartItem.variants
+              .map((variant) => `${variant.name} - ${variant.value}`)
+              .join(", ")})`}
+          </h4>
+          <div className="flex gap-2">
+            <small className="text-default-500">Rs {product.price}</small>
+            <small className="text-default-500 line-through">
+              Rs {product.actualPrice}
+            </small>
+          </div>
         </div>
         {cartProduct && (
-          <div className="flex flex-col items-start justify-between w-full pt-1">
-            <div className="flex items-center justify-between  w-full">
+          <div className="flex flex-col items-start justify-between pt-1 w-full">
+            <div className="flex justify-between w-full gap-2">
+              <div className="flex items-center justify-between w-full">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleQuantityChange(cartProduct.quantity - 1);
+                  }}
+                  className="border border-foreground px-3 py-1.5 text-2xl"
+                >
+                  -
+                </button>
+                <span className="text-2xl">{cartProduct.quantity}</span>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleQuantityChange(cartProduct.quantity + 1);
+                  }}
+                  className="border border-foreground px-3 py-1.5 text-2xl"
+                >
+              +
+                </button>
+              </div>
               <button
                 onClick={(e) => {
-                  e.stopPropagation()
-                  handleQuantityChange(cartProduct.quantity - 1);
+                  e.stopPropagation();
+                  handleQuantityChange(0);
                 }}
-                className="border border-foreground px-3 py-1.5 text-2xl"
+                className="border border-red-500 px-3 py-1.5 text-2xl"
               >
-                -
-              </button>
-              <span className="text-2xl">{cartProduct.quantity}</span>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation()
-                  handleQuantityChange(cartProduct.quantity + 1);
-                }}
-                className="border border-foreground px-3 py-1.5 text-2xl"
-              >
-                +
+                  <MdDelete color="red" />
               </button>
             </div>
             <div className="flex justify-between w-full mt-2">
               <div className="text-default-500">
-                Total: Rs {cartProduct.quantity * product.price}
+                {`${cartProduct.quantity} * ${product.price} = Rs ${
+                  cartProduct.quantity * product.price
+                }`}
               </div>
               <div className="h-5">
                 {mutateAddToCart.isPending && (

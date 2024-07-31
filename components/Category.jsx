@@ -17,13 +17,14 @@ import useURL from "@/hooks/useURL";
 import ProductModal from "./modals/ProductModal";
 import { AnimatePresence } from "framer-motion";
 import CustomGrid from "./layout/CustomGrid";
+import CartModal from "./modals/CartModal";
 
 function Category({ category, products }) {
   const [getSearchParams, setSearchParams] = useURL();
 
-  const product =
-    products &&
-    products.find(({ name }) => name === getSearchParams("product").product);
+  const { product: productName } = getSearchParams("product");
+
+  const product = products && products.find(({ name }) => productName === name);
 
   return (
     <>

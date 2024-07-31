@@ -12,6 +12,13 @@ export async function readOneAddress({ id }) {
   });
 }
 
+
+export async function readByUserIdAddress({ userId }) {
+  return await fetchApi(`/api/address/read-by-user-id?userId=${userId}`, {
+    method: "GET",
+  });
+}
+
 export async function updateOneAddress({ id, newAddress }) {
   return await fetchApi(`/api/address/update-one?id=${id}`, {
     method: "PUT",
@@ -33,17 +40,4 @@ export async function readAllAddress({ pageParam, limit, search }) {
       method: "GET",
     }
   );
-}
-
-export async function readByNameAddress({ name }) {
-  return await fetchApi(`/api/address/read-by-name?name=${name}`, {
-    method: "GET",
-  });
-}
-
-export async function addToFavoritesAddress({ id, favorite }) {
-  return await fetchApi(`/api/address/add-to-favorites`, {
-    method: "PUT",
-    body: { id, favorite },
-  });
 }

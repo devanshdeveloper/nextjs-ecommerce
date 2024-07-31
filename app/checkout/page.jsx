@@ -1,10 +1,10 @@
 "use client";
 import { useAuthContext } from "@/components/providers/AuthProvider";
-import { createOneAddress } from "@/fetch/address";
+import { createOneAddress, readByUserIdAddress, updateOneAddress } from "@/fetch/address";
 import { defaultCheckoutFormValue } from "@/utils/defaultFormValue";
 import parseError from "@/utils/parseError";
 import { Button, Input, Textarea } from "@nextui-org/react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 // async function handleCheckout() {
 //   const {
 //     data: { key },
@@ -83,19 +83,40 @@ import { useEffect, useRef, useState } from "react";
 function CheckoutPage() {
   const [checkoutForm, setCheckoutForm] = useState(defaultCheckoutFormValue());
   const { user } = useAuthContext();
-
+  const [selectedAddress, setSelectedAddress] = useState(null);
   const streetTextareaRef = useRef(null);
 
   const [errors, setErrors] = useState([]);
 
+  const { data: userAddresses } = useQuery({
+    queryKey: ["address", user._id],
+    queryFn: async () => {
+      const addresses = await readByUserIdAddress({ userId: user._id });
+      return addresses;
+    },
+
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
+
+  console.log(userAddresses);
+
   const mutate_address = useMutation({
     mutationFn: async () => {
-      return await createOneAddress({
-        ...checkoutForm,
-        user: user._id,
-      });
+      if (selectedAddress) {
+        return await updateOneAddress({
+          id: selectedAddress,
+          newAddress: checkoutForm,
+        });
+      } else {
+        return await createOneAddress({
+          ...checkoutForm,
+          user: user._id,
+        });
+      }
     },
     onSuccess: (data) => {
+      console.log(data);
       setCheckoutForm(defaultCheckoutFormValue());
     },
   });
@@ -103,6 +124,20 @@ function CheckoutPage() {
   useEffect(() => {
     streetTextareaRef.current.style.height = "130px !important";
   }, []);
+  useEffect(() => {
+    if (!selectedAddress) return;
+    const newAddress = userAddresses.find(
+      (address) => address._id === selectedAddress
+    );
+    setCheckoutForm({
+      street: newAddress.street,
+      city: newAddress.city,
+      state: newAddress.state,
+      phoneNo: newAddress.phoneNo,
+      zipCode: newAddress.zipCode,
+      country: newAddress.country,
+    });
+  }, [selectedAddress, userAddresses]);
 
   return (
     <>
@@ -111,8 +146,25 @@ function CheckoutPage() {
         onLoad={() => {}}
       />
       <div className="flex justify-center">
-        <div className="w-[min(900px,80vw)]">
-          <div className="text-2xl lg:text-5xl py-5 lg:py-10">Address Info</div>
+        <div className="w-[min(900px,80vw)] flex flex-col gap-5 pt-5">
+          <div className="text-2xl lg:text-5xl">Address Info</div>
+          <div className="flex flex-wrap gap-2">
+            {userAddresses &&
+              userAddresses.map((address) => {
+                return (
+                  <Button
+                    key={address._id}
+                    variant="bordered"
+                    isDisabled={selectedAddress === address._id}
+                    onClick={() => setSelectedAddress(address._id)}
+                    className="text-wrap h-auto py-2"
+                    isSelected={address._id === selectedAddress}
+                  >
+                    {`${address.street}, ${address.city}, ${address.state}`}
+                  </Button>
+                );
+              })}
+          </div>
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -120,7 +172,7 @@ function CheckoutPage() {
             }}
             className="flex flex-col gap-4"
           >
-            <div className="flex gap-4 h-full">
+            <div className="flex flex-col md:flex-row gap-4 h-full">
               <Textarea
                 isDisabled={mutate_address.isPending}
                 type="text"
@@ -128,7 +180,7 @@ function CheckoutPage() {
                 name="street"
                 classNames={{
                   inputWrapper: "!h-[130px]",
-                  base: "!h-[130px] w-1/2",
+                  base: "!h-[130px] w-full md:w-1/2",
                 }}
                 ref={streetTextareaRef}
                 onValueChange={(value) =>
@@ -137,7 +189,7 @@ function CheckoutPage() {
                 value={checkoutForm.street}
                 isRequired
               />
-              <div className="flex flex-col gap-4 w-1/2">
+              <div className="flex flex-col gap-4 w-full md:w-1/2">
                 <Input
                   isDisabled={mutate_address.isPending}
                   type="text"
@@ -164,7 +216,7 @@ function CheckoutPage() {
                 />
               </div>
             </div>
-            <div className="flex gap-4">
+            <div className="flex flex-col md:flex-row gap-4">
               <Input
                 isDisabled={mutate_address.isPending}
                 type="text"

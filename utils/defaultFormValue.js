@@ -12,11 +12,11 @@ export function defaultProductFormValue() {
 
 export function defaultCheckoutFormValue() {
   return {
-    street: "123 Elm Street",
-    city: "Springfield",
-    state: "IL",
-    phoneNo: "5551234567",
-    zipCode: "62701",
-    country: "USA",
+    street: "",
+    city: "",
+    state: "",
+    phoneNo: "",
+    zipCode: "",
+    country: "",
   };
 }

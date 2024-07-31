@@ -11,12 +11,18 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
 // UTILS
-import { continueWithGoogleUser, createOneUser, logInUser } from "@/fetch/user";
+import {
+  addToCart,
+  continueWithGoogleUser,
+  createOneUser,
+  logInUser,
+} from "@/fetch/user";
 import getFormData from "@/utils/getFormData";
 import parseError from "@/utils/parseError";
 import { BsGoogle } from "react-icons/bs";
 import loadScript from "@/utils/loadScript";
 import { fetchGoogleUserDetails } from "@/utils/google-auth";
+import { useCallback } from "react";
 
 function AuthPage() {
   const { setUser } = useAuthContext();
@@ -25,18 +31,42 @@ function AuthPage() {
 
   const isLoginPage = getSearchParams("action").action === "login";
 
+  const handlePendingAddToCart = useCallback(async (user) => {
+    const pendingAddToCart = localStorage.getItem("addToCartPending");
+    if (pendingAddToCart) {
+      const { productId, quantity, variants } = JSON.parse(pendingAddToCart);
+      const newCart = await addToCart({
+        productId,
+        quantity,
+        variants,
+        userId: user._id,
+      });
+      user.cart = newCart;
+      return user;
+    } else return user;
+  }, []);
+
   function onSuccess(user) {
-    setUser(user.user || user);
-    router.push(user.user ? "/shop" : "/verify-email");
+    setUser(user);
+    const pendingAddToCart = localStorage.getItem("addToCartPending");
+    // router.push(user.user ? "/shop" : "/verify-email");
+    router.push(pendingAddToCart ? "/shop?showCartModal=true" : "/shop");
+    localStorage.removeItem("addToCartPending");
   }
 
   const mutate_createOneUser = useMutation({
-    mutationFn: createOneUser,
+    mutationFn: async (...args) => {
+      const user = await createOneUser(...args);
+      return await handlePendingAddToCart(user);
+    },
     onSuccess,
   });
 
   const mutate_logInUser = useMutation({
-    mutationFn: logInUser,
+    mutationFn: async (...args) => {
+      const user = await logInUser(...args);
+      return await handlePendingAddToCart(user.user);
+    },
     onSuccess,
   });
 
@@ -55,15 +85,14 @@ function AuthPage() {
               credentialResponse.access_token
             );
             if (googleUser) {
-              resolve(
-                await continueWithGoogleUser({
-                  name: googleUser.name,
-                  email: googleUser.email,
-                  isEmailVerified: googleUser.verified_email,
-                  image: googleUser.picture,
-                  provider: "google",
-                })
-              );
+              const user = await continueWithGoogleUser({
+                name: googleUser.name,
+                email: googleUser.email,
+                isEmailVerified: googleUser.verified_email,
+                image: googleUser.picture,
+                provider: "google",
+              });
+              resolve(await handlePendingAddToCart(user));
             } else {
               reject("Failed to get Google user");
             }
@@ -75,8 +104,10 @@ function AuthPage() {
     },
     onSuccess(user) {
       setUser(user);
-      console.log(user);
-      router.push("/shop");
+      const pendingAddToCart = localStorage.getItem("addToCartPending");
+      // router.push(user.user ? "/shop" : "/verify-email");
+      router.push(pendingAddToCart ? "/shop?showCartModal=true" : "/shop");
+      localStorage.removeItem("addToCartPending");
     },
   });
 
@@ -124,14 +155,13 @@ function AuthPage() {
         <div>
           <Button
             type="button"
-            variant="faded"
+            variant="bordered"
             size="lg"
             color="primary"
-            isIconOnly
             onPress={() => mutate_logInWithGoogle.mutate()}
             isLoading={mutate_logInWithGoogle.isPending}
           >
-            <BsGoogle size={20} />
+            <BsGoogle size={20} /> Continue With Google
           </Button>
         </div>
       </div>

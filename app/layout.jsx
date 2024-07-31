@@ -7,11 +7,16 @@ import Nav from "@/components/layout/Nav";
 import ThemeButton from "@/components/buttons/ThemeButton";
 import useIsClient from "@/hooks/useIsClient";
 import Footer from "@/components/layout/Footer";
+import { AnimatePresence } from "framer-motion";
+import CartModal from "@/components/modals/CartModal";
+import useURL from "@/hooks/useURL";
 
 const poppins = Poppins({ weight: "400", subsets: ["latin"] });
 
 export default function RootLayout({ children }) {
+  const [getSearchParams, setSearchParams] = useURL();
   const [isClient] = useIsClient();
+  const { showCartModal } = getSearchParams("showCartModal");
 
   return (
     <html lang="en">
@@ -28,6 +33,9 @@ export default function RootLayout({ children }) {
                 <ThemeButton />
               </div>
               <Footer />
+              <AnimatePresence>
+                {showCartModal && <CartModal />}
+              </AnimatePresence>
             </main>
           </Providers>
         )}

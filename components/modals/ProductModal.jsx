@@ -41,7 +41,7 @@ function ProductModal({ product }) {
       onClick={closeModal}
     >
       <motion.div
-        className="relative w-[min(100vw,1000px)] bg-background h-screen md:h-[800px] overflow-x-scroll shadow-xl rounded-2xl py-20 px-5 md:p-10"
+        className="relative w-[min(100vw,1000px)] bg-background h-screen md:h-[600px] overflow-y-scroll shadow-xl rounded-2xl py-20 px-5 md:p-10"
         layoutId={`card-${product._id}`}
         onClick={(e) => e.stopPropagation()}
       >
@@ -56,7 +56,7 @@ function ProductModal({ product }) {
         </button>
         <div className="flex flex-col md:flex-row gap-5">
           <ImageListViewer images={product.images} />
-          <div className="w-full md:w-7/12 flex flex-col gap-2">
+          <div className="w-full md:w-7/12 flex flex-col gap-2 h-full overflow-y-scroll">
             <h2 className="text-2xl font-bold">{`${product.name} (${Object.keys(
               currentVariants
             )
@@ -64,10 +64,10 @@ function ProductModal({ product }) {
                 (variantKey) => `${variantKey} - ${currentVariants[variantKey]}`
               )
               .join(", ")})`}</h2>
-            <p className="text-gray-700">
-              {product.description} This is an expanded view of the card
-              content. Click anywhere to close the modal.
-            </p>
+            <div className="h-[200px] overflow-y-scroll">
+              <p className="text-gray-700">{product.description}</p>
+            </div>
+     
             <div className="flex gap-2">
               <small className="text-default-500">Rs {product.price}</small>
               <small className="text-default-500 line-through">
@@ -126,7 +126,7 @@ function ProductModal({ product }) {
                   <div className="flex flex-col justify-between gap-2 items-end w-1/4">
                     <div className="h-5">
                       {mutateAddToCart.isPending && (
-                        <Spinner size="sm" color="white" />
+                        <Spinner size="sm" color="current" />
                       )}
                     </div>
                     <div className="text-default-500">
@@ -156,7 +156,7 @@ function ProductModal({ product }) {
                 }}
               >
                 {mutateAddToCart.isPending ? (
-                  <Spinner size="sm" color="white" />
+                  <Spinner size="sm" color="current" />
                 ) : (
                   "Add to Cart"
                 )}
