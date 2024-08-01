@@ -11,12 +11,12 @@ import { useInView } from "react-intersection-observer";
 import { readProductsByIds } from "@/fetch/product";
 import CartFooter from "../CartFooter";
 
-
 function CartModal() {
-  const [getSearchParams, setSearchParams] = useURL();
-  const { showCartModal } = getSearchParams("showCartModal");
   const { user, setUser } = useAuthContext();
   const router = useRouter();
+
+  const [_, setSearchParams] = useURL();
+
   const {
     data,
     status,
@@ -53,9 +53,6 @@ function CartModal() {
 
   const products = data && data.pages.flatMap((page) => page.data);
 
-  // const product =
-  //   products &&
-  //   products.find(({ name }) => name === getSearchParams("product").product);
   const closeModal = useCallback(() => {
     setSearchParams({ showCartModal: "" });
   }, [setSearchParams]);
@@ -115,9 +112,8 @@ function CartModal() {
     exit: { opacity: 0, scale: 0.8 },
   };
 
-  console.log(products);
 
-  return showCartModal ? (
+  return (
     <motion.div
       className="fixed inset-0 z-50 flex items-center justify-end bg-foreground-50 bg-opacity-50 backdrop-blur-sm"
       variants={modalVariants}
@@ -169,15 +165,15 @@ function CartModal() {
                 hasNextPage,
                 fetchNextPage,
                 isFetching,
-                user, 
-                setUser
+                user,
+                setUser,
               }}
             />
           </>
         )}
       </motion.div>
     </motion.div>
-  ) : null;
+  );
 }
 
 export default CartModal;

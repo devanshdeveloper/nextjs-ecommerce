@@ -8,11 +8,17 @@ const generateMockData = () => {
     const mockObject = {
       name: faker.commerce.productName(),
       description: faker.lorem.sentence(),
-      price: faker.datatype.number({ min: 100, max: 5000 }),
-      actualPrice: faker.datatype.number({ min: 100, max: 5000 }),
-      images: [faker.image.image()],
-      category: "669809c0618c359c6fb81a41",
-      variants: [{ name: "Size", options: ["M", "L", "XL"] }],
+      price: faker.number.int({ min: 100, max: 5000 }),
+      actualPrice: faker.number.int({ min: 100, max: 5000 }),
+      images: [faker.image.avatar()],
+      category: { id : "669e59f34d53c19640e192c3"},
+      variants: [
+        { 
+          name: "Size", 
+          inventory: faker.number.int({ min: 0, max: 100 }), 
+          options: ["M", "L", "XL"] 
+        }
+      ],
     };
     mockData.push(mockObject);
   }
@@ -23,6 +29,7 @@ const generateMockData = () => {
 // Generate 100 mock data objects
 const mockDataArray = generateMockData();
 console.log(mockDataArray);
+
 export {
     mockDataArray,
 }

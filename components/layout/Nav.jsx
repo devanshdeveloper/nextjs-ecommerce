@@ -101,7 +101,6 @@ export default function Nav() {
   function NavbarItems({ NavbarItem, className }) {
     return menuItems.map((item, index) => {
       if (!item.show) return null;
-      console.log(item.CustomElement);
       if (item.CustomElement) {
         return <item.CustomElement key={index} />;
       }

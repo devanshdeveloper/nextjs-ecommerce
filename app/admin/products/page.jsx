@@ -4,55 +4,32 @@
 import AdminLayoutCover from "@/components/layout/AdminLayoutCover";
 import { Button, Input, Spinner } from "@nextui-org/react";
 
-// UTILS
-import { readAllProducts } from "@/fetch/product";
-import parseError from "@/utils/parseError";
-
 // HOOKS
-import { useInfiniteQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { useInView } from "react-intersection-observer";
-import { useDebouncedCallback } from "use-debounce";
 import AdminProductCard from "@/components/cards/AdminProductCard";
+import { AnimatePresence } from "framer-motion";
+import ProductModal from "@/components/modals/ProductModal";
+import useProducts from "@/hooks/useProducts";
+import Category from "@/components/Category";
+import AdminLayoutSpinner from "@/components/spinners/AdminLayoutSpinner";
 
 export default function ProductsPage() {
   const router = useRouter();
-  const [searchInputValue, setSearchInputValue] = useState("");
-  const [searchValue, setSearchValue] = useState("");
 
   const {
-    data,
-    status,
-    error,
-    fetchNextPage,
-    isFetching,
+    searchInputValue,
+    products,
+    ref,
+    debouncedMutateSearchProduct,
     hasNextPage,
+    isFetching,
+    setSearchInputValue,
     refetch,
-  } = useInfiniteQuery({
-    queryKey: ["products", searchValue],
-    queryFn: (params) =>
-      readAllProducts({ ...params, limit: 20, search: searchValue }),
-    initialPageParam: 1,
-    getNextPageParam: (lastPage) => {
-      return lastPage.info.nextPage;
-    },
-    refetchOnWindowFocus: false,
-    retry: false,
+    isPending,
+    error,
+  } = useProducts({
+    queryKey: ["products"],
   });
-
-  const debouncedMutateSearchProduct = useDebouncedCallback((search) => {
-    if (search.length < 3) return setSearchValue("");
-    setSearchValue(search);
-  }, 2000);
-
-  const { ref, inView } = useInView();
-
-  useEffect(() => {
-    if (inView) {
-      fetchNextPage();
-    }
-  }, [inView, fetchNextPage]);
 
   return (
     <>
@@ -82,46 +59,21 @@ export default function ProductsPage() {
           }}
         />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-10 p-2 md:p-5 lg:p-10">
-        {data ? (
-          data.pages.map((page) => {
-            return page.data.map((product, i) => {
-              return <AdminProductCard key={i} {...{ ...product  , refetch}} />;
-            });
-          })
-        ) : status === "pending" ? null : (
-          <AdminLayoutCover>
-            <div className="flex flex-col items-center gap-10">
-              <div className="text-3xl">No Products Found</div>
-              <Button
-                variant="flat"
-                color="primary"
-                size="lg"
-                onPress={() => router.back()}
-              >
-                Back
-              </Button>
-            </div>
-          </AdminLayoutCover>
-        )}
-      </div>
-      <div
-        className="h-full flex items-center justify-center"
-        ref={ref}
-      >
-        {hasNextPage && (
-          <Button
-            variant="flat"
-            color="primary"
-            size="lg"
-            isLoading={isFetching}
-            onPress={fetchNextPage}
-          >
-            Load More
-          </Button>
-        )}
-        {!hasNextPage && isFetching && <Spinner />}
-      </div>
+      <Category
+        {...{
+          category: { name: "Products" },
+          products,
+          isFetching,
+          isPending,
+          hasNextPage,
+          error,
+          PageLayout: AdminLayoutCover,
+          PageLayoutSpinner: AdminLayoutSpinner,
+          ProductCard : AdminProductCard,
+          ref,
+          refetch
+        }}
+      />
     </>
   );
 }

@@ -14,6 +14,7 @@ import { Button, Spinner } from "@nextui-org/react";
 import { readByNameCategory } from "@/fetch/category";
 import { readProductsByCategoryId } from "@/fetch/product";
 import Category from "@/components/Category";
+import useProducts from "@/hooks/useProducts";
 
 export default function CategoryPage() {
   const { name } = useParams();
@@ -27,14 +28,17 @@ export default function CategoryPage() {
   });
 
   const {
-    data,
-    status,
-    error,
-    fetchNextPage,
-    isFetching,
+    searchInputValue,
+    products,
+    ref,
+    debouncedMutateSearchProduct,
     hasNextPage,
+    isFetching,
     refetch,
-  } = useInfiniteQuery({
+    setSearchInputValue,
+    isPending,
+    error,
+  } = useProducts({
     queryKey: [`products_${name}`],
     queryFn: (params) =>
       readProductsByCategoryId({
@@ -43,47 +47,29 @@ export default function CategoryPage() {
         search: "",
         categoryId: category._id,
       }),
-    initialPageParam: 1,
-    getNextPageParam: (lastPage) => {
-      return lastPage.info.nextPage;
-    },
-    refetchOnWindowFocus: false,
-    retry: false,
     enabled: !!category?._id,
   });
 
-  const { ref, inView } = useInView();
-
-  useEffect(() => {
-    if (inView) {
-      fetchNextPage();
-    }
-  }, [inView, fetchNextPage]);
-
   return (
     <div>
-      <div
-        className="h-full flex items-center justify-center"
-        ref={ref}
-      >
+      <div className="h-full flex items-center justify-center">
         {category && data && (
           <Category
-            category={category}
-            products={data.pages.map((page) => page.data)[0]}
+            {...{
+              category,
+              products: data.pages.map((page) => page.data)[0],
+              isFetching,
+              isPending,
+              hasNextPage,
+              error,
+              PageLayout,
+              PageLayoutSpinner,
+              ProductCard,
+              ref,
+              refetch,
+            }}
           />
         )}
-        {hasNextPage && (
-          <Button
-            variant="flat"
-            color="primary"
-            size="lg"
-            isLoading={isFetching}
-            onPress={fetchNextPage}
-          >
-            Load More
-          </Button>
-        )}
-        {!hasNextPage && isFetching && <Spinner />}
       </div>
     </div>
   );

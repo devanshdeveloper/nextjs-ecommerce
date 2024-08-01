@@ -13,8 +13,6 @@ import { useInView } from "react-intersection-observer";
 import { readProductsByIds } from "@/fetch/product";
 import { useRouter } from "next/navigation";
 import PageLayoutSpinner from "@/components/spinners/PageLayoutSpinner";
-import { AnimatePresence } from "framer-motion";
-import ProductModal from "@/components/modals/ProductModal";
 import useURL from "@/hooks/useURL";
 import CustomGrid from "@/components/layout/CustomGrid";
 import CartFooter from "@/components/CartFooter";
@@ -60,9 +58,7 @@ function CartPage() {
 
   const products = data && data.pages.flatMap((page) => page.data);
 
-  const product =
-    products &&
-    products.find(({ name }) => name === getSearchParams("product").product);
+
 
   if (!user) {
     return (
@@ -150,9 +146,6 @@ function CartPage() {
           }}
         />
       </div>
-      <AnimatePresence>
-        {product && <ProductModal product={product} />}
-      </AnimatePresence>
     </div>
   );
 }

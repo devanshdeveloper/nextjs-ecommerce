@@ -19,7 +19,6 @@ function useCart({ product, nowVariants, user, setUser }) {
     },
   });
 
-  console.log("Running");
 
   const currentVariants =
     nowVariants ||
@@ -37,7 +36,6 @@ function useCart({ product, nowVariants, user, setUser }) {
       })
     );
   }, [currentVariants, product?._id, user]);
-  console.log("Running");
 
   const debouncedInputChange = useDebouncedCallback((newQuantity) => {
     mutateAddToCart.mutate({
@@ -48,7 +46,6 @@ function useCart({ product, nowVariants, user, setUser }) {
     });
   }, 1000);
 
-  console.log("Running");
   const handleQuantityChange = useCallback(
     (value) => {
       if (!user) {
@@ -80,7 +77,6 @@ function useCart({ product, nowVariants, user, setUser }) {
         });
         return;
       }
-      console.log("Running");
 
       function setCart(cart) {
         setUser({ ...user, cart });
@@ -98,7 +94,6 @@ function useCart({ product, nowVariants, user, setUser }) {
         })
       );
       debouncedInputChange(newQuantity);
-      console.log("Running");
     },
     [
       currentVariants,
@@ -112,7 +107,6 @@ function useCart({ product, nowVariants, user, setUser }) {
       setSearchParams,
     ]
   );
-  console.log("Running");
   return {
     currentVariants,
     handleQuantityChange,

@@ -3,10 +3,9 @@
 // UI COMPONENTS
 import CartCard from "@/components/cards/CartCard";
 import PageLayout from "@/components/layout/PageLayout";
-import { Button, Divider, Spinner } from "@nextui-org/react";
+import { Button } from "@nextui-org/react";
 
 // HOOKS
-import { useAuthContext } from "@/components/providers/AuthProvider";
 import {
   useInfiniteQuery,
   useQuery,
@@ -15,12 +14,9 @@ import {
 import { useEffect } from "react";
 import { useInView } from "react-intersection-observer";
 import { readProductsByIds } from "@/fetch/product";
-import parseAmount from "@/utils/parseAmount";
 import { useParams, useRouter } from "next/navigation";
 import PageLayoutSpinner from "@/components/spinners/PageLayoutSpinner";
-import { readOneUser, updateOneUser } from "@/fetch/user";
-import { AnimatePresence } from "framer-motion";
-import ProductModal from "@/components/modals/ProductModal";
+import { readOneUser } from "@/fetch/user";
 import useURL from "@/hooks/useURL";
 import CustomGrid from "@/components/layout/CustomGrid";
 import CartFooter from "@/components/CartFooter";
@@ -37,7 +33,6 @@ function AdminCartPage() {
     retry: false,
   });
 
-  console.log(pageUser);
 
   const router = useRouter();
   const {
@@ -104,7 +99,6 @@ function AdminCartPage() {
   const setUser = (...args) =>
     queryClient.setQueryData([`user_${id}`], ...args)
 
-  console.log(products, pageUser);
   return (
     <div className="flex flex-col items-center ">
       <div className="w-[min(80vw,1250px)]">
@@ -141,9 +135,7 @@ function AdminCartPage() {
           }}
         />
       </div>
-      <AnimatePresence>
-        {product && <ProductModal product={product} />}
-      </AnimatePresence>
+
     </div>
   );
 }

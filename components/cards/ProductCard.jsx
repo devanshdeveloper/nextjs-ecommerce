@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { MdImageNotSupported } from "react-icons/md";
 import { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import useURL from "@/hooks/useURL";
 import { useAuthContext } from "../providers/AuthProvider";
 
@@ -27,7 +27,7 @@ export default function ProductCard({
   };
   const [getSearchParams, setSearchParams] = useURL();
 
-  console.log(images);
+  console.log("ProductCard", images);
 
   return (
     <motion.div

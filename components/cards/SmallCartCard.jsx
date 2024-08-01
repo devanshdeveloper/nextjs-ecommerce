@@ -37,7 +37,7 @@ export default function SmallCartCard({ product, cartItem }) {
 
   return (
     <motion.div
-      className="flex items-center p-1 md:p-2 border border-foreground-200 rounded-lg cursor-pointer"
+      className="flex flex-col items-center p-1 md:p-2 border border-foreground-200 rounded-lg cursor-pointer"
       variants={cardVariants}
       initial="hidden"
       animate="visible"

@@ -1,48 +1,73 @@
 "use client";
-
-// UTILS
-import getGridOption from "@/utils/getGridOption";
-
-// HOOKS
-import useWindowSize from "@/hooks/useWindowSize";
-import { useCallback, useState } from "react";
-
-// UI COMPONENTS
-import { Button, ButtonGroup } from "@nextui-org/react";
-import { IoSquare } from "react-icons/io5";
-import { TfiLayoutGrid2Alt, TfiLayoutGrid4Alt } from "react-icons/tfi";
-import { RiLayoutGrid2Fill } from "react-icons/ri";
-import ProductCard from "./cards/ProductCard";
 import useURL from "@/hooks/useURL";
 import ProductModal from "./modals/ProductModal";
 import { AnimatePresence } from "framer-motion";
 import CustomGrid from "./layout/CustomGrid";
-import CartModal from "./modals/CartModal";
+import { Spinner } from "@nextui-org/react";
+import { forwardRef } from "react";
 
-function Category({ category, products }) {
-  const [getSearchParams, setSearchParams] = useURL();
+const Category = forwardRef(
+  (
+    {
+      category,
+      products,
+      isFetching,
+      isPending,
+      hasNextPage,
+      error,
+      PageLayout,
+      PageLayoutSpinner,
+      ProductCard,
+      refetch
+    },
+    ref
+  ) => {
+    const [getSearchParams, setSearchParams] = useURL();
 
-  const { product: productName } = getSearchParams("product");
+    const { product: productName } = getSearchParams("product");
 
-  const product = products && products.find(({ name }) => productName === name);
+    const product =
+      products && products.find(({ name }) => productName === name);
 
-  return (
-    <>
-      <CustomGrid
-        title={category.name}
-        items={
-          products
-            ? products.map((product, i) => {
-                return <ProductCard key={i} {...{ ...product }} />;
-              })
-            : null
-        }
-      />
-      <AnimatePresence>
-        {product && <ProductModal product={product} />}
-      </AnimatePresence>
-    </>
-  );
-}
+    if (isPending) {
+      return <PageLayoutSpinner />;
+    }
 
+    if (error) {
+      return (
+        <PageLayout>
+          <h1>An error occurred while fetching products.</h1>
+          <p>{error.message}</p>
+          <p>Please try again later.</p>
+        </PageLayout>
+      );
+    }
+
+    return (
+      <div className="flex justify-center">
+        <div className="w-[min(80vw,1250px)]">
+          <CustomGrid
+            title={category.name}
+            items={
+              products
+                ? products.map((product, i) => {
+                    return <ProductCard key={i} {...{ ...product }} />;
+                  })
+                : null
+            }
+          />
+          {ref?.current && (
+            <div className="h-full flex items-center justify-center" ref={ref}>
+              {!hasNextPage && isFetching && <Spinner />}
+            </div>
+          )}
+          <AnimatePresence>
+            {product && <ProductModal product={product} />}
+          </AnimatePresence>
+        </div>
+      </div>
+    );
+  }
+);
+Category.displayName = "Category";
 export default Category;
