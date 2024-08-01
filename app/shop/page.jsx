@@ -34,6 +34,7 @@ function ShopPage() {
                 PageLayout: PageLayout,
                 PageLayoutSpinner: PageLayoutSpinner,
                 ProductCard: ProductCard,
+                titleHref : `/category/${category.name}`
               }}
               key={category._id}
             />

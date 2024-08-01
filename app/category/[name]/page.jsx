@@ -15,6 +15,9 @@ import { readByNameCategory } from "@/fetch/category";
 import { readProductsByCategoryId } from "@/fetch/product";
 import Category from "@/components/Category";
 import useProducts from "@/hooks/useProducts";
+import PageLayout from "@/components/layout/PageLayout";
+import PageLayoutSpinner from "@/components/spinners/PageLayoutSpinner";
+import ProductCard from "@/components/cards/ProductCard";
 
 export default function CategoryPage() {
   const { name } = useParams();
@@ -53,18 +56,18 @@ export default function CategoryPage() {
   return (
     <div>
       <div className="h-full flex items-center justify-center">
-        {category && data && (
+        {category && (
           <Category
             {...{
               category,
-              products: data.pages.map((page) => page.data)[0],
+              products,
               isFetching,
               isPending,
               hasNextPage,
               error,
-              PageLayout,
-              PageLayoutSpinner,
-              ProductCard,
+              PageLayout: PageLayout,
+              PageLayoutSpinner: PageLayoutSpinner,
+              ProductCard: ProductCard,
               ref,
               refetch,
             }}

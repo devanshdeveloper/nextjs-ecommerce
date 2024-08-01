@@ -83,13 +83,14 @@ export async function getImagesFromBucket(...keys) {
     keys.forEach((key) => {
       if (key.startsWith("/") || key.startsWith("http")) {
         imageKeys[key] = key;
-        keys = keys.filter((currentKey) => currentKey === key);
+        keys = keys.filter((currentKey) => currentKey !== key);
       } else if (Object.keys(cachedKeys).includes(key)) {
         imageKeys[key] = cachedKeys[key];
-        keys = keys.filter((currentKey) => currentKey === key);
+        keys = keys.filter((currentKey) => currentKey !== key);
       }
     });
     let fetchedKeys = {};
+
     if (keys.length > 0) {
       keys.forEach(
         (key) =>

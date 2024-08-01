@@ -12,6 +12,7 @@ import ProductModal from "@/components/modals/ProductModal";
 import useProducts from "@/hooks/useProducts";
 import Category from "@/components/Category";
 import AdminLayoutSpinner from "@/components/spinners/AdminLayoutSpinner";
+import ProductCard from "@/components/cards/ProductCard";
 
 export default function ProductsPage() {
   const router = useRouter();
@@ -69,7 +70,7 @@ export default function ProductsPage() {
           error,
           PageLayout: AdminLayoutCover,
           PageLayoutSpinner: AdminLayoutSpinner,
-          ProductCard : AdminProductCard,
+          ProductCard : ProductCard,
           ref,
           refetch
         }}

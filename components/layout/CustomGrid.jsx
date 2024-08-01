@@ -13,7 +13,8 @@ import { IoSquare } from "react-icons/io5";
 import { TfiLayoutGrid2Alt, TfiLayoutGrid4Alt } from "react-icons/tfi";
 import { RiLayoutGrid2Fill } from "react-icons/ri";
 import { AnimatePresence } from "framer-motion";
-function CustomGrid({ title, items }) {
+import Link from "next/link";
+function CustomGrid({ title, items, href, message }) {
   const [windowSize] = useWindowSize({
     onChange: useCallback((value) => {
       setGridOption(getGridOption(value));
@@ -29,8 +30,15 @@ function CustomGrid({ title, items }) {
 
   return (
     <div className="flex flex-col">
-      <div className="flex justify-between">
-        <div className="text-3xl font-bold my-5">{title}</div>
+      <div className="flex justify-between px-3">
+        <div className="my-5">
+          <div className="text-3xl font-bold">
+            {href ? <Link href={href}>{title}</Link> : title}
+          </div>
+          {message && (
+            <div className="text-foreground-500 text-sm">{message}</div>
+          )}
+        </div>
         <ButtonGroup>
           <Button
             className="md:hidden"
@@ -68,7 +76,7 @@ function CustomGrid({ title, items }) {
       </div>
       <AnimatePresence>
         <div
-          className={`grid ${gridOptions[gridOption]} gap-3 md:gap-5 lg:gap-8`}
+          className={`grid ${gridOptions[gridOption]} gap-1 md:gap-5 lg:gap-8`}
         >
           {items}
         </div>

@@ -47,8 +47,10 @@ function useProducts(param) {
 
   const { ref, inView } = useInView();
 
+  console.log(ref.current, inView);
   useEffect(() => {
     if (inView) {
+
       fetchNextPage();
     }
   }, [inView, fetchNextPage]);

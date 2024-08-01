@@ -4,6 +4,7 @@ import { getImagesFromBucket } from "@/utils/s3-bucket-front";
 async function getImagesForProducts(products) {
   const keys = products.flatMap((product) => product.images);
   const urls = await getImagesFromBucket(...keys);
+  console.log(urls , keys);
   return products.map((product) => ({
     ...product,
     images: product.images.map((image) => urls[image]),

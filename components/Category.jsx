@@ -18,7 +18,8 @@ const Category = forwardRef(
       PageLayout,
       PageLayoutSpinner,
       ProductCard,
-      refetch
+      refetch,
+      titleHref,
     },
     ref
   ) => {
@@ -33,6 +34,8 @@ const Category = forwardRef(
       return <PageLayoutSpinner />;
     }
 
+    console.log(hasNextPage, isFetching);
+
     if (error) {
       return (
         <PageLayout>
@@ -43,11 +46,16 @@ const Category = forwardRef(
       );
     }
 
+    console.log(products && products.length);
+
     return (
       <div className="flex justify-center">
-        <div className="w-[min(80vw,1250px)]">
+        <div className="w-[min(95vw,1250px)]">
+         
           <CustomGrid
+            href={titleHref}
             title={category.name}
+            message={`Showing ${10} products`}
             items={
               products
                 ? products.map((product, i) => {
@@ -56,11 +64,10 @@ const Category = forwardRef(
                 : null
             }
           />
-          {ref?.current && (
-            <div className="h-full flex items-center justify-center" ref={ref}>
-              {!hasNextPage && isFetching && <Spinner />}
-            </div>
-          )}
+
+          <div className="flex items-center justify-center py-10" ref={ref}>
+            {hasNextPage && isFetching && <Spinner />}
+          </div>
           <AnimatePresence>
             {product && <ProductModal product={product} />}
           </AnimatePresence>

@@ -1,18 +1,14 @@
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useCallback, useEffect } from "react";
+import useScrollPosition from "./useScrollPosition";
 
 export default function useURL() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
 
-  useEffect(() => {
-    const persistentScroll = localStorage.getItem("persistentScroll");
-    if (persistentScroll === null) return;
-    window.scrollTo({ top: Number(persistentScroll) });
-    if (Number(persistentScroll) === window.scrollY)
-      localStorage.removeItem("persistentScroll");
-  }, [searchParams]);
+  const scrollPosition = useScrollPosition()
+  console.log(scrollPosition , "scrollPosition");
 
   const get = useCallback(
     (...keys) => {
@@ -38,7 +34,17 @@ export default function useURL() {
           params.set(key, obj[key]);
         }
       }
-      localStorage.setItem("persistentScroll", window.scrollY.toString());
+      const persistentScroll = localStorage.getItem("persistentScroll");
+      console.log(persistentScroll, "persistentScroll");
+      console.log(window.scrollY.toString(), "scrolly");
+      console.dir(window, document);
+      if (persistentScroll) {
+        console.log(persistentScroll, "scrollBy");
+        window.scrollBy({ top: Number(persistentScroll) });
+        localStorage.removeItem("persistentScroll");
+      } else {
+        localStorage.setItem("persistentScroll", window.scrollY.toString());
+      }
       router.push(pathname + "?" + params.toString());
     },
     [searchParams, router, pathname]

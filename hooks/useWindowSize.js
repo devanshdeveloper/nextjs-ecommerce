@@ -7,17 +7,24 @@ export default function useWindowSize({ onChange = () => {} }) {
 
   const handleResize = useCallback(() => {
     console.log("onResize");
-
-    setWindowSize(window.innerWidth);
-    onChange && onChange(window.innerWidth);
-  }, [onChange]);
-
+    
+    const newWidth = window.innerWidth;
+    // Only update if the change is greater than 100 pixels
+    if (Math.abs(newWidth - windowSize) > 100) {
+      setWindowSize(newWidth);
+      onChange && onChange(newWidth);
+    }
+  }, [windowSize, onChange]);
+  
   useEffect(() => {
+    console.log("useEffect onResize");
     handleResize();
-  }, []);
+  }, []); // Empty dependency array means this runs only once after mount
+
   useEffect(() => {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, [handleResize]);
+
   return [windowSize];
 }
