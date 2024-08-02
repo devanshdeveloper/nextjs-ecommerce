@@ -7,9 +7,6 @@ export default function useURL() {
   const router = useRouter();
   const pathname = usePathname();
 
-  const scrollPosition = useScrollPosition()
-  console.log(scrollPosition , "scrollPosition");
-
   const get = useCallback(
     (...keys) => {
       const res = {};
@@ -34,18 +31,8 @@ export default function useURL() {
           params.set(key, obj[key]);
         }
       }
-      const persistentScroll = localStorage.getItem("persistentScroll");
-      console.log(persistentScroll, "persistentScroll");
-      console.log(window.scrollY.toString(), "scrolly");
-      console.dir(window, document);
-      if (persistentScroll) {
-        console.log(persistentScroll, "scrollBy");
-        window.scrollBy({ top: Number(persistentScroll) });
-        localStorage.removeItem("persistentScroll");
-      } else {
-        localStorage.setItem("persistentScroll", window.scrollY.toString());
-      }
-      router.push(pathname + "?" + params.toString());
+
+      router.push(pathname + "?" + params.toString(), { scroll: false });
     },
     [searchParams, router, pathname]
   );

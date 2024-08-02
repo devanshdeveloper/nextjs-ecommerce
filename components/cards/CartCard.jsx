@@ -34,6 +34,8 @@ export default function CartCard({ product, cartItem, user, setUser }) {
   };
   const [getSearchParams, setSearchParams] = useURL();
 
+  if(!product) return;
+
   return (
     <motion.div
       className="border border-foreground-200 rounded-lg cursor-pointer"

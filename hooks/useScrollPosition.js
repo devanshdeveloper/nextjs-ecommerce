@@ -9,7 +9,6 @@ function useScrollPosition(element = window) {
       element === document ? document.documentElement : element;
     let lastScrollPosition = targetElement.scrollTop;
     const handleScroll = (e) => {
-        console.log(e);
       const currentScrollPosition = targetElement.scrollTop;
       const scrollDifference = Math.abs(
         currentScrollPosition - lastScrollPosition

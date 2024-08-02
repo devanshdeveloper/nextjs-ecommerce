@@ -63,13 +63,6 @@ function ProductForm({ editId }) {
 
   const mutate_product = useMutation({
     mutationFn: async () => {
-      return await Promise.all(
-        mockDataArray.map((product) => {
-          console.log(product);
-          return createOneProduct(product);
-        })
-      );
-
       const productToUpload = {
         ...productInputValue,
         actualPrice: parseInt(productInputValue.actualPrice),

@@ -16,6 +16,7 @@ import PageLayoutSpinner from "@/components/spinners/PageLayoutSpinner";
 import useURL from "@/hooks/useURL";
 import CustomGrid from "@/components/layout/CustomGrid";
 import CartFooter from "@/components/CartFooter";
+import removeDuplicates from "@/utils/removeDuplicates";
 
 // UTILS
 
@@ -37,7 +38,9 @@ function CartPage() {
       readProductsByIds({
         ...params,
         limit: 20,
-        productIds: user?.cart.map((cartItem) => cartItem.product),
+        productIds: removeDuplicates(
+          user?.cart.map((cartItem) => cartItem.product)
+        ),
       }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
@@ -57,8 +60,6 @@ function CartPage() {
   }, [inView, fetchNextPage]);
 
   const products = data && data.pages.flatMap((page) => page.data);
-
-
 
   if (!user) {
     return (
@@ -110,6 +111,7 @@ function CartPage() {
   if (status === "pending") {
     return <PageLayoutSpinner />;
   }
+
   return (
     <div className="flex flex-col items-center ">
       <div className="w-[min(80vw,1250px)]">
@@ -127,7 +129,7 @@ function CartPage() {
                     ),
                     cartItem,
                     user,
-                    setUser
+                    setUser,
                   }}
                 />
               );
@@ -141,8 +143,8 @@ function CartPage() {
             hasNextPage,
             fetchNextPage,
             isFetching,
-            user ,
-            setUser
+            user,
+            setUser,
           }}
         />
       </div>
