@@ -31,6 +31,7 @@ function ShopPage() {
                 isFetching,
                 isPending,
                 error,
+                productsCount: products.length,
                 PageLayout: PageLayout,
                 PageLayoutSpinner: PageLayoutSpinner,
                 ProductCard: ProductCard,

@@ -26,7 +26,6 @@ import { validateProductForm } from "@/utils/formValidation";
 import addPreviewToImage from "@/utils/addPreviewToImage";
 import { urlToFile } from "@/utils/urlsToFiles";
 import { useRouter } from "next/navigation";
-import { mockDataArray } from "@/dummy/products";
 function ProductForm({ editId }) {
   const router = useRouter();
   const [productInputValue, setProductInputValue] = useState(

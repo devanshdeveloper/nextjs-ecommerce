@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
+import { twMerge } from "tailwind-merge";
 
-export default function CardFrame({ children, ...props }) {
+export default function CardFrame({ children, className, ...props }) {
   const cardVariants = {
     hidden: { opacity: 0, y: 50 },
     visible: { opacity: 1, y: 0 },
@@ -9,7 +10,10 @@ export default function CardFrame({ children, ...props }) {
 
   return (
     <motion.div
-      className="border border-foreground-200 rounded-lg cursor-pointer"
+      className={twMerge(
+        "border border-foreground-200 rounded-lg cursor-pointer",
+        className
+      )}
       variants={cardVariants}
       initial="hidden"
       animate="visible"

@@ -20,6 +20,7 @@ const Category = forwardRef(
       ProductCard,
       refetch,
       titleHref,
+      productsCount,
     },
     ref
   ) => {
@@ -34,8 +35,6 @@ const Category = forwardRef(
       return <PageLayoutSpinner />;
     }
 
-    console.log(hasNextPage, isFetching);
-
     if (error) {
       return (
         <PageLayout>
@@ -46,16 +45,13 @@ const Category = forwardRef(
       );
     }
 
-    console.log(products && products.length);
-
     return (
       <div className="flex justify-center">
         <div className="w-[min(95vw,1250px)]">
-         
           <CustomGrid
             href={titleHref}
             title={category.name}
-            message={`Showing ${10} products`}
+            message={productsCount && `Showing ${productsCount} products`}
             items={
               products
                 ? products.map((product, i) => {

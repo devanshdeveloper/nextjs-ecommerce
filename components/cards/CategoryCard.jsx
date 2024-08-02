@@ -4,6 +4,7 @@ import { FaRegHeart } from "react-icons/fa";
 import { FaHeart } from "react-icons/fa";
 import { useMutation } from "@tanstack/react-query";
 import { addToFavoritesCategory } from "@/fetch/category";
+import CardFrame from "./CardFrame";
 
 function CategoryCard({
   category,
@@ -22,51 +23,45 @@ function CategoryCard({
 
   return (
     <>
-      <div className="flex items-center justify-between bg-foreground-50 p-2 md:p-5 rounded-xl">
-        <div className="text-xs sm:text-sm md:text-medium">{category.name}</div>
-        <div className="flex gap-2">
-          <Button
-            isIconOnly
-            variant="flat"
-            color="primary"
-            size="sm"
-            isLoading={mutate_AddToFavorite.isPending}
-            onPress={() => {
-              mutate_AddToFavorite.mutate(!category.favorite);
-            }}
+      <CardFrame className="p-6 flex justify-between items-center gap-4">
+        <div className="text-sm md:text-base font-medium text-foreground-800">
+          {category.name}
+        </div>
+        <div className="flex gap-3">
+          <button
+            onClick={() => mutate_AddToFavorite.mutate(!category.favorite)}
+            className={`p-2 rounded-full transition-colors duration-200 ${
+              category.favorite
+                ? "bg-red-100 text-red-500"
+                : "bg-foreground-100 text-foreground-500"
+            } hover:bg-red-200`}
           >
             {category.favorite ? (
-              <FaRegHeart size={20} />
+              <FaHeart size={25} />
             ) : (
-              <FaHeart size={20} />
+              <FaRegHeart size={25} />
             )}
-          </Button>
-          <Button
-            isIconOnly
-            variant="flat"
-            color="primary"
-            size="sm"
-            onPress={() => {
+          </button>
+          <button
+            onClick={() => {
               onOpenChangeDeleteOneCategoryModal();
               setCurrentActionCategory({ action: "delete", category });
             }}
+            className="p-2 rounded-full transition-colors duration-200 hover:bg-foreground-200 text-foreground-600"
           >
-            <MdOutlineDelete size={20} />
-          </Button>
-          <Button
-            isIconOnly
-            variant="flat"
-            color="danger"
-            size="sm"
-            onPress={() => {
+            <MdOutlineDelete size={25} />
+          </button>
+          <button
+            onClick={() => {
               onOpenChangeEditCategoryModal();
               setCurrentActionCategory({ action: "edit", category });
             }}
+            className="p-2 rounded-full transition-colors duration-200 hover:bg-red-200 text-red-600"
           >
-            <MdOutlineEdit size={20} />
-          </Button>
+            <MdOutlineEdit size={25} />
+          </button>
         </div>
-      </div>
+      </CardFrame>
     </>
   );
 }

@@ -6,7 +6,7 @@ import { Avatar, Button, Spinner, Input } from "@nextui-org/react";
 import { IoIosArrowForward } from "react-icons/io";
 
 // UTILS
-import {  readAllUsers } from "@/fetch/user";
+import { readAllUsers } from "@/fetch/user";
 
 // HOOKS
 import { useInfiniteQuery } from "@tanstack/react-query";
@@ -14,6 +14,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { useDebouncedCallback } from "use-debounce";
+import Link from "next/link";
+import CardFrame from "@/components/cards/CardFrame";
 
 export default function UsersPage() {
   const router = useRouter();
@@ -46,12 +48,13 @@ export default function UsersPage() {
     }
   }, [inView, fetchNextPage]);
 
+  const users = data && data.pages.flatMap((page) => page.data);
   function User({ user }) {
     return (
-      <div key={user._id} className="flex items-center justify-between">
+      <div key={user?._id} className="flex items-center justify-between">
         <div className="flex items-center gap-2 md:gap-5">
           <Avatar
-            onClick={() => router.push(`/admin/users/${user._id}/details`)}
+            onClick={() => router.push(`/admin/users/${user?._id}/details`)}
             className="w-10 h-10 md:w-12 md:h-12 cursor-pointer"
             src={user.image}
             name={user.name}
@@ -68,7 +71,7 @@ export default function UsersPage() {
             isIconOnly
             size="sm"
             onPress={() => {
-              router.push(`/admin/users/${user._id}/details`);
+              router.push(`/admin/users/${user?._id}/details`);
             }}
           >
             <IoIosArrowForward size={20} />
@@ -79,15 +82,15 @@ export default function UsersPage() {
   }
 
   return (
-    <>
-      <div className="flex justify-center md:justify-end p-3 md:p-10">
+    <div className="container mx-auto p-5 lg:p-10">
+      <div className="flex justify-center md:justify-end p-3 md:p-5">
         <Input
-          className="w-[300px]"
+          className="w-full md:w-[300px] rounded-md "
           isClearable
           isInvalid={
             searchInputValue.length < 3 && searchInputValue.length !== 0
           }
-          errorMessage="Enter atleast three characters to search"
+          errorMessage="Enter at least three characters to search"
           type="text"
           label="Search"
           variant="bordered"
@@ -99,17 +102,34 @@ export default function UsersPage() {
           }}
         />
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 md:gap-10 lg:gap-14 pr-2 md:p-10 lg:p-14">
-        {data ? (
-          data.pages.map((page) => {
-            return page.data.map((user) => {
-              return <User key={user._id} user={user} />;
-            });
-          })
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5 md:gap-8 lg:gap-10 p-5 md:p-10">
+        {users ? (
+          users.map((user) => (
+            <CardFrame
+              onClick={() => router.push(`/admin/users/${user._id}/details`)}
+              key={user?._id}
+              className="p-6 flex items-center gap-4"
+            >
+              <Avatar
+                size="lg"
+                shape="rounded"
+                className="w-16 h-16"
+                src={user.image}
+                name={user.name}
+              />
+              <div>
+                <div className="text-xl font-semibold text-foreground-800">
+                  {user.name}
+                </div>
+                <div className="text-sm text-foreground-500">{user.email}</div>
+              </div>
+            </CardFrame>
+          ))
         ) : status === "pending" ? null : (
           <AdminLayoutCover>
-            <div className="flex flex-col items-center gap-10">
-              <div className="text-3xl">No Users Found</div>
+            <div className="flex flex-col items-center gap-6">
+              <div className="text-2xl text-foreground-600">No Users Found</div>
               <Button
                 variant="flat"
                 color="primary"
@@ -122,23 +142,10 @@ export default function UsersPage() {
           </AdminLayoutCover>
         )}
       </div>
-      <div
-        className="h-full flex items-center justify-center"
-        ref={ref}
-      >
-        {hasNextPage && (
-          <Button
-            variant="flat"
-            color="primary"
-            size="lg"
-            isLoading={isFetching}
-            onPress={fetchNextPage}
-          >
-            Load More
-          </Button>
-        )}
-        {!hasNextPage && isFetching && <Spinner />}
+
+      <div className="h-full flex items-center justify-center p-5">
+        {hasNextPage && isFetching && <Spinner />}
       </div>
-    </>
+    </div>
   );
 }

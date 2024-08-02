@@ -62,7 +62,7 @@ const CartFooter = forwardRef(
           (cartProduct) => !notFoundProducts.includes(cartProduct.product)
         );
         setUser({ ...user, cart: newCart });
-        updateOneUser({ id: user._id, newUser: { cart: newCart } });
+        updateOneUser({ id: user?.id, newUser: { cart: newCart } });
       }
       const discountAmount = amount * discount;
       setAmounts({
@@ -176,20 +176,10 @@ const CartFooter = forwardRef(
             </Button>
           </div>
         )}
-        <div className="h-full flex items-center justify-center" ref={ref}>
-          {hasNextPage && (
-            <Button
-              variant="flat"
-              color="primary"
-              size="lg"
-              isLoading={isFetching}
-              onPress={fetchNextPage}
-            >
-              Load More
-            </Button>
-          )}
-          {!hasNextPage && isFetching && <Spinner />}
+       <div className="flex items-center justify-center py-10" ref={ref}>
+          {hasNextPage && isFetching && <Spinner />}
         </div>
+        
         {showPartGIF && (
           <div className="absolute bottom-0 left-0">
             <Image

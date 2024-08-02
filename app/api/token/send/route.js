@@ -3,7 +3,7 @@ import { transporter } from "@/lib/nodemailer";
 export async function POST(request) {
   const body = await request.json();
   try {
-    const token = jwt.sign({ userId: body.user._id }, "your_jwt_secret", {
+    const token = jwt.sign({ userId: body.user?._id }, "your_jwt_secret", {
       expiresIn: "1h",
     });
     const url = `/token/verify?token=${token}`;

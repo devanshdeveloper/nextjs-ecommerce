@@ -1,6 +1,10 @@
 "use client";
 import { useAuthContext } from "@/components/providers/AuthProvider";
-import { createOneAddress, readByUserIdAddress, updateOneAddress } from "@/fetch/address";
+import {
+  createOneAddress,
+  readByUserIdAddress,
+  updateOneAddress,
+} from "@/fetch/address";
 import { defaultCheckoutFormValue } from "@/utils/defaultFormValue";
 import parseError from "@/utils/parseError";
 import { Button, Input, Textarea } from "@nextui-org/react";
@@ -89,14 +93,15 @@ function CheckoutPage() {
   const [errors, setErrors] = useState([]);
 
   const { data: userAddresses } = useQuery({
-    queryKey: ["address", user._id],
+    queryKey: ["address", user?._id],
     queryFn: async () => {
-      const addresses = await readByUserIdAddress({ userId: user._id });
+      const addresses = await readByUserIdAddress({ userId: user?._id });
       return addresses;
     },
 
     refetchOnWindowFocus: false,
     retry: false,
+    enabled: !!user?._id,
   });
 
   console.log(userAddresses);
@@ -111,7 +116,7 @@ function CheckoutPage() {
       } else {
         return await createOneAddress({
           ...checkoutForm,
-          user: user._id,
+          user: user?._id,
         });
       }
     },

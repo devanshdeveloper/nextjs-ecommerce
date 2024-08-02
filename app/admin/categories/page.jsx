@@ -101,16 +101,17 @@ export default function CategoriesPage() {
             label="Category"
             name="category"
             size="sm"
+            variant="bordered"
             onValueChange={(value) => setCategoryInputValue(value)}
             value={categoryInputValue}
-          />
+            />
           <Button
             isLoading={mutateCreateCategory.isPending}
-            variant="flat"
             size="sm"
             color="primary"
+            variant="bordered"
             type="submit"
-          >
+            >
             Add Category
           </Button>
           {mutateCreateCategory.error && (
@@ -122,6 +123,7 @@ export default function CategoriesPage() {
         <Input
           className="w-[300px]"
           isClearable
+          variant="bordered"
           size="sm"
           isInvalid={
             searchInputValue.length < 3 && searchInputValue.length !== 0

@@ -2,17 +2,14 @@
 
 // UI COMPONENTS
 import AdminLayoutCover from "@/components/layout/AdminLayoutCover";
-import { Button, Input, Spinner } from "@nextui-org/react";
+import { Button, Input } from "@nextui-org/react";
 
 // HOOKS
 import { useRouter } from "next/navigation";
-import AdminProductCard from "@/components/cards/AdminProductCard";
-import { AnimatePresence } from "framer-motion";
-import ProductModal from "@/components/modals/ProductModal";
 import useProducts from "@/hooks/useProducts";
 import Category from "@/components/Category";
 import AdminLayoutSpinner from "@/components/spinners/AdminLayoutSpinner";
-import ProductCard from "@/components/cards/ProductCard";
+import AdminProductCard from "@/components/cards/AdminProductCard";
 
 export default function ProductsPage() {
   const router = useRouter();
@@ -70,7 +67,7 @@ export default function ProductsPage() {
           error,
           PageLayout: AdminLayoutCover,
           PageLayoutSpinner: AdminLayoutSpinner,
-          ProductCard : ProductCard,
+          ProductCard : AdminProductCard,
           ref,
           refetch
         }}

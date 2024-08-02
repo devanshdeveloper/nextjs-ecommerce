@@ -40,7 +40,7 @@ function useCart({ product, nowVariants, user, setUser }) {
   const debouncedInputChange = useDebouncedCallback((newQuantity) => {
     mutateAddToCart.mutate({
       productId: product?._id,
-      userId: user._id,
+      userId: user?._id,
       quantity: newQuantity,
       variants: currentVariants,
     });
@@ -71,7 +71,7 @@ function useCart({ product, nowVariants, user, setUser }) {
       if (!cartProduct || newQuantity === 0) {
         mutateAddToCart.mutate({
           productId: product?._id,
-          userId: user._id,
+          userId: user?._id,
           quantity: newQuantity,
           variants: currentVariants,
         });

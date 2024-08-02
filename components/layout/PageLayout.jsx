@@ -1,7 +1,16 @@
-function PageLayout({children}) {
+import { twMerge } from "tailwind-merge";
+
+function PageLayout({ children, className }) {
   return (
-    <div className="w-screen h-[calc(100vh-64px)] flex items-center justify-center">{children}</div>
-  )
+    <div
+      className={twMerge(
+        "w-screen h-[calc(100vh-64px)] flex items-center justify-center",
+        className
+      )}
+    >
+      {children}
+    </div>
+  );
 }
 
-export default PageLayout
+export default PageLayout;

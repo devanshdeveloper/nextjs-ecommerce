@@ -1,16 +1,20 @@
 import { getImageFromBucket } from "./s3-bucket-front";
 
+function getS3KeyFromUrl(url) {
+  const regex = /https:\/\/[^\/]+\/([^?]+)/;
+  const match = url.match(regex);
+  return match ? match[1] : null;
+}
+
 export async function urlToFile(url) {
   console.log(url);
   try {
-    // Fetch the image data from the URL
-    const response = await fetch((await getImageFromBucket({ Key: url }))[url], {
-      method: "GET",
-      headers: {
-        "Content-Type": "image/" + url.split(".")[url.split(".").length - 1],
-      },
-      mode: "no-cors",
-    });
+    const response = await fetch(
+      await getImageFromBucket({ Key: getS3KeyFromUrl(url) }),
+      {
+        method: "GET",
+      }
+    );
     console.log("response: " + JSON.stringify(response));
 
     if (!response.ok) {

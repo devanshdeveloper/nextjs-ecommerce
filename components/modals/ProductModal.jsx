@@ -7,9 +7,10 @@ import { twMerge } from "tailwind-merge";
 import { Spinner } from "@nextui-org/react";
 import useCart from "@/hooks/useCart";
 import { useAuthContext } from "../providers/AuthProvider";
+import { useRouter } from "next/navigation";
 function ProductModal({ product }) {
   const [getSearchParams, setSearchParams] = useURL();
-
+  const router = useRouter();
   const { user, setUser } = useAuthContext();
 
   const {
@@ -69,7 +70,7 @@ function ProductModal({ product }) {
               .map(
                 (variantKey) => `${variantKey} - ${currentVariants[variantKey]}`
               )
-              .join(", ")})`}</h2>
+              ?.join(", ")})`}</h2>
             <div className="h-[200px] overflow-y-scroll">
               <p className="text-gray-700">{product.description}</p>
             </div>
@@ -142,7 +143,7 @@ function ProductModal({ product }) {
                 </div>
                 <button
                   className="border border-foreground py-2 my-2 w-full"
-                  onClick={() => {}}
+                  onClick={() => router.push("/cart")}
                 >
                   Move to cart
                 </button>

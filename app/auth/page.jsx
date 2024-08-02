@@ -26,7 +26,7 @@ import { useCallback } from "react";
 
 function AuthPage() {
   const { setUser } = useAuthContext();
-  const [getSearchParams] = useURL();
+  const [getSearchParams, setSearchParams] = useURL();
   const router = useRouter();
 
   const isLoginPage = getSearchParams("action").action === "login";
@@ -39,7 +39,7 @@ function AuthPage() {
         productId,
         quantity,
         variants,
-        userId: user._id,
+        userId: user?._id,
       });
       user.cart = newCart;
       return user;
@@ -123,27 +123,32 @@ function AuthPage() {
   const pendingAddToCart = localStorage.getItem("addToCartPending");
 
   return (
-    <div className="flex justify-center items-center">
-      <div className="w-[min(80vw,500px)] flex flex-col gap-10 items-center">
-        <div className="flex flex-col gap-2 text-5xl font-semibold my-20">
-          {isLoginPage ? "Log in" : "Sign In"}
-          <div className="text-foreground-500 text-xs md:text-sm">
-            Login to continue the action
-          </div>
+    <div className="flex justify-center items-center min-h-[calc(100vh-100px)]">
+      <div className="bg-background p-8 w-[min(80vw,500px)] flex flex-col gap-10 items-center">
+        <div className="flex flex-col gap-2 text-center my-10">
+          <h1 className="text-4xl md:text-5xl font-bold text-foreground-800">
+            {isLoginPage ? "Log in" : "Sign Up"}
+          </h1>
+          {pendingAddToCart && (
+            <p className="text-foreground-500 text-xs md:text-sm font-normal">
+              Login to continue the action
+            </p>
+          )}
         </div>
         <form onSubmit={handleSubmit} className="flex flex-col w-full gap-5">
           {!isLoginPage && <Input type="text" label="Name" name="name" />}
           <Input type="email" label="Email" name="email" />
           <PasswordInput name="password" />
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-3">
             <Button
               isLoading={
                 mutate_createOneUser.isPending || mutate_logInUser.isPending
               }
               type="submit"
               color="primary"
+              className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition duration-300"
             >
-              {isLoginPage ? "Log in" : "Sign In"}
+              {isLoginPage ? "Log in" : "Sign Up"}
             </Button>
             {(mutate_createOneUser.error || mutate_logInUser.error) && (
               <span className="text-red-500">
@@ -156,18 +161,40 @@ function AuthPage() {
             )}
           </div>
         </form>
-        <Divider />
-        <div>
-          <Button
-            type="button"
-            variant="bordered"
-            size="lg"
-            color="primary"
-            onPress={() => mutate_logInWithGoogle.mutate()}
-            isLoading={mutate_logInWithGoogle.isPending}
-          >
-            <BsGoogle size={20} /> Continue With Google
-          </Button>
+        <Divider className="my-6" />
+        <Button
+          type="button"
+          variant="bordered"
+          size="lg"
+          color="primary"
+          onPress={() => mutate_logInWithGoogle.mutate()}
+          isLoading={mutate_logInWithGoogle.isPending}
+          className="flex items-center justify-center w-full py-3 border border-foreground-300 rounded-lg hover:bg-foreground-100 transition duration-300"
+        >
+          <BsGoogle size={20} className="mr-2" /> Continue With Google
+        </Button>
+        <div className="text-center mt-6">
+          {isLoginPage ? (
+            <p className="text-sm text-foreground-600">
+              New to Bhrm Clothing?{" "}
+              <span
+                className="text-blue-600 cursor-pointer"
+                onClick={() => setSearchParams({ action: "signup" })}
+              >
+                Sign Up
+              </span>
+            </p>
+          ) : (
+            <p className="text-sm text-foreground-600">
+              Already have an account?{" "}
+              <span
+                className="text-blue-600 cursor-pointer"
+                onClick={() => setSearchParams({ action: "login" })}
+              >
+                Log in
+              </span>
+            </p>
+          )}
         </div>
       </div>
     </div>

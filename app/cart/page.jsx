@@ -3,7 +3,7 @@
 // UI COMPONENTS
 import CartCard from "@/components/cards/CartCard";
 import PageLayout from "@/components/layout/PageLayout";
-import { Button } from "@nextui-org/react";
+import { Button, Spinner } from "@nextui-org/react";
 
 // HOOKS
 import { useAuthContext } from "@/components/providers/AuthProvider";
@@ -17,6 +17,8 @@ import useURL from "@/hooks/useURL";
 import CustomGrid from "@/components/layout/CustomGrid";
 import CartFooter from "@/components/CartFooter";
 import removeDuplicates from "@/utils/removeDuplicates";
+import { AnimatePresence } from "framer-motion";
+import ProductModal from "@/components/modals/ProductModal";
 
 // UTILS
 
@@ -24,6 +26,11 @@ function CartPage() {
   const { user, setUser } = useAuthContext();
   const [getSearchParams, setSearchParams] = useURL();
   const router = useRouter();
+
+  const productIds = removeDuplicates(
+    user?.cart.map((cartItem) => cartItem.product)
+  );
+
   const {
     data,
     status,
@@ -33,14 +40,12 @@ function CartPage() {
     hasNextPage,
     refetch,
   } = useInfiniteQuery({
-    queryKey: ["cartProducts"],
+    queryKey: ["cartProducts", productIds?.join(", ")],
     queryFn: (params) =>
       readProductsByIds({
         ...params,
         limit: 20,
-        productIds: removeDuplicates(
-          user?.cart.map((cartItem) => cartItem.product)
-        ),
+        productIds,
       }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
@@ -51,7 +56,7 @@ function CartPage() {
     enabled: !!user?.cart?.length,
   });
 
-  const { ref: loaderRef, inView } = useInView();
+  const { ref, inView } = useInView();
 
   useEffect(() => {
     if (inView) {
@@ -60,6 +65,9 @@ function CartPage() {
   }, [inView, fetchNextPage]);
 
   const products = data && data.pages.flatMap((page) => page.data);
+  const { product: productName } = getSearchParams("product");
+
+  const product = products && products.find(({ name }) => productName === name);
 
   if (!user) {
     return (
@@ -117,6 +125,7 @@ function CartPage() {
       <div className="w-[min(80vw,1250px)]">
         <CustomGrid
           title={"Cart"}
+          message={`Showing ${user?.cart.length} product${user?.cart.length === 1 ? "" : "s"}`}
           items={
             products &&
             user?.cart.map((cartItem, i) => {
@@ -136,10 +145,16 @@ function CartPage() {
             })
           }
         />
+        <div className="flex items-center justify-center py-10" ref={ref}>
+          {hasNextPage && isFetching && <Spinner />}
+        </div>
+        <AnimatePresence>
+          {product && <ProductModal product={product} />}
+        </AnimatePresence>
         <CartFooter
           {...{
             products,
-            ref: loaderRef,
+            ref,
             hasNextPage,
             fetchNextPage,
             isFetching,

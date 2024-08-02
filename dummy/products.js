@@ -28,7 +28,6 @@ const generateMockData = () => {
 
 // Generate 100 mock data objects
 const mockDataArray = generateMockData();
-console.log(mockDataArray);
 
 export {
     mockDataArray,

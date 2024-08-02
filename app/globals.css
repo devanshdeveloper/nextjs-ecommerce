@@ -8,6 +8,16 @@ body {
   max-width: 100vw;
 } */
 
+* {
+  user-select: none;
+}
+
+img {
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
 ::-webkit-scrollbar {
   width: 0px;
 }

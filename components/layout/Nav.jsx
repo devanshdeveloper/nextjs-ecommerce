@@ -9,6 +9,7 @@ import Image from "next/image";
 import { FaAngleDown } from "react-icons/fa6";
 import { Button } from "@nextui-org/react";
 import { twMerge } from "tailwind-merge";
+import { ShoppingCart } from "lucide-react";
 
 function Nav() {
   // CONTEXT
@@ -21,40 +22,48 @@ function Nav() {
   const router = useRouter();
   const pathname = usePathname();
 
+  const isAuthenticated = !!user;
+  const isAdmin = user?.role === "Admin";
   const menuItems = [
     { href: "/shop", text: "Shop", emoji: "🛒", show: true },
-    { href: "/auth?action=login", text: "Log In", emoji: "🔑", show: !user },
-    { href: "/auth?action=signin", text: "Sign In", emoji: "📝", show: !user },
-    { href: "/cart", text: "Cart", emoji: "🛍️", show: true },
+    { href: "/auth?action=login", text: "Log In", emoji: "🔑", show: !isAuthenticated },
+    { href: "/auth?action=signin", text: "Sign In", emoji: "📝", show: !isAuthenticated },
+    {
+      href: "/cart",
+      text: "Cart",
+      emoji: "🛍️",
+      show: true,
+      className: "hidden md:flex",
+    },
     {
       href: "/account",
       text: "Account",
       emoji: "👤",
-      show: !!user,
+      show: isAuthenticated,
     },
     {
       href: "/admin/users",
       text: "Users",
       emoji: "👥",
-      show: !!user && user.role === "Admin",
+      show: isAdmin,
     },
     {
       href: "/admin/categories",
       text: "Categories",
       emoji: "📂",
-      show: !!user && user.role === "Admin",
+      show: isAdmin,
     },
     {
       href: "/admin/products",
       text: "Products",
       emoji: "🛒",
-      show: !!user && user.role === "Admin",
+      show: isAdmin,
     },
     {
       href: "/admin/orders",
       text: "Orders",
       emoji: "📦",
-      show: !!user && user.role === "Admin",
+      show: isAdmin,
     },
     {
       onClick: () => {
@@ -63,74 +72,90 @@ function Nav() {
       },
       text: "Log out",
       emoji: "🚪",
-      show: !!user,
+      show: isAuthenticated,
       color: "danger",
     },
   ];
 
   return (
-    <div className="flex justify-center h-[80px] w-screen bg-background relative z-[10000] border-b-1">
-      <div className="flex items-center justify-between h-full w-[min(1320px,100vw)] px-5 md:px-10">
-        <Link href="/" className="flex items-center h-full">
-          <span className="text-lg md:text-xl">Bhrm Clothings</span>
-        </Link>
-        <button
-          className={`md:hidden flex items-center gap-2 text-2xl text-foreground hover:text-foreground-500 ${
-            isMenuOpen ? "rotate-180" : ""
-          }`}
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-        >
-          {isMenuOpen ? "X" : "☰"}
-        </button>
-        <ul
-          className={twMerge(
-            "absolute md:static top-[80px]  bg-background h-screen md:h-full w-screen md:w-auto flex flex-col items-start md:items-center md:flex-row gap-5 md:gap-7 p-10 md:p-0 transition-all duration-200",
-            isMenuOpen ? "left-0" : "left-[-100vw]"
-          )}
-        >
-          {menuItems.map((item, i) => {
-            if (!item.show) return null;
-            if (item.CustomElement) {
-              return <item.CustomElement key={index} />;
-            }
-            if (item.onClick) {
+    <>
+      <div className="fixed flex justify-center h-[80px] w-screen bg-background z-[10] border-b-1 border-foreground-500 border-opacity-50">
+        <div className="flex items-center justify-between h-full w-[min(1320px,100vw)] px-5 md:px-10">
+          <button
+            className={`md:hidden flex items-center text-2xl text-foreground hover:text-foreground-500 ${
+              isMenuOpen ? "rotate-180" : ""
+            }`}
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            {isMenuOpen ? "X" : "☰"}
+          </button>
+
+          <Link href="/" className="flex items-center h-full">
+            <span className="text-lg md:text-xl">Bhrm Clothings</span>
+          </Link>
+          <Link href="/cart" className="flex items-center h-full md:hidden">
+            <ShoppingCart />
+          </Link>
+
+          <ul
+            className={twMerge(
+              "absolute md:static top-[80px]  bg-background h-screen md:h-full w-screen md:w-auto flex flex-col items-start md:items-center md:flex-row gap-5 md:gap-7 p-10 md:p-0 transition-all duration-200",
+              isMenuOpen ? "left-0" : "left-[-100vw]"
+            )}
+          >
+            {menuItems.map((item, i) => {
+              if (!item.show) return null;
+              if (item.CustomElement) {
+                return <item.CustomElement key={index} />;
+              }
+              if (item.onClick) {
+                return (
+                  <li
+                    className={twMerge("flex items-center", item.className)}
+                    key={i}
+                  >
+                    <Button
+                      className="w-full"
+                      color={item.color || "primary"}
+                      variant="flat"
+                      onPress={() => {
+                        setIsMenuOpen(false);
+                        item.onClick();
+                      }}
+                    >
+                      <span>{item.emoji}</span>
+                      <span>{item.text}</span>
+                    </Button>
+                  </li>
+                );
+              }
               return (
-                <li className="flex items-center" key={i}>
-                  <Button
-                    className="w-full"
-                    color={item.color || "primary"}
-                    variant="flat"
-                    onPress={() => {
+                <li
+                  className={twMerge("flex items-center", item.className)}
+                  key={i}
+                >
+                  <Link
+                    href={item.href}
+                    className={twMerge(
+                      "hover:underline transition-all duration-200 flex gap-2",
+                      pathname.includes(item.href) ? "font-bold" : ""
+                    )}
+                    key={item.text}
+                    onClick={() => {
                       setIsMenuOpen(false);
-                      item.onClick();
                     }}
                   >
-                    {item.text}
-                  </Button>
+                    <span>{item.emoji}</span>
+                    <span>{item.text}</span>
+                  </Link>
                 </li>
               );
-            }
-            return (
-              <li className="flex items-center" key={i}>
-                <Link
-                  href={item.href}
-                  className={twMerge(
-                    "hover:underline transition-all duration-200",
-                    pathname.includes(item.href) ? "font-bold" : ""
-                  )}
-                  key={item.text}
-                  onClick={() => {
-                    setIsMenuOpen(false);
-                  }}
-                >
-                  {item.text}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
+            })}
+          </ul>
+        </div>
       </div>
-    </div>
+      <div className="h-[80px]"></div>
+    </>
   );
 }
 

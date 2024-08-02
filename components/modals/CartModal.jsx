@@ -1,21 +1,26 @@
-import { motion } from "framer-motion";
 import { CgClose } from "react-icons/cg";
 import { useCallback, useEffect } from "react";
 import useURL from "@/hooks/useURL";
 import { Button } from "@nextui-org/react";
-import SmallCartCard from "../cards/SmallCartCard";
 import { useRouter } from "next/navigation";
 import { useAuthContext } from "../providers/AuthProvider";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
 import { readProductsByIds } from "@/fetch/product";
 import CartFooter from "../CartFooter";
+import CartCard from "../cards/CartCard";
+import removeDuplicates from "@/utils/removeDuplicates";
+import ModalFrame from "./ModalFrame";
 
 function CartModal() {
   const { user, setUser } = useAuthContext();
   const router = useRouter();
 
   const [_, setSearchParams] = useURL();
+
+  const productIds = removeDuplicates(
+    user?.cart.map((cartItem) => cartItem.product)
+  );
 
   const {
     data,
@@ -26,12 +31,12 @@ function CartModal() {
     hasNextPage,
     refetch,
   } = useInfiniteQuery({
-    queryKey: ["cartProducts"],
+    queryKey: ["cartProducts", `${productIds?.join(", ")}`],
     queryFn: (params) =>
       readProductsByIds({
         ...params,
         limit: 20,
-        productIds: user?.cart.map((cartItem) => cartItem.product),
+        productIds,
       }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
@@ -49,7 +54,6 @@ function CartModal() {
       fetchNextPage();
     }
   }, [inView, fetchNextPage]);
-  console.log(data);
 
   const products = data && data.pages.flatMap((page) => page.data);
 
@@ -106,73 +110,51 @@ function CartModal() {
     );
   }
 
-  const modalVariants = {
-    hidden: { opacity: 0, scale: 0.8 },
-    visible: { opacity: 1, scale: 1, transition: { duration: 0.3 } },
-    exit: { opacity: 0, scale: 0.8 },
-  };
-
-
   return (
-    <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-end bg-foreground-50 bg-opacity-50 backdrop-blur-sm"
-      variants={modalVariants}
-      initial="hidden"
-      animate="visible"
-      exit="exit"
-      onClick={closeModal}
-    >
-      <motion.div
-        className="relative w-[min(100vw,700px)] bg-background h-screen overflow-y-scroll shadow-xl rounded-2xl py-20 px-5 md:p-10"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <button
-          className="absolute top-10 md:top-5 right-5"
-          onClick={closeModal}
-        >
-          <CgClose
-            size={20}
-            className=" text-foreground-700 hover:text-foreground-800"
-          />
-        </button>
-        {contents && contents}
+    <ModalFrame {...{ closeModal }}>
+      <button className="absolute top-10 md:top-5 right-5" onClick={closeModal}>
+        <CgClose
+          size={20}
+          className=" text-foreground-700 hover:text-foreground-800"
+        />
+      </button>
+      {contents && contents}
 
-        {!contents && (
-          <>
-            <h2 className="text-3xl font-bold text-foreground-700 mb-5">
-              Cart
-            </h2>
-            <div className="flex flex-col gap-5">
-              {products &&
-                user?.cart.map((cartItem, i) => {
-                  return (
-                    <SmallCartCard
-                      key={i}
-                      {...{
-                        product: products.find(
-                          (product) => cartItem.product === product?._id
-                        ),
-                        cartItem,
-                      }}
-                    />
-                  );
-                })}
-            </div>
-            <CartFooter
-              {...{
-                products,
-                ref: loaderRef,
-                hasNextPage,
-                fetchNextPage,
-                isFetching,
-                user,
-                setUser,
-              }}
-            />
-          </>
-        )}
-      </motion.div>
-    </motion.div>
+      {!contents && (
+        <>
+          <h2 className="text-3xl font-bold text-foreground-700 mb-5">Cart</h2>
+          <div className="flex flex-col gap-5">
+            {products &&
+              user?.cart.map((cartItem, i) => {
+                return (
+                  <CartCard
+                    key={i}
+                    {...{
+                      product: products.find(
+                        (product) => cartItem.product === product?._id
+                      ),
+                      cartItem,
+                      user,
+                      setUser,
+                    }}
+                  />
+                );
+              })}
+          </div>
+          <CartFooter
+            {...{
+              products,
+              ref: loaderRef,
+              hasNextPage,
+              fetchNextPage,
+              isFetching,
+              user,
+              setUser,
+            }}
+          />
+        </>
+      )}
+    </ModalFrame>
   );
 }
 

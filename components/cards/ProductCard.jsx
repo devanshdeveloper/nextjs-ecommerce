@@ -18,15 +18,17 @@ export default function ProductCard({
   reviews,
   variants,
   _id,
+  children,
+  displayName,
+  layoutId
 }) {
-  const [isCardHovered, setCardHovered] = useState(false);
   const { user } = useAuthContext();
 
   const [getSearchParams, setSearchParams] = useURL();
 
   return (
     <CardFrame
-      layoutId={`card-${_id}`}
+      layoutId={layoutId || `card-${_id}`}
       onClick={() => {
         const cartVariants = user?.cart.find(
           (cartItem) => cartItem.product === _id
@@ -44,10 +46,10 @@ export default function ProductCard({
         setSearchParams({ product: name, ...defaultVariants });
       }}
     >
-      <ImageViewer {...{images}}/>
+      <ImageViewer {...{ images }} />
       <div className="flex flex-col items-start p-3 pt-0">
         <h4 className="font-bold sm:text-sm md:text-md lg:text-large">
-          {name}
+          {displayName || name}
         </h4>
         <div className="flex gap-2">
           <small className="text-default-500">Rs {price}</small>
@@ -56,6 +58,7 @@ export default function ProductCard({
           </small>
         </div>
       </div>
+      {children}
     </CardFrame>
   );
 }
