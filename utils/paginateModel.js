@@ -29,6 +29,16 @@ async function paginateModel({
       : {};
     await connectDB();
     const count = await Model.countDocuments(query);
+    if (count === 0) {
+      return [
+        {
+          info: { pageParam, limit, count, totalPages: null, nextPage: null },
+          data: null,
+        },
+        { status: 200 },
+      ];
+    }
+
     const totalPages = Math.ceil(count / limit);
     if (pageParam > totalPages) {
       return [{ info: { nextPage: null } }, { status: 500 }];
@@ -38,7 +48,6 @@ async function paginateModel({
       nextPage = null;
     }
     const data = await Model.find(query)
-      .sort({ _id: -1 })
       .skip((pageParam - 1) * limit)
       .limit(limit);
     const processedData = processData ? await processData(data) : data;

@@ -5,6 +5,7 @@ import { AnimatePresence } from "framer-motion";
 import CustomGrid from "./layout/CustomGrid";
 import { Spinner } from "@nextui-org/react";
 import { forwardRef } from "react";
+import { getProductsCountMessage } from "@/utils/message";
 
 const Category = forwardRef(
   (
@@ -18,7 +19,6 @@ const Category = forwardRef(
       PageLayout,
       PageLayoutSpinner,
       ProductCard,
-      refetch,
       titleHref,
       productsCount,
     },
@@ -29,7 +29,7 @@ const Category = forwardRef(
     const { product: productName } = getSearchParams("product");
 
     const product =
-      products && products.find(({ name }) => productName === name);
+      products && products.find((item) => productName === item?.name);
 
     if (isPending) {
       return <PageLayoutSpinner />;
@@ -51,11 +51,13 @@ const Category = forwardRef(
           <CustomGrid
             href={titleHref}
             title={category.name}
-            message={productsCount && `Showing ${productsCount} products`}
+            message={getProductsCountMessage(productsCount)}
             items={
               products
                 ? products.map((product, i) => {
-                    return <ProductCard key={i} {...{ ...product }} />;
+                    return (
+                      <ProductCard key={i} {...{ index: i, ...product }} />
+                    );
                   })
                 : null
             }

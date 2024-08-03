@@ -40,6 +40,7 @@ function ProductForm({ editId }) {
     data: product,
     error: productQueryError,
     isPending,
+    isFetching
   } = useQuery({
     queryKey: ["product", editId],
     queryFn: async () => {
@@ -117,7 +118,7 @@ function ProductForm({ editId }) {
     },
   });
 
-  if (isPending) {
+  if (isFetching) {
     return <PageLayoutSpinner />;
   }
 

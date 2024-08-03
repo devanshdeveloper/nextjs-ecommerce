@@ -50,12 +50,13 @@ function useProducts(param) {
   console.log(ref.current, inView);
   useEffect(() => {
     if (inView) {
-
       fetchNextPage();
     }
   }, [inView, fetchNextPage]);
 
-  const products = data && data.pages.flatMap((page) => page.data);
+  const products = (data && data?.pages?.flatMap((page) => page.data))?.filter(
+    (item) => item !== null
+  );
 
   return {
     searchInputValue,

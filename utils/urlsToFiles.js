@@ -1,15 +1,12 @@
 export function getS3KeyFromUrl(url) {
   if (!url) return null;
-
-  // Create a URL object
   const urlObj = new URL(url);
-
-  // Extract the pathname from the URL
+  const isS3Url = urlObj.hostname.endsWith('amazonaws.com') || urlObj.hostname.includes('s3');
+  if (!isS3Url) {
+    return url; 
+  }
   const pathname = urlObj.pathname;
-
-  // Decode URL components to handle encoded spaces and special characters
-  const s3Key = decodeURIComponent(pathname.slice(1)); // Remove leading slash
-
+  const s3Key = decodeURIComponent(pathname.slice(1)); 
   return s3Key;
 }
 

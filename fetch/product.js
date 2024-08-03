@@ -2,6 +2,8 @@ import fetchApi from "@/utils/fetchApi";
 import { getImagesFromBucket } from "@/utils/s3-bucket-front";
 
 async function getImagesForProducts(products) {
+  if (!products) return products;
+
   const keys = products.flatMap((product) => product.images);
   const urls = await getImagesFromBucket(...keys);
   return products.map((product) => ({

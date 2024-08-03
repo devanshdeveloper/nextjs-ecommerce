@@ -31,6 +31,8 @@ function CartPage() {
     user?.cart.map((cartItem) => cartItem.product)
   );
 
+  console.log(!!user?.cart?.length);
+
   const {
     data,
     status,
@@ -64,10 +66,21 @@ function CartPage() {
     }
   }, [inView, fetchNextPage]);
 
-  const products = data && data.pages.flatMap((page) => page.data);
+  if (error) {
+    console.log(error);
+  }
+  console.log(data);
+
+  const products = (data && data?.pages?.flatMap((page) => page.data))?.filter(
+    (item) => item !== null
+  );
+
   const { product: productName } = getSearchParams("product");
 
-  const product = products && products.find(({ name }) => productName === name);
+  const product =
+    products &&
+    productName &&
+    products.find((item) => productName === item?.name);
 
   if (!user) {
     return (
@@ -97,7 +110,7 @@ function CartPage() {
     );
   }
 
-  if (!user?.cart.length) {
+  if (!user?.cart.length || !products?.length) {
     return (
       <PageLayout>
         <div className="flex flex-col items-center gap-10">
@@ -120,12 +133,16 @@ function CartPage() {
     return <PageLayoutSpinner />;
   }
 
+
+
   return (
     <div className="flex flex-col items-center ">
       <div className="w-[min(95vw,1250px)]">
         <CustomGrid
           title={"Cart"}
-          message={`Showing ${user?.cart.length} product${user?.cart.length === 1 ? "" : "s"}`}
+          message={`Showing ${user?.cart.length} product${
+            user?.cart.length === 1 ? "" : "s"
+          }`}
           items={
             products &&
             user?.cart.map((cartItem, i) => {

@@ -1,9 +1,11 @@
 import ProductCard from "./ProductCard";
 import { Button } from "@nextui-org/react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteOneProduct } from "@/fetch/product";
-import { Delete, Edit } from "lucide-react";
+import { Edit } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { MdDelete } from "react-icons/md";
+import { deleteInfiniteQueryData } from "@/utils/react-query";
 
 export default function AdminProductCard({
   actualPrice,
@@ -16,12 +18,20 @@ export default function AdminProductCard({
   reviews,
   variants,
   _id,
+  index,
 }) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const mutate_deleteOneProduct = useMutation({
     mutationFn: deleteOneProduct,
     onSuccess() {
-      refetch();
+      queryClient.setQueriesData([`products`], (oldData) =>
+        deleteInfiniteQueryData({
+          data: oldData,
+          pageIndex: Math.floor(index / 20) + 1,
+          dataId: _id,
+        })
+      );
     },
   });
   return (
@@ -40,18 +50,29 @@ export default function AdminProductCard({
         _id,
       }}
     >
-      <Button
-        isLoading={mutate_deleteOneProduct.isPending}
-        isIconOnly
-        variant="flat"
-        color="primary"
-        radius="lg"
-        size="lg"
-        className="absolute right-3 bottom-3"
-        onPress={() => router.push(`/admin/products/${_id}/edit`)}
-      >
-        <Edit size={20} />
-      </Button>
+      <div className="absolute right-3 bottom-3 flex gap-3">
+        <Button
+          isIconOnly
+          variant="flat"
+          color="primary"
+          radius="lg"
+          size="lg"
+          onPress={() => router.push(`/admin/products/${_id}/edit`)}
+        >
+          <Edit size={20} />
+        </Button>
+        <Button
+          isIconOnly
+          variant="flat"
+          color="danger"
+          isLoading={mutate_deleteOneProduct.isPending}
+          radius="lg"
+          size="lg"
+          onPress={() => mutate_deleteOneProduct.mutate({ id: _id })}
+        >
+          <MdDelete size={20} />
+        </Button>
+      </div>
     </ProductCard>
   );
 }

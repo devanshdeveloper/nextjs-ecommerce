@@ -1,7 +1,7 @@
 export function updateInfiniteQueryData({ data, pageIndex, dataId, newData }) {
   if (!data) return data;
   const newPagesArray = data.pages.map((page, idx) => {
-    if (idx === pageIndex) {
+    if (data.pageParams[idx] === pageIndex) {
       const newDataArray = page.data.map((item) =>
         item._id === dataId ? newData : item
       );
@@ -21,7 +21,7 @@ export function pushInfiniteQueryData({ data, pageIndex, newData, pushIndex }) {
   if (!data) return data;
 
   const newPagesArray = data.pages.map((page, idx) => {
-    if (idx === pageIndex) {
+    if (data.pageParams[idx] === pageIndex) {
       const newDataArray = [
         ...page.data.slice(0, pushIndex),
         newData,
@@ -40,10 +40,17 @@ export function pushInfiniteQueryData({ data, pageIndex, newData, pushIndex }) {
   };
 }
 export function deleteInfiniteQueryData({ data, pageIndex, dataId }) {
+  console.log(data, pageIndex, dataId);
+
   if (!data) return data;
   const newPagesArray = data.pages.map((page, idx) => {
-    if (idx === pageIndex) {
+    if (data.pageParams[idx] === pageIndex) {
       const newDataArray = page.data.filter((item) => item._id !== dataId);
+      console.log({
+        ...page,
+        data: newDataArray,
+      });
+      
       return {
         ...page,
         data: newDataArray,
@@ -51,6 +58,12 @@ export function deleteInfiniteQueryData({ data, pageIndex, dataId }) {
     }
     return page;
   });
+
+  console.log({
+    ...data,
+    pages: newPagesArray,
+  });
+
   return {
     ...data,
     pages: newPagesArray,
