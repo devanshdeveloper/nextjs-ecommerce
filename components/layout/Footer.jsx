@@ -3,7 +3,7 @@ import React from "react";
 
 function Footer() {
   return (
-    <footer className="flex flex-wrap flex-col md:flex-row p-5 gap-5 bg-background justify-between">
+    <footer className="flex flex-wrap flex-col md:flex-row p-5 gap-5 justify-between">
         <span className="text-sm text-foreground-400">
           © 2024{" "}
           <Link href="/" className="hover:underline">

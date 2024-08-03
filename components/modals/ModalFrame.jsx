@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 
-function ModalFrame({ closeModal, children }) {
+function ModalFrame({ closeModal, children, wrapperProps, modalProps }) {
   const modalVariants = {
     hidden: { opacity: 0, scale: 0.8 },
     visible: { opacity: 1, scale: 1, transition: { duration: 0.3 } },
@@ -15,12 +15,15 @@ function ModalFrame({ closeModal, children }) {
       animate="visible"
       exit="exit"
       onClick={closeModal}
+      {...wrapperProps}
     >
       <motion.div
-        className="relative w-[min(100vw,700px)] bg-background h-screen overflow-y-scroll shadow-xl rounded-2xl py-20 px-5 md:p-10"
+        className="relative w-[min(100vw,700px)] bg-background h-screen top-[120px] md:top-[unset] overflow-y-scroll shadow-xl rounded-2xl py-20 px-5 md:p-10"
         onClick={(e) => e.stopPropagation()}
+        {...modalProps}
       >
         {children}
+        <div className="h-[120px]"></div>
       </motion.div>
     </motion.div>
   );

@@ -1,3 +1,4 @@
+import { removeParams } from "@/utils/removeParams";
 import { putObjectURL } from "@/utils/s3-bucket";
 
 export async function POST(request) {
@@ -17,10 +18,14 @@ export async function POST(request) {
         });
       })
     );
-    let res = {};
+    const res = {}
     response.forEach((obj) => {
-      res[Object.keys(obj)[0]] = Object.values(obj)[0];
+      res[Object.keys(obj)[0]] = {
+        putObjectURL: Object.values(obj)[0],
+        url: removeParams(Object.values(obj)[0]),
+      };
     });
+    console.log(res);
     return Response.json(res);
   } catch (error) {
     return Response.json(error, { status: 500 });

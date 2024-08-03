@@ -3,7 +3,7 @@ import Category from "@/models/Category";
 
 export async function PUT(request) {
   const { id, newCategory } = await request.json();
-  
+
   try {
     await connectDB();
     const category = await Category.findById(id);
@@ -16,10 +16,7 @@ export async function PUT(request) {
       }
     }
     await category.save();
-    return Response.json(
-      { category, success: true },
-      { status: 200 }
-    );
+    return Response.json(category , { status: 200 });
   } catch (err) {
     console.log(err);
     return Response.json({ error: err.message }, { status: 500 });

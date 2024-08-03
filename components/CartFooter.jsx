@@ -98,7 +98,7 @@ const CartFooter = forwardRef(
                 <span>Shipping</span>
                 <span>{parseAmount(amounts.shippingCharges)}</span>
               </div>
-              <div className="border-t border-gray-300 mt-2 pt-2">
+              <div className="border-t border-foreground-300 mt-2 pt-2">
                 <div className="flex justify-between text-lg font-semibold">
                   <span>Total</span>
                   <span>{parseAmount(amounts.totalAmount)}</span>

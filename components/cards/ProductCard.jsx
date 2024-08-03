@@ -28,6 +28,7 @@ export default function ProductCard({
 
   return (
     <CardFrame
+    className={"relative"}
       layoutId={layoutId || `card-${_id}`}
       onClick={() => {
         const cartVariants = user?.cart.find(

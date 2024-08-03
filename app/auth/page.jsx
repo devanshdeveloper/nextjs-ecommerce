@@ -124,7 +124,7 @@ function AuthPage() {
 
   return (
     <div className="flex justify-center items-center min-h-[calc(100vh-100px)]">
-      <div className="bg-background p-8 w-[min(80vw,500px)] flex flex-col gap-10 items-center">
+      <div className="p-5 w-[min(95vw,500px)] flex flex-col gap-10 items-center">
         <div className="flex flex-col gap-2 text-center my-10">
           <h1 className="text-4xl md:text-5xl font-bold text-foreground-800">
             {isLoginPage ? "Log in" : "Sign Up"}

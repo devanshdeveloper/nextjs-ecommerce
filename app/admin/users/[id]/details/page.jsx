@@ -29,7 +29,7 @@ function UserDetailsPage() {
   const mutateUpdateOneUser = useMutation({
     mutationFn: (newUser) => updateOneUser({ id, newUser }),
     onSuccess: (data) => {
-      queryClient.setQueryData([`user_${id}`], () => ({ ...data.user }));
+      queryClient.setQueryData([`user_${id}`], () => ({ ...data }));
     },
   });
 
@@ -96,7 +96,7 @@ function UserDetailsPage() {
         />
         <div className="text-center">
           <div className="font-bold text-2xl lg:text-3xl">{pageUser.name}</div>
-          <div className="text-lg lg:text-xl text-gray-600">
+          <div className="text-lg lg:text-xl text-foreground-600">
             {pageUser.email}
           </div>
         </div>

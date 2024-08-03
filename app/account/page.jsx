@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 function AccountPage() {
-  const { user } = useAuthContext();
+  const { user , setUser } = useAuthContext();
   const router = useRouter();
 
   if (!user) {
@@ -25,6 +25,7 @@ function AccountPage() {
             color="primary"
             variant="flat"
             className="px-4 py-2 lg:px-6 lg:py-3"
+            onClick={() => router.push("/account/edit")}
           >
             Edit Profile
           </Button>
@@ -33,7 +34,8 @@ function AccountPage() {
             variant="flat"
             className="px-4 py-2 lg:px-6 lg:py-3"
             onPress={() => {
-              // Handle logout logic here
+              router.push("/");
+              setUser(null);
             }}
           >
             Logout
@@ -73,24 +75,7 @@ function AccountPage() {
               View Orders
             </Link>
           </div>
-          <div className="bg-foreground-100 p-6 rounded-lg shadow-sm">
-            <h3 className="text-xl font-semibold text-foreground-700 mb-3">Settings</h3>
-            <Link
-              href="/settings"
-              className="text-primary hover:text-primary-dark font-medium"
-            >
-              Account Settings
-            </Link>
-          </div>
-          <div className="bg-foreground-100 p-6 rounded-lg shadow-sm">
-            <h3 className="text-xl font-semibold text-foreground-700 mb-3">Support</h3>
-            <Link
-              href="/support"
-              className="text-primary hover:text-primary-dark font-medium"
-            >
-              Get Help
-            </Link>
-          </div>
+        
         </div>
       </div>
     </div>

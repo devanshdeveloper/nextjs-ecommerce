@@ -65,21 +65,11 @@ function Nav() {
       emoji: "📦",
       show: isAdmin,
     },
-    {
-      onClick: () => {
-        router.push("/");
-        setUser(null);
-      },
-      text: "Log out",
-      emoji: "🚪",
-      show: isAuthenticated,
-      color: "danger",
-    },
   ];
 
   return (
     <>
-      <div className="fixed flex justify-center h-[80px] w-screen bg-background z-[10] border-b-1 border-foreground-500 border-opacity-50">
+      <div className="fixed flex justify-center h-[80px] w-screen bg-background/50 backdrop-blur-md z-[20] border-b-1 border-foreground-500 border-opacity-50">
         <div className="flex items-center justify-between h-full w-[min(1320px,100vw)] px-5 md:px-10">
           <button
             className={`md:hidden flex items-center text-2xl text-foreground hover:text-foreground-500 ${
@@ -99,7 +89,7 @@ function Nav() {
 
           <ul
             className={twMerge(
-              "absolute md:static top-[80px]  bg-background h-screen md:h-full w-screen md:w-auto flex flex-col items-start md:items-center md:flex-row gap-5 md:gap-7 p-10 md:p-0 transition-all duration-200",
+              "fixed md:static top-[80px] h-screen md:h-full w-screen bg-background/80 md:bg-[unset] md:w-auto flex flex-col items-start md:items-center md:flex-row gap-5 md:gap-7 p-10 md:p-0 transition-all duration-200",
               isMenuOpen ? "left-0" : "left-[-100vw]"
             )}
           >

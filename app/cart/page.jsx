@@ -122,7 +122,7 @@ function CartPage() {
 
   return (
     <div className="flex flex-col items-center ">
-      <div className="w-[min(80vw,1250px)]">
+      <div className="w-[min(95vw,1250px)]">
         <CustomGrid
           title={"Cart"}
           message={`Showing ${user?.cart.length} product${user?.cart.length === 1 ? "" : "s"}`}

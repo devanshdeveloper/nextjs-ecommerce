@@ -19,11 +19,11 @@ function AuthProvider({ children }) {
 
   useEffect(() => {
     async function asyncHandler() {
-      if (!user || !user?._id) {
+      if (!user || !user._id) {
         return;
       }
       try {
-        const updatedUser = await readOneUser({ id: user?._id });
+        const updatedUser = await readOneUser({ id: user._id });
         setUser(updatedUser);
       } catch (error) {
         console.error(error);
@@ -35,11 +35,11 @@ function AuthProvider({ children }) {
   }, []);
 
   const refetchUser = useCallback(async () => {
-    if (!user || !user?._id) {
+    if (!user || !user._id) {
       return;
     }
     try {
-      const updatedUser = await readOneUser({ id: user?._id });
+      const updatedUser = await readOneUser({ id: user._id });
       setUser(updatedUser);
     } catch (error) {
       console.error(error);

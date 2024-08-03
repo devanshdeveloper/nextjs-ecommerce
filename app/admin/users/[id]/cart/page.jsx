@@ -20,6 +20,7 @@ import { readOneUser } from "@/fetch/user";
 import useURL from "@/hooks/useURL";
 import CustomGrid from "@/components/layout/CustomGrid";
 import CartFooter from "@/components/CartFooter";
+import removeDuplicates from "@/utils/removeDuplicates";
 
 // UTILS
 
@@ -33,6 +34,9 @@ function AdminCartPage() {
     retry: false,
   });
 
+  const productIds = removeDuplicates(
+    pageUser?.cart.map((cartItem) => cartItem.product)
+  );
 
   const router = useRouter();
   const {
@@ -44,12 +48,12 @@ function AdminCartPage() {
     hasNextPage,
     refetch,
   } = useInfiniteQuery({
-    queryKey: [`cartProducts_${id}`],
+    queryKey: [`cartProducts_${id}`, productIds?.join(", ")],
     queryFn: (params) =>
       readProductsByIds({
         ...params,
         limit: 20,
-        productIds: pageUser?.cart.map((cartItem) => cartItem.product),
+        productIds,
       }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
@@ -78,7 +82,9 @@ function AdminCartPage() {
     return (
       <PageLayout>
         <div className="flex flex-col items-center gap-10">
-          <div className="text-3xl">{pageUser?.name ?? "User"} Cart is Empty</div>
+          <div className="text-3xl">
+            {pageUser?.name ?? "User"} Cart is Empty
+          </div>
           <div className="flex gap-5">
             <Button
               variant="flat"
@@ -86,7 +92,7 @@ function AdminCartPage() {
               size="lg"
               onPress={() => router.back()}
             >
-             Back
+              Back
             </Button>
           </div>
         </div>
@@ -97,13 +103,13 @@ function AdminCartPage() {
     return <PageLayoutSpinner />;
   }
   const setUser = (...args) =>
-    queryClient.setQueryData([`user_${id}`], ...args)
+    queryClient.setQueryData([`user_${id}`], ...args);
 
   return (
     <div className="flex flex-col items-center ">
-      <div className="w-[min(80vw,1250px)]">
+      <div className="w-[min(95vw,1250px)]">
         <CustomGrid
-          title={"Cart"}
+          title={`${pageUser.name}'s Cart`}
           items={
             products &&
             pageUser?.cart.map((cartItem, i) => {
@@ -130,12 +136,11 @@ function AdminCartPage() {
             hasNextPage,
             fetchNextPage,
             isFetching,
-            user : pageUser, 
-            setUser
+            user: pageUser,
+            setUser,
           }}
         />
       </div>
-
     </div>
   );
 }

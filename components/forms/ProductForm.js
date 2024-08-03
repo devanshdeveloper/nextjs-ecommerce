@@ -12,7 +12,10 @@ import {
   updateOneProduct,
 } from "@/fetch/product";
 import { readAllCategory } from "@/fetch/category";
-import { uploadImagesToBucket } from "@/utils/s3-bucket-front";
+import {
+  getImageFromBucket,
+  uploadImagesToBucket,
+} from "@/utils/s3-bucket-front";
 import { v4 } from "uuid";
 import { defaultProductFormValue } from "@/utils/defaultFormValue";
 import parseError, { recursiveError } from "@/utils/parseError";
@@ -24,20 +27,32 @@ import ImageUploader from "@/components/inputs/ImageUploaderInput";
 import imageCompression from "browser-image-compression";
 import { validateProductForm } from "@/utils/formValidation";
 import addPreviewToImage from "@/utils/addPreviewToImage";
-import { urlToFile } from "@/utils/urlsToFiles";
+import { getS3KeyFromUrl, urlToFile } from "@/utils/urlsToFiles";
 import { useRouter } from "next/navigation";
+import PageLayoutSpinner from "../spinners/PageLayoutSpinner";
+import PageLayout from "../layout/PageLayout";
 function ProductForm({ editId }) {
   const router = useRouter();
   const [productInputValue, setProductInputValue] = useState(
     defaultProductFormValue()
   );
-  const { data: product, error: productQueryError } = useQuery({
+  const {
+    data: product,
+    error: productQueryError,
+    isPending,
+  } = useQuery({
     queryKey: ["product", editId],
     queryFn: async () => {
       const product = await readOneProduct({ id: editId });
-      const images = (await Promise.all(product.images.map(urlToFile))).map(
-        addPreviewToImage
+      const images = await Promise.all(
+        product.images.map(async (url) => {
+          const signedUrl = await getImageFromBucket({
+            Key: getS3KeyFromUrl(url),
+          });
+          return addPreviewToImage(await urlToFile(signedUrl));
+        })
       );
+
       setProductInputValue({
         name: product.name,
         description: product.description,
@@ -82,13 +97,14 @@ function ProductForm({ editId }) {
           });
         })
       );
-      const imageKeys = await uploadImagesToBucket(
+      const urlObj = await uploadImagesToBucket(
         compressedFiles.map((image) => ({
           Key: `product/${productToUpload.category.name}/${image.name}`,
           file: image,
           fileType: image.type,
         }))
       );
+      const imageKeys = Object.keys(urlObj);
       return await (editId ? updateOneProduct : createOneProduct)({
         ...productToUpload,
         images: imageKeys,
@@ -100,6 +116,20 @@ function ProductForm({ editId }) {
       router.push(`/admin/products/${data._id}/details`);
     },
   });
+
+  if (isPending) {
+    return <PageLayoutSpinner />;
+  }
+
+  if (productQueryError) {
+    return (
+      <PageLayout className={"flex flex-col gap-10"}>
+        <h1>An error occurred while fetching products.</h1>
+        <p>{productQueryError.message}</p>
+        <p>Please try again later.</p>
+      </PageLayout>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center">

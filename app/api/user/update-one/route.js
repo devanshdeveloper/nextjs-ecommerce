@@ -3,7 +3,7 @@ import User from "@/models/User";
 
 export async function PUT(request) {
   const { id, newUser } = await request.json();
-  
+
   try {
     await connectDB();
     const user = await User.findById(id);
@@ -16,10 +16,7 @@ export async function PUT(request) {
       }
     }
     await user.save();
-    return Response.json(
-      { user, success: true },
-      { status: 200 }
-    );
+    return Response.json(user, { status: 200 });
   } catch (err) {
     console.log(err);
     return Response.json({ error: err.message }, { status: 500 });

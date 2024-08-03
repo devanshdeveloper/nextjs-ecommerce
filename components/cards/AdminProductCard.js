@@ -40,28 +40,18 @@ export default function AdminProductCard({
         _id,
       }}
     >
-      <div className="flex gap-2 p-3 pt-0">
-        <Button
-          isLoading={mutate_deleteOneProduct.isPending}
-          isIconOnly
-          variant="flat"
-          color="primary"
-          radius="lg"
-          onPress={() => router.push(`/admin/products/${_id}/edit`)}
-        >
-          <Edit size={30} />
-        </Button>
-        <Button
-          isLoading={mutate_deleteOneProduct.isPending}
-          isIconOnly
-          variant="flat"
-          color="danger"
-          radius="lg"
-          onPress={() => mutate_deleteOneProduct.mutate({ id: _id })}
-        >
-          <Delete size={30} />
-        </Button>
-      </div>
+      <Button
+        isLoading={mutate_deleteOneProduct.isPending}
+        isIconOnly
+        variant="flat"
+        color="primary"
+        radius="lg"
+        size="lg"
+        className="absolute right-3 bottom-3"
+        onPress={() => router.push(`/admin/products/${_id}/edit`)}
+      >
+        <Edit size={20} />
+      </Button>
     </ProductCard>
   );
 }

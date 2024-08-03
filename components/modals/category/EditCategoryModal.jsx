@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import MyModal from "../Modal";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button, Input } from "@nextui-org/react";
 import parseError from "@/utils/parseError";
 import { updateOneCategory } from "@/fetch/category";
+import { updateInfiniteQueryData } from "@/utils/react-query";
 
 function EditCategoryModal({
   isOpenEditCategoryModal,
@@ -12,15 +13,26 @@ function EditCategoryModal({
   onCloseEditCategoryModal,
   category,
   refetch,
+  pageIndex,
 }) {
   const [categoryInputValue, setCategoryInputValue] = useState(category.name);
+  const queryClient = useQueryClient()
 
   const mutateEditCategory = useMutation({
     mutationFn: (newCategory) =>
       updateOneCategory({ id: category._id, newCategory }),
-    onSuccess: () => {
+    onSuccess: (data) => {
       onCloseEditCategoryModal();
-      refetch();
+      console.log(data);
+      
+      queryClient.setQueriesData([`categories`], (oldData) =>
+        updateInfiniteQueryData({
+          data: oldData,
+          pageIndex,
+          dataId: data._id,
+          newData: data,
+        })
+      );
     },
   });
 

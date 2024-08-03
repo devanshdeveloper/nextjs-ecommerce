@@ -12,7 +12,7 @@ export async function PUT(request) {
     }
     category.favorite = favorite;
     await category.save();
-    return Response.json({ category, success: true }, { status: 200 });
+    return Response.json(category, { status: 200 });
   } catch (err) {
     console.log(err);
     return Response.json({ error: err.message }, { status: 500 });

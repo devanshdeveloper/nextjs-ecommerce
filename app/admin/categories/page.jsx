@@ -10,13 +10,18 @@ import { createOneCategory, readAllCategory } from "@/fetch/category";
 import parseError from "@/utils/parseError";
 
 // HOOKS
-import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { useDebouncedCallback } from "use-debounce";
 import EditCategoryModal from "@/components/modals/category/EditCategoryModal";
 import DeleteOneCategoryModal from "@/components/modals/category/DeleteOneCategoryModal";
+import { pushInfiniteQueryData } from "@/utils/react-query";
 
 export default function CategoriesPage() {
   const router = useRouter();
@@ -29,6 +34,7 @@ export default function CategoriesPage() {
   const [categoryInputValue, setCategoryInputValue] = useState("");
   const [searchInputValue, setSearchInputValue] = useState("");
   const [searchValue, setSearchValue] = useState("");
+  const queryClient = useQueryClient();
 
   const {
     isOpen: isOpenEditCategoryModal,
@@ -70,8 +76,15 @@ export default function CategoriesPage() {
 
   const mutateCreateCategory = useMutation({
     mutationFn: (name) => createOneCategory({ name }),
-    onSuccess: () => {
-      refetch();
+    onSuccess: (data) => {
+      queryClient.setQueriesData(["categories"], (oldData) =>
+        pushInfiniteQueryData({
+          data: oldData,
+          pageIndex: 0,
+          newData: data,
+          pushIndex: 0,
+        })
+      );
     },
   });
 
@@ -104,14 +117,13 @@ export default function CategoriesPage() {
             variant="bordered"
             onValueChange={(value) => setCategoryInputValue(value)}
             value={categoryInputValue}
-            />
+          />
           <Button
             isLoading={mutateCreateCategory.isPending}
-            size="sm"
             color="primary"
             variant="bordered"
             type="submit"
-            >
+          >
             Add Category
           </Button>
           {mutateCreateCategory.error && (
@@ -141,17 +153,18 @@ export default function CategoriesPage() {
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 md:gap-10  p-2 sm:p-5 md:p-10 !pt-0">
         {data ? (
-          data.pages.map((page) => {
-            return page.data.map((category, i) => {
+          data.pages.map((page, i) => {
+            return page.data.map((category) => {
               return (
                 <CategoryCard
-                  key={i}
+                  key={category.name}
                   {...{
                     category,
                     onOpenChangeDeleteOneCategoryModal,
                     onOpenChangeEditCategoryModal,
                     setCurrentActionCategory,
-                    refetch
+                    refetch,
+                    pageIndex: i,
                   }}
                 />
               );
@@ -174,18 +187,7 @@ export default function CategoriesPage() {
         )}
       </div>
       <div className="h-full flex items-center justify-center" ref={ref}>
-        {hasNextPage && (
-          <Button
-            variant="flat"
-            color="primary"
-            size="lg"
-            isLoading={isFetching}
-            onPress={fetchNextPage}
-          >
-            Load More
-          </Button>
-        )}
-        {!hasNextPage && isFetching && <Spinner />}
+        {hasNextPage && isFetching && <Spinner />}
       </div>
       {currentActionCategory.action === "edit" && (
         <EditCategoryModal
@@ -198,6 +200,7 @@ export default function CategoriesPage() {
               currentActionCategory.action === "edit" &&
               currentActionCategory.category,
             refetch,
+            pageIndex: currentActionCategory.pageIndex,
           }}
         />
       )}
@@ -212,6 +215,7 @@ export default function CategoriesPage() {
               currentActionCategory.action === "delete" &&
               currentActionCategory.category,
             refetch,
+            pageIndex: currentActionCategory.pageIndex,
           }}
         />
       )}

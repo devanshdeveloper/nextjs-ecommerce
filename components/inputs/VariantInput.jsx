@@ -60,7 +60,7 @@ export default function VariantInput({ variants, setVariants, isRequired }) {
                 <Button
                   variant="outline"
                   size="sm"
-                  color="gray"
+                  color="foreground"
                   className="flex items-center justify-center"
                   onPress={() => deleteVariant(variantIndex)}
                 >
@@ -88,7 +88,7 @@ export default function VariantInput({ variants, setVariants, isRequired }) {
                       <Button
                         variant="outline"
                         size="sm"
-                        color="gray"
+                        color="foreground"
                         className="flex items-center justify-center"
                         onPress={() => deleteOption(variantIndex, optionIndex)}
                       >

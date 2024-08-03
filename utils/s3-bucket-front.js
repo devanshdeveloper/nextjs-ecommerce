@@ -51,15 +51,16 @@ export async function uploadImagesToBucket(images) {
         fileType,
       })),
     });
-    await Promise.all(
-      Object.entries(data).map(([Key, url]) => {
-        return fetch(url, {
+     await Promise.all(
+      Object.entries(data).map(async ([Key, {url , putObjectURL}]) => {
+        const res = await fetch(putObjectURL, {
           method: "PUT",
           body: images.find((image) => image.Key === Key).file,
         });
+        return await res.text();
       })
     );
-    return images.map((image) => image.Key);
+    return data;
   } catch (error) {
     console.log(error);
   }
@@ -67,6 +68,9 @@ export async function uploadImagesToBucket(images) {
 
 export async function getImageFromBucket({ Key }) {
   try {
+    if (Key.startsWith("/") || Key.startsWith("http")) {
+      return Key;
+    }
     const data = await fetchApi(`/api/s3-bucket/get/one?Key=${Key}`, {
       method: "POST",
     });

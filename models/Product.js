@@ -37,10 +37,6 @@ const ProductSchema = new mongoose.Schema({
         type: String,
         required: [true, "Please enter variant name"],
       },
-      inventory: {
-        type: Number,
-        required: [true, "Please enter variant inventory"],
-      },
       options: [
         {
           type: String,

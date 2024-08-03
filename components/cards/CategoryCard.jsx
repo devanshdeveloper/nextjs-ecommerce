@@ -1,10 +1,10 @@
-import { Button } from "@nextui-org/react";
 import { MdOutlineDelete, MdOutlineEdit } from "react-icons/md";
 import { FaRegHeart } from "react-icons/fa";
 import { FaHeart } from "react-icons/fa";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addToFavoritesCategory } from "@/fetch/category";
 import CardFrame from "./CardFrame";
+import { updateInfiniteQueryData } from "@/utils/react-query";
 
 function CategoryCard({
   category,
@@ -12,12 +12,22 @@ function CategoryCard({
   onOpenChangeEditCategoryModal,
   setCurrentActionCategory,
   refetch,
+  pageIndex,
 }) {
+  const queryClient = useQueryClient();
+
   const mutate_AddToFavorite = useMutation({
     mutationFn: (value) =>
       addToFavoritesCategory({ id: category._id, favorite: value }),
-    onSuccess: () => {
-      refetch();
+    onSuccess: (data) => {
+      queryClient.setQueriesData([`categories`], (oldData) =>
+        updateInfiniteQueryData({
+          data: oldData,
+          pageIndex,
+          dataId: data._id,
+          newData: data,
+        })
+      );
     },
   });
 
@@ -45,7 +55,7 @@ function CategoryCard({
           <button
             onClick={() => {
               onOpenChangeDeleteOneCategoryModal();
-              setCurrentActionCategory({ action: "delete", category });
+              setCurrentActionCategory({ action: "delete", category , pageIndex });
             }}
             className="p-2 rounded-full transition-colors duration-200 hover:bg-foreground-200 text-foreground-600"
           >
@@ -54,7 +64,7 @@ function CategoryCard({
           <button
             onClick={() => {
               onOpenChangeEditCategoryModal();
-              setCurrentActionCategory({ action: "edit", category });
+              setCurrentActionCategory({ action: "edit", category  , pageIndex });
             }}
             className="p-2 rounded-full transition-colors duration-200 hover:bg-red-200 text-red-600"
           >

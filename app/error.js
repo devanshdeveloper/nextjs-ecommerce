@@ -4,13 +4,13 @@ import Link from "next/link";
 
 function ErrorPage() {
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col justify-center items-center">
+    <div className="min-h-screen bg-foreground-100 flex flex-col justify-center items-center">
       <div className="text-center">
-        <h1 className="text-9xl font-bold text-gray-800">404</h1>
-        <p className="mt-4 text-2xl font-semibold text-gray-600">
+        <h1 className="text-9xl font-bold text-foreground-800">404</h1>
+        <p className="mt-4 text-2xl font-semibold text-foreground-600">
           Oops! Page not found
         </p>
-        <p className="mt-2 text-gray-500">
+        <p className="mt-2 text-foreground-500">
           Sorry, we couldn&apos;t find the page you&apos;re looking for.
         </p>
         <Link href="/">

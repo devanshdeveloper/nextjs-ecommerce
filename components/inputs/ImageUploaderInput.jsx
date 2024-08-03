@@ -57,10 +57,10 @@ function ImageUploaderInput({ acceptedImages, setAcceptedImages }) {
       <div className="">
         <div
           {...getRootProps()}
-          className="border-4 border-dashed border-gray-300 rounded-lg p-6 cursor-pointer text-center mb-4 hover:border-blue-500 transition duration-300 ease-in-out"
+          className="border-4 border-dashed border-foreground-300 rounded-lg p-6 cursor-pointer text-center mb-4 hover:border-blue-500 transition duration-300 ease-in-out"
         >
           <input {...getInputProps()} />
-          <p className="text-gray-500">
+          <p className="text-foreground-500">
             Drag &apos;n&apos; drop an image here, or click to select one
           </p>
         </div>

@@ -83,7 +83,7 @@ export default function UsersPage() {
 
   return (
     <div className="container mx-auto p-5 lg:p-10">
-      <div className="flex justify-center md:justify-end p-3 md:p-5">
+      <div className="flex justify-center md:justify-end">
         <Input
           className="w-full md:w-[300px] rounded-md "
           isClearable
@@ -103,26 +103,27 @@ export default function UsersPage() {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5 md:gap-8 lg:gap-10 p-5 md:p-10">
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5 md:gap-8 lg:gap-10 mt-5 md:mt-10">
         {users ? (
           users.map((user) => (
             <CardFrame
               onClick={() => router.push(`/admin/users/${user._id}/details`)}
               key={user?._id}
-              className="p-6 flex items-center gap-4"
+              className="p-4 flex items-center gap-4"
             >
-              <Avatar
-                size="lg"
-                shape="rounded"
-                className="w-16 h-16"
-                src={user.image}
-                name={user.name}
-              />
-              <div>
-                <div className="text-xl font-semibold text-foreground-800">
+              <div className="w-16 h-16">
+                <Avatar
+                  size="lg"
+                  shape="rounded"
+                  src={user.image}
+                  name={user.name}
+                />
+              </div>
+              <div className="w-full">
+                <div className="text-xl font-semibold text-foreground-800 truncate w-full">
                   {user.name}
                 </div>
-                <div className="text-sm text-foreground-500">{user.email}</div>
+                <div className="text-sm text-foreground-500 truncate w-full">{user.email}</div>
               </div>
             </CardFrame>
           ))

@@ -7,6 +7,12 @@ export async function POST(request) {
     await connectDB();
     const user = await User.findOne({ email: body.email });
     if (user) {
+      for (const key in body) {
+        if (body.hasOwnProperty(key)) {
+          user[key] = body[key];
+        }
+      }
+      await user.save();
       return Response.json(user, { status: 200 });
     }
     const newUser = await User.create(body);
