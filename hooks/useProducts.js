@@ -8,21 +8,13 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { useDebouncedCallback } from "use-debounce";
+import useInfiniteQueryExtended from "./useInfiniteQueryExtended";
 
 function useProducts(param) {
   const [searchInputValue, setSearchInputValue] = useState("");
   const [searchValue, setSearchValue] = useState("");
 
-  const {
-    data,
-    status,
-    error,
-    fetchNextPage,
-    isFetching,
-    hasNextPage,
-    isPending,
-    refetch,
-  } = useInfiniteQuery({
+  const queryResults = useInfiniteQueryExtended({
     queryKey: [...param.queryKey, searchValue],
     queryFn: (params) => {
       if (param?.queryFn) {
@@ -31,12 +23,6 @@ function useProducts(param) {
         return readAllProducts({ ...params, limit: 20, search: searchValue });
       }
     },
-    initialPageParam: 1,
-    getNextPageParam: (lastPage) => {
-      return lastPage.info.nextPage;
-    },
-    refetchOnWindowFocus: false,
-    retry: false,
     enabled: param.enabled === false ? false : true,
   });
 
@@ -45,30 +31,13 @@ function useProducts(param) {
     setSearchValue(search);
   }, 2000);
 
-  const { ref, inView } = useInView();
-
-  console.log(ref.current, inView);
-  useEffect(() => {
-    if (inView) {
-      fetchNextPage();
-    }
-  }, [inView, fetchNextPage]);
-
-  const products = (data && data?.pages?.flatMap((page) => page.data))?.filter(
-    (item) => item !== null
-  );
-
   return {
-    searchInputValue,
-    products,
-    ref,
-    debouncedMutateSearchProduct,
-    hasNextPage,
-    isFetching,
-    refetch,
+    ...queryResults,
     setSearchInputValue,
-    isPending,
-    error,
+    debouncedMutateSearchProduct,
+    searchInputValue,
+    searchValue,
+    setSearchValue,
   };
 }
 

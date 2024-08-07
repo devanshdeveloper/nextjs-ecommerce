@@ -1,19 +1,24 @@
 "use client";
 
-import AdminLayoutSpinner from "@/components/spinners/AdminLayoutSpinner";
-import AdminLayoutCover from "@/components/layout/AdminLayoutCover";
 import { readOneUser, deleteOneUser, updateOneUser } from "@/fetch/user";
 import { Avatar, Button, Select, SelectItem } from "@nextui-org/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import PageLayout from "@/components/layout/PageLayout";
+import PageLayoutSpinner from "@/components/spinners/PageLayoutSpinner";
+import useOptimisticMutation from "@/hooks/useOptimisticMutation";
+
 
 function UserDetailsPage() {
   const { id } = useParams();
   const router = useRouter();
-  const queryClient = useQueryClient();
-
-  const { data: pageUser, isPending } = useQuery({
+  const queryClient = useQueryClient()
+  const {
+    data: pageUser,
+    isPending,
+    error,
+  } = useQuery({
     queryKey: [`user_${id}`],
     queryFn: () => readOneUser({ id }),
     retry: false,
@@ -21,25 +26,37 @@ function UserDetailsPage() {
 
   const mutateDeleteUserById = useMutation({
     mutationFn: () => deleteOneUser({ id }),
+    
     onSuccess: () => {
+      queryClient.refetchQueries(["users"])
       router.push("/admin/users");
     },
   });
 
-  const mutateUpdateOneUser = useMutation({
+  const mutateUpdateOneUser = useOptimisticMutation({
     mutationFn: (newUser) => updateOneUser({ id, newUser }),
-    onSuccess: (data) => {
-      queryClient.setQueryData([`user_${id}`], () => ({ ...data }));
+    queryKeys: [`user_${id}`],
+    actionFunc(newUser, oldData) {
+      return { ...oldData, ...newUser };
     },
   });
 
   if (isPending) {
-    return <AdminLayoutSpinner />;
+    return <PageLayoutSpinner />;
+  }
+  if (error) {
+    return (
+      <PageLayout >
+        <h1>An error occurred while fetching user.</h1>
+        <p>{error.message}</p>
+        <p>Please try again later.</p>
+      </PageLayout>
+    );
   }
 
   if (!pageUser) {
     return (
-      <AdminLayoutCover>
+      <PageLayout>
         <div className="flex flex-col items-center gap-10">
           <div className="text-3xl">No User Found</div>
           <Button
@@ -51,7 +68,7 @@ function UserDetailsPage() {
             Back
           </Button>
         </div>
-      </AdminLayoutCover>
+      </PageLayout>
     );
   }
 
@@ -65,7 +82,6 @@ function UserDetailsPage() {
           <div className="flex gap-5 items-center">
             <Select
               label="Role"
-              isLoading={mutateUpdateOneUser.isPending}
               onSelectionChange={(value) => {
                 mutateUpdateOneUser.mutate({ role: [...value][0] });
               }}

@@ -1,91 +1,49 @@
 "use client";
 
-// UI COMPONENTS
-import CartCard from "@/components/cards/CartCard";
 import PageLayout from "@/components/layout/PageLayout";
-import { Button } from "@nextui-org/react";
-
-// HOOKS
-import {
-  useInfiniteQuery,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
-import { useEffect } from "react";
-import { useInView } from "react-intersection-observer";
-import { readProductsByIds } from "@/fetch/product";
-import { useParams, useRouter } from "next/navigation";
+import CartPage from "@/components/pages/CartPage";
 import PageLayoutSpinner from "@/components/spinners/PageLayoutSpinner";
 import { readOneUser } from "@/fetch/user";
-import useURL from "@/hooks/useURL";
-import CustomGrid from "@/components/layout/CustomGrid";
-import CartFooter from "@/components/CartFooter";
-import removeDuplicates from "@/utils/removeDuplicates";
+import { Button } from "@nextui-org/react";
+import { useQuery } from "@tanstack/react-query";
+import { useParams } from "next/navigation";
+import { useCallback } from "react";
 
-// UTILS
-
-function AdminCartPage() {
-  const [getSearchParams, setSearchParams] = useURL();
+function UserCartPage() {
   const { id } = useParams();
 
-  const { data: pageUser, isPending } = useQuery({
+  const {
+    data: pageUser,
+    isPending,
+    error,
+  } = useQuery({
     queryKey: [`user_${id}`],
     queryFn: () => readOneUser({ id }),
     retry: false,
   });
-
-  const productIds = removeDuplicates(
-    pageUser?.cart.map((cartItem) => cartItem.product)
+  const setUser = useCallback(
+    (...args) => queryClient.setQueryData([`user_${id}`], ...args),
+    [id]
   );
 
-  const router = useRouter();
-  const {
-    data,
-    status,
-    error,
-    fetchNextPage,
-    isFetching,
-    hasNextPage,
-    refetch,
-  } = useInfiniteQuery({
-    queryKey: [`cartProducts_${id}`, productIds?.join(", ")],
-    queryFn: (params) =>
-      readProductsByIds({
-        ...params,
-        limit: 20,
-        productIds,
-      }),
-    initialPageParam: 1,
-    getNextPageParam: (lastPage) => {
-      return lastPage.info.nextPage;
-    },
-    refetchOnWindowFocus: false,
-    retry: false,
-    enabled: !!pageUser?.cart?.length,
-  });
-
-  const { ref: loaderRef, inView } = useInView();
-  const queryClient = useQueryClient();
-  useEffect(() => {
-    if (inView) {
-      fetchNextPage();
+  function renderContent() {
+    if (isPending) {
+      return <PageLayoutSpinner />;
     }
-  }, [inView, fetchNextPage]);
-
-  const products = data && data.pages.flatMap((page) => page.data);
-
-  const product =
-    products &&
-    products.find(({ name }) => name === getSearchParams("product").product);
-
-  if (!pageUser?.cart?.length) {
-    return (
-      <PageLayout>
-        <div className="flex flex-col items-center gap-10">
-          <div className="text-3xl">
-            {pageUser?.name ?? "User"} Cart is Empty
-          </div>
-          <div className="flex gap-5">
+    if (error) {
+      return (
+        <PageLayout>
+          <h1>An error occurred while getting user details.</h1>
+          <p>{error.message}</p>
+          <p>Please try again later.</p>
+        </PageLayout>
+      );
+    }
+    if (!pageUser) {
+      return (
+        <PageLayout>
+          <div className="flex flex-col items-center gap-10">
+            <div className="text-3xl">No User Found</div>
             <Button
               variant="flat"
               color="primary"
@@ -95,54 +53,16 @@ function AdminCartPage() {
               Back
             </Button>
           </div>
-        </div>
-      </PageLayout>
+        </PageLayout>
+      );
+    }
+    return (
+      <>
+        <CartPage {...{ user: pageUser, setUser }} />
+      </>
     );
   }
-  if (status === "pending") {
-    return <PageLayoutSpinner />;
-  }
-  const setUser = (...args) =>
-    queryClient.setQueryData([`user_${id}`], ...args);
-
-  return (
-    <div className="flex flex-col items-center ">
-      <div className="w-[min(95vw,1250px)]">
-        <CustomGrid
-          title={`${pageUser.name}'s Cart`}
-          items={
-            products &&
-            pageUser?.cart.map((cartItem, i) => {
-              return (
-                <CartCard
-                  key={i}
-                  {...{
-                    product: products.find(
-                      (product) => cartItem.product === product?._id
-                    ),
-                    cartItem,
-                    user: pageUser,
-                    setUser,
-                  }}
-                />
-              );
-            })
-          }
-        />
-        <CartFooter
-          {...{
-            products,
-            ref: loaderRef,
-            hasNextPage,
-            fetchNextPage,
-            isFetching,
-            user: pageUser,
-            setUser,
-          }}
-        />
-      </div>
-    </div>
-  );
+  return renderContent();
 }
 
-export default AdminCartPage;
+export default UserCartPage;

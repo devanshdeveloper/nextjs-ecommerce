@@ -1,3 +1,5 @@
+import Zoom from "react-medium-image-zoom";
+import "react-medium-image-zoom/dist/styles.css";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import React, { useState } from "react";
@@ -17,13 +19,15 @@ function ImageListViewer({ images }) {
             transition={{ duration: 0.5 }}
             className="absolute w-full h-full"
           >
-            <Image
-              src={mainImage}
-              layout="fill"
-              objectFit="contain"
-              alt="Main"
-              className="border-2 border-foreground-300"
-            />
+            <Zoom>
+              <Image
+                src={mainImage}
+                width={500}
+                height={500}
+                alt="Main"
+                className="border-2 border-foreground-300"
+              />
+            </Zoom>
           </motion.div>
         </AnimatePresence>
       </div>

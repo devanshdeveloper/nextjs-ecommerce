@@ -1,9 +1,9 @@
 import MyModal from "../Modal";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@nextui-org/react";
 import parseError from "@/utils/parseError";
 import { deleteOneCategory } from "@/fetch/category";
 import { deleteInfiniteQueryData } from "@/utils/react-query";
+import useOptimisticMutation from "@/hooks/useOptimisticMutation";
 
 function DeleteOneCategoryModal({
   isOpenDeleteOneCategoryModal,
@@ -12,22 +12,20 @@ function DeleteOneCategoryModal({
   onCloseDeleteOneCategoryModal,
   category,
   pageIndex,
-  refetch,
 }) {
-  const queryClient = useQueryClient();
-  const mutateDeleteOneCategory = useMutation({
+  const mutateDeleteOneCategory = useOptimisticMutation({
+    infiniteQueryKeys: ["categories"],
     mutationFn: () => deleteOneCategory({ id: category._id }),
-    onSuccess: () => {
+    actionFunc: (_, oldData) => {
       onCloseDeleteOneCategoryModal();
-      queryClient.setQueriesData([`categories`], (oldData) =>
-        deleteInfiniteQueryData({
-          data: oldData,
-          pageIndex,
-          dataId: category._id,
-        })
-      );
+      return deleteInfiniteQueryData({
+        data: oldData,
+        pageIndex,
+        dataId: category._id,
+      });
     },
   });
+
 
   return (
     <MyModal

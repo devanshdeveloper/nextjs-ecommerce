@@ -1,7 +1,6 @@
 "use client";
 
 // UI COMPONENTS
-import AdminLayoutCover from "@/components/layout/AdminLayoutCover";
 import { Button, Input, Spinner, useDisclosure } from "@nextui-org/react";
 import CategoryCard from "@/components/cards/CategoryCard";
 
@@ -22,6 +21,10 @@ import { useDebouncedCallback } from "use-debounce";
 import EditCategoryModal from "@/components/modals/category/EditCategoryModal";
 import DeleteOneCategoryModal from "@/components/modals/category/DeleteOneCategoryModal";
 import { pushInfiniteQueryData } from "@/utils/react-query";
+import PageLayoutSpinner from "@/components/spinners/PageLayoutSpinner";
+import PageLayout from "@/components/layout/PageLayout";
+import useOptimisticMutation from "@/hooks/useOptimisticMutation";
+import useInfiniteQueryExtended from "@/hooks/useInfiniteQueryExtended";
 
 export default function CategoriesPage() {
   const router = useRouter();
@@ -51,22 +54,17 @@ export default function CategoriesPage() {
 
   const {
     data,
+    flatData: categories,
     status,
     error,
-    fetchNextPage,
-    isFetching,
+    ref,
     hasNextPage,
-    refetch,
-  } = useInfiniteQuery({
+    isFetching,
+    isPending,
+  } = useInfiniteQueryExtended({
     queryKey: ["categories", searchValue],
     queryFn: (params) =>
       readAllCategory({ ...params, limit: 20, search: searchValue }),
-    initialPageParam: 1,
-    getNextPageParam: (lastPage) => {
-      return lastPage.info.nextPage;
-    },
-    refetchOnWindowFocus: false,
-    retry: false,
   });
 
   const debouncedMutateSearchCategory = useDebouncedCallback((search) => {
@@ -74,27 +72,62 @@ export default function CategoriesPage() {
     setSearchValue(search);
   }, 2000);
 
-  const mutateCreateCategory = useMutation({
+  const mutateCreateCategory = useOptimisticMutation({
+    infiniteQueryKeys: ["categories"],
     mutationFn: (name) => createOneCategory({ name }),
-    onSuccess: (data) => {
-      queryClient.setQueriesData(["categories"], (oldData) =>
-        pushInfiniteQueryData({
-          data: oldData,
-          pageIndex: 0,
-          newData: data,
-          pushIndex: 0,
-        })
-      );
-    },
+    actionFunc: (newData, oldData) =>
+      pushInfiniteQueryData({
+        data: oldData,
+        pageIndex: 0,
+        newData: { name: newData, _id: "23455" },
+        pushIndex: "last",
+      }),
   });
 
-  const { ref, inView } = useInView();
-
-  useEffect(() => {
-    if (inView) {
-      fetchNextPage();
+  function renderContent() {
+    if (isPending) {
+      return <PageLayoutSpinner />;
     }
-  }, [inView, fetchNextPage]);
+    if (error) {
+      return (
+        <PageLayout>
+          <h1>An error occurred while fetching products.</h1>
+          <p>{error.message}</p>
+          <p>Please try again later.</p>
+        </PageLayout>
+      );
+    }
+    if (categories?.length === 0) {
+      return (
+        <PageLayout className={"flex-col gap-3"}>
+          <p className="text-2xl text-center">No categories found.</p>
+          {!searchValue && (
+            <p className="text-center">Add some categories to start.</p>
+          )}
+        </PageLayout>
+      );
+    }
+    return (
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 md:gap-10  p-2 sm:p-5 md:p-10 !pt-0">
+        {data.pages.map((page, i) => {
+          return page.data.map((category) => {
+            return (
+              <CategoryCard
+                key={category.name}
+                {...{
+                  category,
+                  onOpenChangeDeleteOneCategoryModal,
+                  onOpenChangeEditCategoryModal,
+                  setCurrentActionCategory,
+                  pageIndex: i,
+                }}
+              />
+            );
+          });
+        })}
+      </div>
+    );
+  }
 
   return (
     <>
@@ -151,41 +184,7 @@ export default function CategoriesPage() {
           }}
         />
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 md:gap-10  p-2 sm:p-5 md:p-10 !pt-0">
-        {data ? (
-          data.pages.map((page, i) => {
-            return page.data.map((category) => {
-              return (
-                <CategoryCard
-                  key={category.name}
-                  {...{
-                    category,
-                    onOpenChangeDeleteOneCategoryModal,
-                    onOpenChangeEditCategoryModal,
-                    setCurrentActionCategory,
-                    refetch,
-                    pageIndex: i,
-                  }}
-                />
-              );
-            });
-          })
-        ) : status === "pending" ? null : (
-          <AdminLayoutCover>
-            <div className="flex flex-col items-center gap-10">
-              <div className="text-3xl">No Categories Found</div>
-              <Button
-                variant="flat"
-                color="primary"
-                size="lg"
-                onPress={() => router.back()}
-              >
-                Back
-              </Button>
-            </div>
-          </AdminLayoutCover>
-        )}
-      </div>
+      {renderContent()}
       <div className="h-full flex items-center justify-center" ref={ref}>
         {hasNextPage && isFetching && <Spinner />}
       </div>
@@ -199,7 +198,6 @@ export default function CategoriesPage() {
             category:
               currentActionCategory.action === "edit" &&
               currentActionCategory.category,
-            refetch,
             pageIndex: currentActionCategory.pageIndex,
           }}
         />
@@ -214,7 +212,6 @@ export default function CategoriesPage() {
             category:
               currentActionCategory.action === "delete" &&
               currentActionCategory.category,
-            refetch,
             pageIndex: currentActionCategory.pageIndex,
           }}
         />

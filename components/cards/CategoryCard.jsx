@@ -11,7 +11,6 @@ function CategoryCard({
   onOpenChangeDeleteOneCategoryModal,
   onOpenChangeEditCategoryModal,
   setCurrentActionCategory,
-  refetch,
   pageIndex,
 }) {
   const queryClient = useQueryClient();

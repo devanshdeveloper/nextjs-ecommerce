@@ -5,6 +5,7 @@ import { Button, Input } from "@nextui-org/react";
 import parseError from "@/utils/parseError";
 import { updateOneCategory } from "@/fetch/category";
 import { updateInfiniteQueryData } from "@/utils/react-query";
+import useOptimisticMutation from "@/hooks/useOptimisticMutation";
 
 function EditCategoryModal({
   isOpenEditCategoryModal,
@@ -12,27 +13,23 @@ function EditCategoryModal({
   onOpenEditCategoryModal,
   onCloseEditCategoryModal,
   category,
-  refetch,
   pageIndex,
 }) {
   const [categoryInputValue, setCategoryInputValue] = useState(category.name);
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
-  const mutateEditCategory = useMutation({
+  const mutateEditCategory = useOptimisticMutation({
+    infiniteQueryKeys: ["categories"],
     mutationFn: (newCategory) =>
       updateOneCategory({ id: category._id, newCategory }),
-    onSuccess: (data) => {
+    actionFunc: (data, oldData) => {
       onCloseEditCategoryModal();
-      console.log(data);
-      
-      queryClient.setQueriesData([`categories`], (oldData) =>
-        updateInfiniteQueryData({
-          data: oldData,
-          pageIndex,
-          dataId: data._id,
-          newData: data,
-        })
-      );
+      updateInfiniteQueryData({
+        data: oldData,
+        pageIndex,
+        dataId: "q892eyq2",
+        newData: data,
+      });
     },
   });
 

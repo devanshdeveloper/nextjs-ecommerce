@@ -22,7 +22,7 @@ import parseError, { recursiveError } from "@/utils/parseError";
 
 // HOOKS
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ImageUploader from "@/components/inputs/ImageUploaderInput";
 import imageCompression from "browser-image-compression";
 import { validateProductForm } from "@/utils/formValidation";
@@ -31,6 +31,7 @@ import { getS3KeyFromUrl, urlToFile } from "@/utils/urlsToFiles";
 import { useRouter } from "next/navigation";
 import PageLayoutSpinner from "../spinners/PageLayoutSpinner";
 import PageLayout from "../layout/PageLayout";
+// import { products } from "@/dummy/products";
 function ProductForm({ editId }) {
   const router = useRouter();
   const [productInputValue, setProductInputValue] = useState(
@@ -40,20 +41,26 @@ function ProductForm({ editId }) {
     data: product,
     error: productQueryError,
     isPending,
-    isFetching
+    isFetching,
   } = useQuery({
     queryKey: ["product", editId],
     queryFn: async () => {
       const product = await readOneProduct({ id: editId });
-      const images = await Promise.all(
-        product.images.map(async (url) => {
-          const signedUrl = await getImageFromBucket({
-            Key: getS3KeyFromUrl(url),
-          });
-          return addPreviewToImage(await urlToFile(signedUrl));
-        })
-      );
-
+      let images = [];
+      try {
+        images = await Promise.all(
+          product.images.map(async (url) => {
+            const signedUrl = await getImageFromBucket({
+              Key: getS3KeyFromUrl(url),
+            });
+            return addPreviewToImage(await urlToFile(signedUrl));
+          })
+        );
+      } catch (error) {
+        if (productQueryError?.name === "TypeError") {
+          images = product.images.map((image) => ({ url: image }));
+        }
+      }
       setProductInputValue({
         name: product.name,
         description: product.description,
@@ -72,7 +79,6 @@ function ProductForm({ editId }) {
       console.log(data);
     },
   });
-  console.log(productQueryError);
 
   const [errors, setErrors] = useState([]);
 
@@ -114,7 +120,7 @@ function ProductForm({ editId }) {
     },
     onSuccess: (data) => {
       setProductInputValue(defaultProductFormValue());
-      router.push(`/admin/products/${data._id}/details`);
+      router.push(`/admin/products`);
     },
   });
 

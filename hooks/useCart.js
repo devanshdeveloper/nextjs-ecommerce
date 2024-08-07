@@ -83,7 +83,7 @@ function useCart({ product, nowVariants, user, setUser }) {
       }
 
       setCart(
-        user?.cart.map((cartItem) => {
+        user?.cart?.map((cartItem) => {
           if (
             cartItem.product === product?._id &&
             areVariantsEqual(cartItem.variants, currentVariants)

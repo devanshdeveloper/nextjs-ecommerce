@@ -19,7 +19,7 @@ function CartModal() {
   const [_, setSearchParams] = useURL();
 
   const productIds = removeDuplicates(
-    user?.cart.map((cartItem) => cartItem.product)
+    user?.cart?.map((cartItem) => cartItem.product)
   );
 
   const {
@@ -29,7 +29,6 @@ function CartModal() {
     fetchNextPage,
     isFetching,
     hasNextPage,
-    refetch,
   } = useInfiniteQuery({
     queryKey: ["cartProducts", `${productIds?.join(", ")}`],
     queryFn: (params) =>
@@ -125,7 +124,7 @@ function CartModal() {
           <h2 className="text-3xl font-bold text-foreground-700 mb-5">Cart</h2>
           <div className="flex flex-col gap-5">
             {products &&
-              user?.cart.map((cartItem, i) => {
+              user?.cart?.map((cartItem, i) => {
                 return (
                   <CartCard
                     key={i}

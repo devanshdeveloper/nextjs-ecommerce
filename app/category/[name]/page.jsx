@@ -37,7 +37,6 @@ export default function CategoryPage() {
     debouncedMutateSearchProduct,
     hasNextPage,
     isFetching,
-    refetch,
     setSearchInputValue,
     isPending,
     error,
@@ -69,7 +68,6 @@ export default function CategoryPage() {
               PageLayoutSpinner: PageLayoutSpinner,
               ProductCard: ProductCard,
               ref,
-              refetch,
             }}
           />
         )}

@@ -1,14 +1,12 @@
 "use client";
 
 // UI COMPONENTS
-import AdminLayoutCover from "@/components/layout/AdminLayoutCover";
 import { Button, Input } from "@nextui-org/react";
 
 // HOOKS
 import { useRouter } from "next/navigation";
 import useProducts from "@/hooks/useProducts";
 import Category from "@/components/Category";
-import AdminLayoutSpinner from "@/components/spinners/AdminLayoutSpinner";
 import AdminProductCard from "@/components/cards/AdminProductCard";
 import PageLayoutSpinner from "@/components/spinners/PageLayoutSpinner";
 import PageLayout from "@/components/layout/PageLayout";
@@ -18,14 +16,14 @@ export default function ProductsPage() {
 
   const {
     searchInputValue,
-    products,
+    flatData: products,
     ref,
     debouncedMutateSearchProduct,
     hasNextPage,
     isFetching,
     setSearchInputValue,
-    refetch,
     isPending,
+    totalCount,
     error,
   } = useProducts({
     queryKey: ["products"],
@@ -96,11 +94,11 @@ export default function ProductsPage() {
           isPending,
           hasNextPage,
           error,
-          PageLayout: AdminLayoutCover,
-          PageLayoutSpinner: AdminLayoutSpinner,
+          PageLayout: PageLayout,
+          PageLayoutSpinner: PageLayoutSpinner,
           ProductCard: AdminProductCard,
           ref,
-          refetch,
+          productsCount: totalCount,
         }}
       />
     </>
